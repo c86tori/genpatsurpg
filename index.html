@@ -1785,182 +1785,40 @@ button{font-family:inherit;color:inherit}
 
 
 /* ============================================================
-   v73 MOBILE SAFE LAYOUT
-   PC版は維持。スマホ横画面だけ、縮小ではなく縦長の制御端末として並べ替える。
-   ゲームロジックには触れず、CSS配置だけで安全に調整。
+   v72 MOBILE MINI CONSOLE
+   スマホ横画面では、通常ブラウザ/ホーム画面アプリを問わずPC版制御卓を縮小表示
 ============================================================ */
 html.mobile-mini-console,
 html.mobile-mini-console body{
   width:100%;
-  min-height:100%;
-  height:auto;
-  overflow-x:hidden;
-  overflow-y:auto;
-  background:#050607;
-  touch-action:manipulation;
+  height:100%;
+  overflow:hidden;
+  background:var(--bg);
+  touch-action:none;
   overscroll-behavior:none;
   -webkit-text-size-adjust:none;
   text-size-adjust:none;
 }
 html.mobile-mini-console #game-root{
-  position:relative;
-  inset:auto;
-  width:100vw;
-  min-height:1160px;
-  height:1160px;
-  overflow:visible;
-  transform:none!important;
+  position:fixed;
+  left:0;
+  top:0;
+  right:auto;
+  bottom:auto;
+  width:calc(100dvw / var(--mini-console-scale, .42));
+  height:calc(100dvh / var(--mini-console-scale, .42));
+  transform:scale(var(--mini-console-scale, .42));
+  transform-origin:top left;
 }
-/* スマホのカメラ/ステータス領域を避ける黒い上部スペース */
-html.mobile-mini-console #game-root::before{
-  content:'MOBILE REACTOR TERMINAL';
-  position:absolute;
-  left:0;right:0;top:0;height:86px;
-  display:flex;align-items:center;justify-content:center;
-  color:rgba(234,246,255,.88);
-  font-family:var(--fj);font-weight:700;font-size:15px;letter-spacing:.06em;
-  background:#020304;
-  z-index:20;
-  pointer-events:none;
+html.mobile-mini-console #orientation-gate{
+  transform:none;
 }
-html.mobile-mini-console #zone-atmosphere,
-html.mobile-mini-console #zone-atmosphere-next{position:absolute;inset:0;min-height:1160px}
-html.mobile-mini-console #three-canvas{
-  position:absolute!important;
-  left:12px!important;right:12px!important;top:136px!important;bottom:auto!important;
-  width:calc(100vw - 24px)!important;height:350px!important;
-  border:1px solid rgba(255,255,255,.75);
-  z-index:1;
-}
-html.mobile-mini-console .topbar{
-  position:absolute!important;
-  left:12px!important;right:12px!important;top:86px!important;
-  height:50px!important;min-height:0!important;
-  padding:0!important;gap:0!important;
-  display:block!important;
-  z-index:22!important;
-  overflow:visible;
-  clip-path:none;
-  border-color:rgba(91,231,255,.24);
-}
-html.mobile-mini-console .tb-title,
-html.mobile-mini-console .tb-clock{display:none!important}
-html.mobile-mini-console .tb-pills{
-  display:grid!important;
-  grid-template-columns:repeat(4,1fr)!important;
-  width:100%!important;height:100%!important;
-  gap:0!important;
-}
-html.mobile-mini-console .top-action-btn,
-html.mobile-mini-console .pill.zone-pill{
-  min-width:0!important;width:100%!important;height:50px!important;
-  padding:6px 8px!important;
-  border-top:none!important;border-bottom:none!important;border-left:none!important;
-  border-right:1px solid rgba(91,231,255,.16)!important;
-  background:rgba(6,16,28,.82)!important;
-  clip-path:none!important;
-}
-html.mobile-mini-console .top-action-btn b,
-html.mobile-mini-console .pill.zone-pill b{font-size:8px!important;letter-spacing:.12em!important}
-html.mobile-mini-console .top-action-btn .sub,
-html.mobile-mini-console .pill.zone-pill span{font-size:11px!important;line-height:1.15!important}
-html.mobile-mini-console .top-action-btn .glyph{font-size:30px!important;right:-5px!important;bottom:-8px!important}
-
-html.mobile-mini-console .command-panel{
-  position:absolute!important;
-  left:12px!important;right:12px!important;top:496px!important;bottom:auto!important;
-  width:auto!important;transform:none!important;
-  padding:9px 10px 10px!important;
-  z-index:24!important;
-  clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
-}
-html.mobile-mini-console .command-panel.active{animation:none!important}
-html.mobile-mini-console .cmd-instructions{font-size:9px!important;margin-bottom:7px!important}
-html.mobile-mini-console .cmd-row-battle,
-html.mobile-mini-console .cmd-row-idle{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
-html.mobile-mini-console .command-panel.idle-mode .cmd-row-battle,
-html.mobile-mini-console .command-panel.battle-mode .cmd-row-idle{display:none!important}
-html.mobile-mini-console .cmd-menu-row{display:contents!important}
-html.mobile-mini-console .cmd-row-battle .cmd-btn,
-html.mobile-mini-console .cmd-row-idle .cmd-btn,
-html.mobile-mini-console .cmd-explore-big{min-height:54px!important;padding:8px 10px!important}
-html.mobile-mini-console .cmd-btn b,
-html.mobile-mini-console .cmd-explore-big b{font-size:12px!important}
-html.mobile-mini-console .cmd-btn .sub,
-html.mobile-mini-console .cmd-explore-big .sub{display:block!important;font-size:8px!important}
-html.mobile-mini-console .cmd-btn .glyph,
-html.mobile-mini-console .cmd-explore-big .arrow{font-size:44px!important;right:-7px!important;bottom:-13px!important}
-
-html.mobile-mini-console .message-log{
-  display:block;
-  position:absolute!important;
-  left:12px!important;right:auto!important;top:612px!important;bottom:auto!important;
-  width:300px!important;height:156px!important;
-  z-index:18!important;
-}
-html.mobile-mini-console .message-log .ph,
-html.mobile-mini-console .player-status .ph,
-html.mobile-mini-console .reactor-status .ph{height:28px!important;padding:0 10px!important}
-html.mobile-mini-console .message-log .pbody{padding:8px 10px!important}
-html.mobile-mini-console #message-log-inner{font-size:10.5px!important;line-height:1.5!important;min-height:0!important;gap:3px!important}
-html.mobile-mini-console #message-log-inner .msg-line:nth-child(n+4){display:none!important}
-
-html.mobile-mini-console .player-status{
-  position:absolute!important;
-  left:12px!important;top:780px!important;bottom:auto!important;
-  width:300px!important;
-  z-index:18!important;
-}
-html.mobile-mini-console .reactor-status{
-  position:absolute!important;
-  right:12px!important;left:auto!important;top:650px!important;bottom:auto!important;
-  width:300px!important;
-  z-index:18!important;
-}
-html.mobile-mini-console .player-status .pbody,
-html.mobile-mini-console .reactor-status .pbody{padding:9px 11px!important}
-html.mobile-mini-console .gear-grid .slot:nth-child(2),
-html.mobile-mini-console .gear-grid .slot:nth-child(3){display:block!important}
-html.mobile-mini-console .system-row{font-size:10.5px!important;padding:3px 1px 4px!important}
-html.mobile-mini-console .system-row .stat{font-size:9px!important;padding:1px 6px!important}
-html.mobile-mini-console .repair-progress{font-size:18px!important}
-html.mobile-mini-console .reactor-action-btn{min-height:38px!important;padding:7px 10px!important}
-
-html.mobile-mini-console .enemy-status{
-  position:absolute!important;
-  left:50%!important;top:146px!important;bottom:auto!important;
-  width:min(420px,calc(100vw - 48px))!important;min-width:0!important;
-  z-index:26!important;
-}
-
-/* イベント時はスマホ表示領域の中央に重ねる。下のパネル配置には干渉させない。 */
-html.mobile-mini-console .story-overlay{
-  position:fixed!important;
-  inset:0!important;
-  z-index:70!important;
-  background:rgba(0,0,0,.55)!important;
-}
-html.mobile-mini-console .story-window{
-  position:fixed!important;
-  left:50%!important;top:50%!important;bottom:auto!important;
-  transform:translate(-50%,-50%)!important;
-  width:min(78vw,680px)!important;
-  min-height:170px!important;
-  padding:22px 26px 32px!important;
-  z-index:75!important;
-}
-html.mobile-mini-console .story-window.active{animation:none!important}
-html.mobile-mini-console .sw-body{font-size:15px!important;line-height:2!important}
-
-html.mobile-mini-console .frame-corner{display:none!important}
-html.mobile-mini-console #orientation-gate{transform:none}
-
-@media (max-width:760px) and (orientation:landscape){
-  html.mobile-mini-console #three-canvas{height:330px!important}
-  html.mobile-mini-console .command-panel{top:476px!important}
-  html.mobile-mini-console .message-log{top:590px!important;width:280px!important}
-  html.mobile-mini-console .player-status{top:756px!important;width:280px!important}
-  html.mobile-mini-console .reactor-status{top:628px!important;width:280px!important}
+html.mobile-mini-console .topbar,
+html.mobile-mini-console .side-panel,
+html.mobile-mini-console .bottom-panel,
+html.mobile-mini-console .battle-log{
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
 }
 
 /* ============================================================
@@ -1984,6 +1842,16 @@ html.mobile-mini-console #orientation-gate{transform:none}
   backdrop-filter:blur(12px);
 }
 #orientation-gate.active{ display:flex; }
+/* ============================================================
+   v74 MOBILE: no orientation gate
+   スマホは縦横どちらでも表示するため、端末姿勢異常アラートは常に無効化
+============================================================ */
+#orientation-gate,
+#orientation-gate.active{
+  display:none !important;
+  pointer-events:none !important;
+}
+
 .orientation-card{
   width:min(520px, 92vw);
   border:1px solid rgba(91,231,255,.42);
@@ -7730,17 +7598,18 @@ function updateMobileMiniConsole() {
   }
 }
 function updateOrientationGate() {
+  // v74: スマホ用レイアウトは縦横どちらでも表示するため、姿勢ゲートは無効。
   updateMobileMiniConsole();
   const gate = document.getElementById('orientation-gate');
   const status = document.getElementById('orientation-status');
-  if (!gate) return;
-  const shouldBlock = isMobileLikeDevice() && isPortraitViewport();
-  gate.classList.toggle('active', shouldBlock);
-  gate.setAttribute('aria-hidden', shouldBlock ? 'false' : 'true');
+  if (gate) {
+    gate.classList.remove('active');
+    gate.setAttribute('aria-hidden', 'true');
+  }
   if (status) {
-    if (shouldBlock) status.textContent = 'WAITING FOR LANDSCAPE SIGNAL';
-    else if (document.documentElement.classList.contains('mobile-mini-console')) status.textContent = 'MOBILE SAFE LAYOUT ONLINE';
-    else status.textContent = 'LANDSCAPE SIGNAL CONFIRMED';
+    status.textContent = document.documentElement.classList.contains('mobile-mini-console')
+      ? 'MINI CONSOLE MODE ONLINE'
+      : 'ORIENTATION GATE DISABLED';
   }
 }
 async function requestImmersiveLandscape() {
