@@ -2004,7 +2004,20 @@ button{font-family:inherit;color:inherit}
   .player-status .upgrade-entry-btn:hover:not(:disabled){
     transform:translateY(calc(-50% - 1px));
   }
+  .player-status .upgrade-entry-btn:not(:disabled){
+    border-color:rgba(255,194,77,.95);
+    background:rgba(255,194,77,.16);
+    color:#fff6bf;
+    box-shadow:0 0 24px rgba(255,194,77,.22), inset 0 0 14px rgba(255,194,77,.08);
+    text-shadow:0 0 12px rgba(255,194,77,.55);
+    animation:upgradeEntryBlink .85s ease-in-out infinite;
+  }
+  @keyframes upgradeEntryBlink{
+    0%,100%{filter:brightness(1);opacity:.86}
+    50%{filter:brightness(1.75);opacity:1}
+  }
 }
+
 
 
 /* ============================================================
@@ -2354,8 +2367,7 @@ window.RENDER_DIM = function(){
           </div>
           <div class="slot">
             <b>Accessory</b>
-            <span class="val" id="player-accessory">なし</span>
-            <span class="sub" id="player-heart-state">未取得</span>
+            <span class="gear-line"><span class="val" id="player-accessory">なし</span><span class="sub gear-stat" id="player-heart-state">(未取得)</span></span>
           </div>
         </div>
         <div class="status-icons" id="player-status-icons"></div>
@@ -8211,7 +8223,7 @@ class GameController {
     if (atkEl) atkEl.textContent = p.getAtk();
     if (defEl) defEl.textContent = p.getDef();
     if (accessoryEl) accessoryEl.textContent = p.getAccessoryName();
-    if (heartStateEl) heartStateEl.textContent = p.hasCitizenHeart ? (p.hasHeartEquipped() ? 'ATK×2 DEF×3' : '所持中') : '未取得';
+    if (heartStateEl) heartStateEl.textContent = p.hasCitizenHeart ? (p.hasHeartEquipped() ? '(ATK×2 DEF×3)' : '(所持中)') : '(未取得)';
     // 防具表示
     const armorEl = document.getElementById('player-armor');
     const armorFxEl = document.getElementById('player-armor-effect');
