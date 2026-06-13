@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -463,10 +463,31 @@ button{font-family:inherit;color:inherit}
 .cmd-menu-row .cmd-btn b{font-size:12px}
 
 /* 依頼達成の注意喚起 */
-.cmd-btn.attention{border-color:rgba(255,194,77,.7);box-shadow:0 0 22px rgba(255,194,77,.18)}
+.cmd-btn.attention{
+  border-color:rgba(255,194,77,1)!important;
+  background:linear-gradient(180deg,rgba(255,194,77,.24),rgba(255,79,94,.10),rgba(6,12,20,.74))!important;
+  box-shadow:0 0 0 1px rgba(255,194,77,.35) inset,0 0 30px rgba(255,194,77,.42),0 0 56px rgba(255,79,94,.18)!important;
+  animation:questRewardPulse .72s infinite alternate;
+}
+.cmd-btn.attention b{color:#fff7ce!important;text-shadow:0 0 12px rgba(255,194,77,.8)}
+.cmd-btn.attention .sub{color:var(--amber)!important;text-shadow:0 0 12px rgba(255,194,77,.7)}
 .cmd-btn.attention::before{
-  content:"";position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;
-  background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1s infinite;
+  content:"受領可";position:absolute;top:4px;right:5px;padding:2px 5px;border-radius:999px;
+  font-family:var(--fm);font-size:9px;font-weight:900;letter-spacing:.08em;line-height:1;
+  color:#170b00;background:var(--amber);box-shadow:0 0 14px var(--amber);animation:blink .55s infinite;
+}
+.cmd-btn.attention::after{
+  content:"";position:absolute;inset:-3px;border:1px solid rgba(255,194,77,.72);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  pointer-events:none;animation:questRewardScan 1.05s infinite;
+}
+@keyframes questRewardPulse{
+  from{filter:brightness(1);transform:translateY(0)}
+  to{filter:brightness(1.35);transform:translateY(-1px)}
+}
+@keyframes questRewardScan{
+  0%,100%{opacity:.25;box-shadow:0 0 8px rgba(255,194,77,.25)}
+  50%{opacity:1;box-shadow:0 0 26px rgba(255,194,77,.75)}
 }
 
 /* ============================================================
@@ -1764,36 +1785,38 @@ button{font-family:inherit;color:inherit}
 
 
 /* ============================================================
-   v71 STANDALONE MINI CONSOLE
-   ホーム画面追加アプリ版・横画面ではPC版制御卓を縮小表示
+   v72 MOBILE MINI CONSOLE
+   スマホ横画面では、通常ブラウザ/ホーム画面アプリを問わずPC版制御卓を縮小表示
 ============================================================ */
-html.standalone-mini-console,
-html.standalone-mini-console body{
+html.mobile-mini-console,
+html.mobile-mini-console body{
   width:100%;
   height:100%;
   overflow:hidden;
   background:var(--bg);
   touch-action:none;
   overscroll-behavior:none;
+  -webkit-text-size-adjust:none;
+  text-size-adjust:none;
 }
-html.standalone-mini-console #game-root{
+html.mobile-mini-console #game-root{
   position:fixed;
   left:0;
   top:0;
   right:auto;
   bottom:auto;
-  width:calc(100dvw / var(--mini-console-scale, .5));
-  height:calc(100dvh / var(--mini-console-scale, .5));
-  transform:scale(var(--mini-console-scale, .5));
+  width:calc(100dvw / var(--mini-console-scale, .42));
+  height:calc(100dvh / var(--mini-console-scale, .42));
+  transform:scale(var(--mini-console-scale, .42));
   transform-origin:top left;
 }
-html.standalone-mini-console #orientation-gate{
+html.mobile-mini-console #orientation-gate{
   transform:none;
 }
-html.standalone-mini-console .topbar,
-html.standalone-mini-console .side-panel,
-html.standalone-mini-console .bottom-panel,
-html.standalone-mini-console .battle-log{
+html.mobile-mini-console .topbar,
+html.mobile-mini-console .side-panel,
+html.mobile-mini-console .bottom-panel,
+html.mobile-mini-console .battle-log{
   -webkit-font-smoothing:antialiased;
   text-rendering:geometricPrecision;
 }
@@ -7548,19 +7571,24 @@ function isPortraitViewport() {
 function isStandaloneDisplayMode() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
-function updateStandaloneMiniConsole() {
-  const isMini = isStandaloneDisplayMode() && isMobileLikeDevice() && !isPortraitViewport();
-  document.documentElement.classList.toggle('standalone-mini-console', isMini);
-  if (document.body) document.body.classList.toggle('standalone-mini-console', isMini);
+function updateMobileMiniConsole() {
+  // v72: 実機でstandalone判定が通らない端末があるため、スマホ横画面なら強制的にミニ制御卓化する。
+  const isMini = isMobileLikeDevice() && !isPortraitViewport();
+  document.documentElement.classList.toggle('mobile-mini-console', isMini);
+  document.documentElement.classList.toggle('standalone-mini-console', false);
+  if (document.body) {
+    document.body.classList.toggle('mobile-mini-console', isMini);
+    document.body.classList.toggle('standalone-mini-console', false);
+  }
   if (isMini) {
-    const scale = Math.max(0.42, Math.min(0.58, window.innerHeight / 850));
+    const scale = Math.max(0.34, Math.min(0.46, window.innerHeight / 1000));
     document.documentElement.style.setProperty('--mini-console-scale', scale.toFixed(3));
   } else {
     document.documentElement.style.removeProperty('--mini-console-scale');
   }
 }
 function updateOrientationGate() {
-  updateStandaloneMiniConsole();
+  updateMobileMiniConsole();
   const gate = document.getElementById('orientation-gate');
   const status = document.getElementById('orientation-status');
   if (!gate) return;
@@ -7569,7 +7597,7 @@ function updateOrientationGate() {
   gate.setAttribute('aria-hidden', shouldBlock ? 'false' : 'true');
   if (status) {
     if (shouldBlock) status.textContent = 'WAITING FOR LANDSCAPE SIGNAL';
-    else if (document.documentElement.classList.contains('standalone-mini-console')) status.textContent = 'MINI CONSOLE MODE ONLINE';
+    else if (document.documentElement.classList.contains('mobile-mini-console')) status.textContent = 'MINI CONSOLE MODE ONLINE';
     else status.textContent = 'LANDSCAPE SIGNAL CONFIRMED';
   }
 }
@@ -9916,15 +9944,18 @@ ${flavor}`;
     if (changed) this.updateQuestAttention();
   }
   updateQuestAttention() {
-    const btn = document.getElementById('quest-btn');
-    if (!btn) return;
+    const buttons = [document.getElementById('quest-btn'), document.getElementById('top-quest-btn')].filter(Boolean);
+    if (!buttons.length) return;
     const closed = !!(game && game.finalProcurementClosed);
     const lockedByObservation = !!(game && !game.mutantObservationUnlocked);
-    btn.classList.toggle('attention', !closed && !lockedByObservation && (game.quests || []).some(q => q.done));
-    btn.classList.toggle('quest-closed', closed || lockedByObservation);
-    btn.disabled = closed || lockedByObservation || game.state !== 'IDLE';
-    const sub = btn.querySelector('.sub');
-    if (sub) sub.textContent = closed ? '処理完了' : (lockedByObservation ? '観測待機' : 'クエスト');
+    const claimable = !closed && !lockedByObservation && (game.quests || []).some(q => q.done);
+    buttons.forEach(btn => {
+      btn.classList.toggle('attention', claimable);
+      btn.classList.toggle('quest-closed', closed || lockedByObservation);
+      btn.disabled = closed || lockedByObservation || game.state !== 'IDLE';
+      const sub = btn.querySelector('.sub');
+      if (sub) sub.textContent = claimable ? '報酬受領可' : (closed ? '処理完了' : (lockedByObservation ? '観測待機' : (btn.id === 'top-quest-btn' ? '依頼' : 'クエスト')));
+    });
   }
   openQuestMenu() {
     if (!game.mutantObservationUnlocked) {
