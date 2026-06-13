@@ -360,11 +360,11 @@ button{font-family:inherit;color:inherit}
 .gear-advisor-notice .quiet{color:var(--muted)}
 
 /* ---------- バトルログ（左下 BATTLE LOG） ---------- */
-.message-log{left:14px;bottom:118px;width:296px;display:none}
+.message-log{position:fixed;left:14px;bottom:14px;width:296px;display:none}
 .message-log .pbody{padding:10px 12px}
-#message-log-inner{min-height:72px}
+#message-log-inner{min-height:189px}
 .message-log.active{display:block}
-#message-log-inner{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.55;min-height:84px}
+#message-log-inner{display:flex;flex-direction:column;gap:4px;font-size:12px;line-height:1.55;min-height:270px}
 .msg-line{opacity:.5;transition:opacity .3s;padding-left:9px;border-left:2px solid rgba(125,147,168,.35)}
 .msg-line.new{opacity:1}
 .msg-line.attack{color:#ffb38a;border-left-color:#ff8a30}
@@ -2020,6 +2020,91 @@ button{font-family:inherit;color:inherit}
 
 
 
+
+
+/* ============================================================
+   v80 PC CORE SYSTEMS CLEANUP
+   未修復はすべて「異常」表示。必要LVは異常の左に小さく表示。
+   REPAIR PROGRESS行はPC版では非表示。
+============================================================ */
+@media (min-width:681px){
+  .reactor-status .repair-foot{ display:none!important; }
+  .reactor-status .system-row{
+    gap:8px;
+  }
+  .reactor-status .system-row .system-state{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    min-width:0;
+    flex:0 0 auto;
+  }
+  .reactor-status .system-row .repair-req{
+    font-family:var(--fm);
+    font-size:7.5px;
+    letter-spacing:.02em;
+    color:var(--muted);
+    white-space:nowrap;
+    opacity:.9;
+  }
+  .reactor-status .system-row .stat.broken{
+    animation:none!important;
+    color:var(--red);
+    border-color:rgba(255,79,94,.52);
+    background:rgba(255,79,94,.055);
+    text-shadow:none;
+  }
+}
+
+
+
+/* ============================================================
+   v81 PC CORE SYSTEMS WIDTH / REPAIR BUTTON COMPACT
+   CORE SYSTEMSをOPERATORと同幅にして左右対称化。
+   原発修復ボタンは1行表記に圧縮。
+============================================================ */
+@media (min-width:681px){
+  .reactor-status{ width:296px!important; }
+  .reactor-actions{ margin-top:8px!important; }
+  .reactor-status .reactor-action-btn{
+    min-height:34px!important;
+    padding:6px 10px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:7px!important;
+    text-align:left!important;
+  }
+  .reactor-status .reactor-action-btn b{
+    display:inline!important;
+    font-size:12px!important;
+    line-height:1.1!important;
+    letter-spacing:.08em!important;
+    white-space:nowrap!important;
+  }
+  .reactor-status .reactor-action-btn .sub{
+    display:inline!important;
+    margin-top:0!important;
+    font-size:8px!important;
+    line-height:1.1!important;
+    letter-spacing:.04em!important;
+    white-space:nowrap!important;
+    color:#8dffae!important;
+  }
+  .reactor-status .reactor-action-btn .glyph{
+    font-size:32px!important;
+    right:-5px!important;
+    bottom:-11px!important;
+  }
+}
+@media (min-width:1021px) and (max-width:1240px){
+  .reactor-status{ width:262px!important; }
+}
+@media (min-width:681px) and (max-width:1020px){
+  .reactor-status{ width:236px!important; }
+}
+
 /* ============================================================
    ★スマホ縦レイアウト v2（PC版不変／後勝ち上書き）
    構成（上から）:
@@ -2187,6 +2272,112 @@ button{font-family:inherit;color:inherit}
   .story-window .sw-title{ font-size:8.5px!important; }
   .story-window .sw-tag,.story-window .sw-hint{ font-size:7px!important; }
   .story-window .sw-next{ font-size:8.5px!important; }
+}
+
+
+/* ============================================================
+   v82 REQUEST alert / modal front window (PC)
+============================================================ */
+@media (min-width:681px){
+  .top-action-btn.quest-link.reward-ready{
+    border-color:rgba(255,194,77,.95)!important;
+    color:#fff6df!important;
+    background:linear-gradient(180deg,rgba(82,50,10,.78),rgba(18,10,2,.78))!important;
+    box-shadow:0 0 34px rgba(255,194,77,.36), inset 0 0 26px rgba(255,194,77,.10)!important;
+    animation:requestRewardPulse .86s ease-in-out infinite!important;
+  }
+  .top-action-btn.quest-link.reward-ready .sub{
+    color:var(--amber)!important;
+    text-shadow:0 0 16px rgba(255,194,77,.85)!important;
+    font-weight:900!important;
+  }
+  /* v83: REWARD badge removed; it was clipped above the button. */
+  @keyframes requestRewardPulse{
+    0%,100%{filter:brightness(1);transform:translateY(0)}
+    50%{filter:brightness(1.42);transform:translateY(-1px)}
+  }
+  #hud.quest-modal-open::before{
+    content:'';position:fixed;inset:0;z-index:43;pointer-events:auto;
+    background:rgba(0,3,7,.70);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .sub-menu.quest-sheet{
+    position:fixed!important;left:50%!important;top:50%!important;bottom:auto!important;right:auto!important;
+    transform:translate(-50%,-50%)!important;
+    width:min(760px,calc(100vw - 38px))!important;
+    max-height:calc(100vh - 70px)!important;
+    z-index:44!important;
+    background:linear-gradient(180deg,rgba(8,18,30,.98),rgba(4,8,14,.96))!important;
+    border:1px solid var(--line-strong)!important;
+    box-shadow:0 30px 110px rgba(0,0,0,.82),0 0 70px rgba(91,231,255,.12)!important;
+    clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px))!important;
+  }
+  .sub-menu.quest-sheet h4{
+    font-size:15px!important;letter-spacing:.22em!important;padding:17px 22px 14px!important;
+    background:linear-gradient(90deg,rgba(91,231,255,.13),rgba(255,194,77,.055),transparent)!important;
+  }
+  .sub-menu.quest-sheet .sub-list{
+    padding:16px 20px!important;gap:10px!important;
+  }
+  .sub-menu.quest-sheet .sub-row{
+    padding:13px 15px!important;font-size:13px!important;
+  }
+  .sub-menu.quest-sheet .sub-row.quest-done{
+    border-color:rgba(255,194,77,.82)!important;
+    background:linear-gradient(90deg,rgba(255,194,77,.12),rgba(109,255,141,.055))!important;
+    box-shadow:0 0 28px rgba(255,194,77,.16)!important;
+    animation:questRowReadyPulse 1.05s ease-in-out infinite;
+  }
+  @keyframes questRowReadyPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.22)}}
+  .sub-menu.quest-sheet .sub-back{
+    margin:0 auto 16px;width:min(260px,calc(100% - 40px));min-height:44px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--fd);font-size:12px;font-weight:900;letter-spacing:.24em;
+    color:var(--cyan);border:1px solid rgba(91,231,255,.42);background:rgba(91,231,255,.06);
+    clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  }
+  .sub-menu.quest-sheet .sub-back:hover{
+    color:#fff;background:rgba(91,231,255,.16);box-shadow:0 0 26px rgba(91,231,255,.18);
+  }
+}
+
+/* ============================================================
+   v83 REQUEST reward label cleanup / Meltdown Sewer King balance
+   報酬受領可の上にはみ出していたREWARDバッジを廃止。
+   ボタン内の2行だけで完結させる。
+============================================================ */
+@media (min-width:681px){
+  .top-action-btn.quest-link.reward-ready{
+    overflow:hidden!important;
+    min-height:42px!important;
+    padding:6px 10px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    gap:2px!important;
+  }
+  .top-action-btn.quest-link.reward-ready::after{
+    content:none!important;
+    display:none!important;
+  }
+  .top-action-btn.quest-link.reward-ready b{
+    display:block!important;
+    font-size:8px!important;
+    line-height:1!important;
+    letter-spacing:.18em!important;
+    color:#ffe39a!important;
+  }
+  .top-action-btn.quest-link.reward-ready .sub{
+    display:block!important;
+    margin-top:0!important;
+    font-size:11px!important;
+    line-height:1.1!important;
+    letter-spacing:.06em!important;
+    white-space:nowrap!important;
+    color:var(--amber)!important;
+    text-shadow:0 0 16px rgba(255,194,77,.85)!important;
+    font-weight:900!important;
+  }
 }
 
 </style>
@@ -2399,7 +2590,7 @@ window.RENDER_DIM = function(){
           <div class="repair-progress" id="repair-progress">0 / 6</div>
         </div>
         <div class="reactor-actions">
-          <button class="cmd-btn reactor-action-btn" data-cmd="reactor" id="reactor-hud-btn"><span class="glyph">炉</span><b>原発修復</b><span class="sub">基幹システム</span></button>
+          <button class="cmd-btn reactor-action-btn" data-cmd="reactor" id="reactor-hud-btn"><span class="glyph">炉</span><b>原発修復</b><span class="sub">（基幹システム）</span></button>
         </div>
       </div>
     </section>
@@ -3622,7 +3813,7 @@ const MONSTERS = [
     "tierName": "ボス級",
     "modelType": "boss",
     "baseHP": 262,
-    "baseATK": 54,
+    "baseATK": 49,
     "baseEXP": 182,
     "baseGold": 127,
     "skills": [
@@ -8223,7 +8414,7 @@ class GameController {
     if (atkEl) atkEl.textContent = p.getAtk();
     if (defEl) defEl.textContent = p.getDef();
     if (accessoryEl) accessoryEl.textContent = p.getAccessoryName();
-    if (heartStateEl) heartStateEl.textContent = p.hasCitizenHeart ? (p.hasHeartEquipped() ? '(ATK×2 DEF×3)' : '(所持中)') : '(未取得)';
+    if (heartStateEl) heartStateEl.textContent = p.hasCitizenHeart ? (p.hasHeartEquipped() ? 'ATK×2 DEF×3' : '所持中') : '未取得';
     // 防具表示
     const armorEl = document.getElementById('player-armor');
     const armorFxEl = document.getElementById('player-armor-effect');
@@ -8338,7 +8529,7 @@ class GameController {
       const repairable = this.getFirstRepairableSystem();
       reactorHudBtn.classList.toggle('repair-ready', !!repairable);
       const sub = reactorHudBtn.querySelector('.sub');
-      if (sub) sub.textContent = repairable ? `${repairable.name} 修復可能` : '基幹システム';
+      if (sub) sub.textContent = repairable ? `（${repairable.name} 修復可能）` : '（基幹システム）';
     }
     // 大型探索ボタン
     document.querySelectorAll('.cmd-explore-big').forEach(btn => {
@@ -8502,12 +8693,14 @@ class GameController {
       row.className = 'system-row';
       const fixed = game.repairedSystems.has(sys.key);
       const locked = game.player.lv < sys.levelReq;
-      const stat = fixed ? 'fixed' : (locked ? 'locked' : 'broken');
-      const label = fixed ? '正常' : (locked ? `Lv${sys.levelReq}` : '異常');
-      row.innerHTML = `<span>${sys.name}</span><span class="stat ${stat}">${label}</span>`;
+      const stat = fixed ? 'fixed' : 'broken';
+      const reqLabel = fixed ? '' : `<span class="repair-req">（LV${sys.levelReq}で修復可能）</span>`;
+      const label = fixed ? '正常' : '異常';
+      row.innerHTML = `<span>${sys.name}</span><span class="system-state">${reqLabel}<span class="stat ${stat}">${label}</span></span>`;
       wrap.appendChild(row);
     });
-    document.getElementById('repair-progress').textContent = `${game.repairedSystems.size} / 6`;
+    const progressEl = document.getElementById('repair-progress');
+    if (progressEl) progressEl.textContent = `${game.repairedSystems.size} / 6`;
     const repairable = this.getFirstRepairableSystem();
     const reactorPanel = document.querySelector('.reactor-status');
     const reactorBtn = document.getElementById('reactor-hud-btn');
@@ -8516,7 +8709,7 @@ class GameController {
       reactorBtn.classList.toggle('repair-ready', !!repairable);
       reactorBtn.disabled = game.state !== 'IDLE';
       const sub = reactorBtn.querySelector('.sub');
-      if (sub) sub.textContent = repairable ? `${repairable.name} 修復可能` : '基幹システム';
+      if (sub) sub.textContent = repairable ? `（${repairable.name} 修復可能）` : '（基幹システム）';
     }
   }
   log(entry) {
@@ -9147,7 +9340,12 @@ class GameController {
   }
   closeSubMenu() {
     game.subMenu = null;
-    document.getElementById('sub-menu').classList.remove('active','upgrade-sheet');
+    const subMenu = document.getElementById('sub-menu');
+    if (subMenu) subMenu.classList.remove('active','upgrade-sheet','quest-sheet');
+    const hud = document.getElementById('hud');
+    if (hud) hud.classList.remove('quest-modal-open');
+    const back = document.getElementById('sub-back');
+    if (back) back.textContent = '← 戻る';
     document.getElementById('command-panel').classList.add('active');
   }
   openStoryMenu() {
@@ -10245,14 +10443,24 @@ ${flavor}`;
   }
   updateQuestAttention() {
     const btn = document.getElementById('quest-btn');
-    if (!btn) return;
+    const topBtn = document.getElementById('top-quest-btn');
     const closed = !!(game && game.finalProcurementClosed);
     const lockedByObservation = !!(game && !game.mutantObservationUnlocked);
-    btn.classList.toggle('attention', !closed && !lockedByObservation && (game.quests || []).some(q => q.done));
-    btn.classList.toggle('quest-closed', closed || lockedByObservation);
-    btn.disabled = closed || lockedByObservation || game.state !== 'IDLE';
-    const sub = btn.querySelector('.sub');
-    if (sub) sub.textContent = closed ? '処理完了' : (lockedByObservation ? '観測待機' : 'クエスト');
+    const hasReward = !closed && !lockedByObservation && (game.quests || []).some(q => q.done);
+    if (btn) {
+      btn.classList.toggle('attention', hasReward);
+      btn.classList.toggle('quest-closed', closed || lockedByObservation);
+      btn.disabled = closed || lockedByObservation || game.state !== 'IDLE';
+      const sub = btn.querySelector('.sub');
+      if (sub) sub.textContent = closed ? '処理完了' : (lockedByObservation ? '観測待機' : (hasReward ? '報酬受領可' : 'クエスト'));
+    }
+    if (topBtn) {
+      topBtn.classList.toggle('attention', hasReward);
+      topBtn.classList.toggle('reward-ready', hasReward);
+      topBtn.classList.toggle('quest-closed', closed || lockedByObservation);
+      const topSub = topBtn.querySelector('.sub');
+      if (topSub) topSub.textContent = closed ? '処理完了' : (lockedByObservation ? '観測待機' : (hasReward ? '報酬受領可' : '依頼'));
+    }
   }
   openQuestMenu() {
     if (!game.mutantObservationUnlocked) {
@@ -10270,7 +10478,15 @@ ${flavor}`;
     game.subMenu = 'quest';
     document.getElementById('sub-menu-title').textContent = '─ 依頼端末 / 業務委託管理システム ─';
     document.getElementById('command-panel').classList.remove('active');
-    document.getElementById('sub-menu').classList.add('active');
+    const hud = document.getElementById('hud');
+    if (hud) hud.classList.add('quest-modal-open');
+    const subMenu = document.getElementById('sub-menu');
+    if (subMenu) {
+      subMenu.classList.remove('upgrade-sheet');
+      subMenu.classList.add('active','quest-sheet');
+    }
+    const back = document.getElementById('sub-back');
+    if (back) back.textContent = '閉じる';
     this.renderQuestMenu();
   }
   renderQuestMenu() {
