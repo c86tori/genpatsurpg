@@ -1869,6 +1869,144 @@ button{font-family:inherit;color:inherit}
 }
 
 
+
+/* ============================================================
+   v76 PC OPERATOR COMPACT REBUILD
+   PC版のみ：OPERATOR上段を横組み化し、ITEM欄を削除した密度へ調整
+============================================================ */
+@media (min-width:681px){
+  .player-status .pbody{ padding:10px 12px 12px; }
+  .operator-vitals{
+    display:grid;
+    grid-template-columns: 118px 1fr;
+    align-items:center;
+    gap:9px;
+    margin-bottom:7px;
+  }
+  .operator-vitals .status-name{
+    margin:0!important;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    min-width:0;
+  }
+  .operator-vitals .status-name>span:first-child{
+    font-size:26px;
+    line-height:1;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .operator-vitals .status-name .lv{
+    font-size:8px;
+    padding:3px 6px;
+    letter-spacing:.08em;
+    white-space:nowrap;
+  }
+  .operator-vitals .status-name .lv b{
+    font-size:12px;
+    margin-left:3px;
+  }
+  .operator-vitals .vital-stack{
+    display:grid;
+    gap:4px;
+    min-width:0;
+  }
+  .operator-vitals .bar-wrap{
+    margin:0!important;
+    height:16px;
+  }
+  .operator-vitals .mp-bar{ height:14px; }
+  .operator-vitals .bar-wrap .label{
+    font-size:9.5px;
+    padding:0 7px;
+  }
+  .player-status .exp-bar{
+    height:5px;
+    margin:0 0 8px!important;
+  }
+  .player-status .gold-row{
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    margin-bottom:8px;
+  }
+  .player-status .gold-row .mini{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:6px 9px;
+    min-height:32px;
+  }
+  .player-status .gold-row .mini b{
+    font-size:8px;
+    letter-spacing:.18em;
+    line-height:1;
+  }
+  .player-status .gold-row .mini span{
+    font-size:12px;
+    line-height:1;
+    white-space:nowrap;
+  }
+  .player-status .gear-grid{
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+  .player-status .slot{
+    padding:7px 8px 8px;
+    min-height:0;
+  }
+  .player-status .slot b{
+    font-size:8px;
+    letter-spacing:.18em;
+    margin-bottom:4px;
+  }
+  .player-status .slot .gear-line{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    min-width:0;
+    padding-right:74px;
+  }
+  .player-status .slot .val{
+    display:inline;
+    font-size:11.5px;
+    line-height:1.25;
+    margin:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .player-status .slot .gear-stat{
+    display:inline;
+    font-family:var(--fm);
+    font-size:8px;
+    letter-spacing:.01em;
+    line-height:1;
+    color:var(--muted);
+    margin:0;
+    white-space:nowrap;
+  }
+  .player-status .slot .gear-stat .num{
+    color:var(--cyan);
+    font-size:8px;
+  }
+  .player-status .slot .sub:not(.gear-stat){
+    font-size:9px;
+    line-height:1.25;
+  }
+  .player-status .upgrade-entry-btn{
+    top:50%;
+    transform:translateY(-50%);
+    font-size:8px;
+    padding:3px 6px;
+  }
+  .player-status .upgrade-entry-btn:hover:not(:disabled){
+    transform:translateY(calc(-50% - 1px));
+  }
+}
+
+
 /* ============================================================
    ★スマホ縦レイアウト v2（PC版不変／後勝ち上書き）
    構成（上から）:
@@ -2179,18 +2317,22 @@ window.RENDER_DIM = function(){
     <section class="hud-panel player-status">
       <div class="ph"><span class="pt">Operator</span><span class="pm">修復技師</span></div>
       <div class="pbody">
-        <div class="status-name">
-          <span id="player-name">技師</span>
-          <span class="lv">LV<b id="player-lv">1</b></span>
-        </div>
-        <div class="bar-wrap hp-bar">
-          <div class="bar-ghost" id="player-hp-ghost" style="width:100%"></div>
-          <div class="bar" id="player-hp-bar" style="width:100%"></div>
-          <div class="label"><span>HP</span><span id="player-hp-text">30/30</span></div>
-        </div>
-        <div class="bar-wrap mp-bar">
-          <div class="bar" id="player-mp-bar" style="width:100%"></div>
-          <div class="label"><span>MP</span><span id="player-mp-text">10/10</span></div>
+        <div class="operator-vitals">
+          <div class="status-name">
+            <span id="player-name">技師</span>
+            <span class="lv">LV<b id="player-lv">1</b></span>
+          </div>
+          <div class="vital-stack">
+            <div class="bar-wrap hp-bar">
+              <div class="bar-ghost" id="player-hp-ghost" style="width:100%"></div>
+              <div class="bar" id="player-hp-bar" style="width:100%"></div>
+              <div class="label"><span>HP</span><span id="player-hp-text">30/30</span></div>
+            </div>
+            <div class="bar-wrap mp-bar">
+              <div class="bar" id="player-mp-bar" style="width:100%"></div>
+              <div class="label"><span>MP</span><span id="player-mp-text">10/10</span></div>
+            </div>
+          </div>
         </div>
         <div class="bar-wrap exp-bar">
           <div class="bar" id="player-exp-bar" style="width:0%"></div>
@@ -2202,24 +2344,18 @@ window.RENDER_DIM = function(){
         <div class="gear-grid">
           <div class="slot">
             <b>Weapon</b>
-            <span class="val" id="player-weapon">緊急用レンチ</span>
-            <span class="sub">ATK <span class="num" id="player-atk">8</span> / DEF <span class="num" id="player-def">4</span></span>
+            <span class="gear-line"><span class="val" id="player-weapon">緊急用レンチ</span><span class="sub gear-stat">(ATK<span class="num" id="player-atk">8</span>/DEF<span class="num" id="player-def">4</span>)</span></span>
             <button class="upgrade-entry-btn" id="weapon-upgrade-btn" type="button" disabled>資材不足</button>
           </div>
           <div class="slot">
             <b>Armor</b>
-            <span class="val" id="player-armor">支給作業服</span>
-            <span class="sub" id="player-armor-effect"></span>
+            <span class="gear-line"><span class="val" id="player-armor">支給作業服</span><span class="sub gear-stat" id="player-armor-effect"></span></span>
             <button class="upgrade-entry-btn" id="armor-upgrade-btn" type="button" disabled>資材不足</button>
           </div>
           <div class="slot">
             <b>Accessory</b>
             <span class="val" id="player-accessory">なし</span>
             <span class="sub" id="player-heart-state">未取得</span>
-          </div>
-          <div class="slot">
-            <b>Item</b>
-            <span class="sub" id="player-items-mini">回復薬×3 / エーテル×1 / 解毒剤×1</span>
           </div>
         </div>
         <div class="status-icons" id="player-status-icons"></div>
@@ -8085,7 +8221,7 @@ class GameController {
       const fx = [];
       if (a.defBonus) fx.push(`DEF+${a.defBonus}`);
       if (a.hpBonus) fx.push(`HP+${a.hpBonus}`);
-      armorFxEl.textContent = fx.join(' ');
+      armorFxEl.textContent = `(DEF+${a.defBonus || 0}${a.hpBonus ? `/HP+${a.hpBonus}` : ''})`;
     }
     const itemMiniEl = document.getElementById('player-items-mini');
     if (itemMiniEl) itemMiniEl.textContent = `回復薬×${p.items.potion || 0} / エーテル×${p.items.ether || 0} / 解毒剤×${p.items.antidote || 0}`;
