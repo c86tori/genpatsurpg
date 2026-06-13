@@ -2,10 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>足立区原発 ─ 最後の制御棒 ─</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -463,31 +460,10 @@ button{font-family:inherit;color:inherit}
 .cmd-menu-row .cmd-btn b{font-size:12px}
 
 /* 依頼達成の注意喚起 */
-.cmd-btn.attention{
-  border-color:rgba(255,194,77,1)!important;
-  background:linear-gradient(180deg,rgba(255,194,77,.24),rgba(255,79,94,.10),rgba(6,12,20,.74))!important;
-  box-shadow:0 0 0 1px rgba(255,194,77,.35) inset,0 0 30px rgba(255,194,77,.42),0 0 56px rgba(255,79,94,.18)!important;
-  animation:questRewardPulse .72s infinite alternate;
-}
-.cmd-btn.attention b{color:#fff7ce!important;text-shadow:0 0 12px rgba(255,194,77,.8)}
-.cmd-btn.attention .sub{color:var(--amber)!important;text-shadow:0 0 12px rgba(255,194,77,.7)}
+.cmd-btn.attention{border-color:rgba(255,194,77,.7);box-shadow:0 0 22px rgba(255,194,77,.18)}
 .cmd-btn.attention::before{
-  content:"受領可";position:absolute;top:4px;right:5px;padding:2px 5px;border-radius:999px;
-  font-family:var(--fm);font-size:9px;font-weight:900;letter-spacing:.08em;line-height:1;
-  color:#170b00;background:var(--amber);box-shadow:0 0 14px var(--amber);animation:blink .55s infinite;
-}
-.cmd-btn.attention::after{
-  content:"";position:absolute;inset:-3px;border:1px solid rgba(255,194,77,.72);
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
-  pointer-events:none;animation:questRewardScan 1.05s infinite;
-}
-@keyframes questRewardPulse{
-  from{filter:brightness(1);transform:translateY(0)}
-  to{filter:brightness(1.35);transform:translateY(-1px)}
-}
-@keyframes questRewardScan{
-  0%,100%{opacity:.25;box-shadow:0 0 8px rgba(255,194,77,.25)}
-  50%{opacity:1;box-shadow:0 0 26px rgba(255,194,77,.75)}
+  content:"";position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;
+  background:var(--amber);box-shadow:0 0 12px var(--amber);animation:blink 1s infinite;
 }
 
 /* ============================================================
@@ -1782,45 +1758,6 @@ button{font-family:inherit;color:inherit}
 }
 
 
-
-
-/* ============================================================
-   v72 MOBILE MINI CONSOLE
-   スマホ横画面では、通常ブラウザ/ホーム画面アプリを問わずPC版制御卓を縮小表示
-============================================================ */
-html.mobile-mini-console,
-html.mobile-mini-console body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:var(--bg);
-  touch-action:none;
-  overscroll-behavior:none;
-  -webkit-text-size-adjust:none;
-  text-size-adjust:none;
-}
-html.mobile-mini-console #game-root{
-  position:fixed;
-  left:0;
-  top:0;
-  right:auto;
-  bottom:auto;
-  width:calc(100dvw / var(--mini-console-scale, .42));
-  height:calc(100dvh / var(--mini-console-scale, .42));
-  transform:scale(var(--mini-console-scale, .42));
-  transform-origin:top left;
-}
-html.mobile-mini-console #orientation-gate{
-  transform:none;
-}
-html.mobile-mini-console .topbar,
-html.mobile-mini-console .side-panel,
-html.mobile-mini-console .bottom-panel,
-html.mobile-mini-console .battle-log{
-  -webkit-font-smoothing:antialiased;
-  text-rendering:geometricPrecision;
-}
-
 /* ============================================================
    v68 MOBILE LANDSCAPE GATE
    スマホ縦画面では制御卓エラーとしてゲーム操作を停止
@@ -1842,16 +1779,6 @@ html.mobile-mini-console .battle-log{
   backdrop-filter:blur(12px);
 }
 #orientation-gate.active{ display:flex; }
-/* ============================================================
-   v74 MOBILE: no orientation gate
-   スマホは縦横どちらでも表示するため、端末姿勢異常アラートは常に無効化
-============================================================ */
-#orientation-gate,
-#orientation-gate.active{
-  display:none !important;
-  pointer-events:none !important;
-}
-
 .orientation-card{
   width:min(520px, 92vw);
   border:1px solid rgba(91,231,255,.42);
@@ -1941,9 +1868,206 @@ html.mobile-mini-console .battle-log{
   50%{ transform:rotate(0deg) scale(1.05); opacity:1; }
 }
 
+
+/* ============================================================
+   ★スマホ縦レイアウト（PC版には影響しない／後勝ちで上書き）
+   - フィールド = 画面幅いっぱいの正方形
+   - その下に：上部バー → コマンド → バトルログ → OPERATOR → CORE SYSTEMS を縦積み
+   - 文字はスマホの都合を無視して確実に縮小（text-size-adjust固定）
+   - 縦スクロールでHUD全体を見られる
+============================================================ */
+@media (max-width:680px) and (orientation:portrait){
+
+  /* iOS等の自動拡大を無効化し、指定サイズを確実に効かせる */
+  html{ -webkit-text-size-adjust:none!important; text-size-adjust:none!important; }
+
+  /* 全体を縦スクロール可能な通常フローへ */
+  html,body{ position:static!important; overflow-y:auto!important; overflow-x:hidden!important;
+    height:auto!important; min-height:100%!important; background:#04070c!important; }
+
+  #game-root{ position:static!important; inset:auto!important; width:100%!important; height:auto!important;
+    min-height:100vh!important; overflow:visible!important; }
+
+  /* 画面フレーム装飾はスマホでは隠す */
+  .frame-corner{ display:none!important; }
+
+  /* --- フィールド：画面幅の正方形（上部固定エリア） --- */
+  #three-canvas{
+    position:fixed!important; top:0!important; left:0!important;
+    width:100vw!important; height:100vw!important; /* 正方形 */
+    inset:auto!important; z-index:1!important;
+  }
+  #zone-atmosphere,#zone-atmosphere-next{
+    position:fixed!important; top:0!important; left:0!important;
+    width:100vw!important; height:100vw!important; inset:auto!important; z-index:1!important;
+  }
+
+  /* --- HUD：正方形フィールドの下に通常フローで縦積み --- */
+  #hud{
+    position:static!important; inset:auto!important; display:block!important;
+    width:100%!important; height:auto!important; z-index:10!important;
+    margin-top:100vw!important; /* 正方形フィールドのぶんだけ下げる */
+    padding:0 0 24px!important; pointer-events:auto!important;
+  }
+  /* phase-shifting等でdisplay:noneにされてもスマホでは積みを維持 */
+  #hud.phase-shifting{ display:block!important; }
+
+  /* 各パネルを絶対配置から通常フローの帯へ */
+  .topbar,.player-status,.reactor-status,.message-log,.command-panel{
+    position:static!important; inset:auto!important; left:auto!important; right:auto!important;
+    top:auto!important; bottom:auto!important; transform:none!important;
+    width:auto!important; max-width:none!important; min-width:0!important;
+    margin:7px 6px 0!important; box-sizing:border-box!important;
+  }
+
+  /* 並び順を指定（flexのorderではなくDOM順だが、念のためhud内をflex化して制御） */
+  #hud{ display:flex!important; flex-direction:column!important; }
+  .topbar{ order:1!important; }
+  .command-panel{ order:2!important; }
+  .message-log{ order:3!important; display:block!important; }
+  .player-status{ order:4!important; }
+  .reactor-status{ order:5!important; }
+  .enemy-status{ order:0!important; } /* 戦闘時の敵ターゲットは最上段（フィールド直下） */
+
+  /* --- 上部バー：4項目を横1行に強制（文字を縮めてでも収める） --- */
+  .topbar{
+    height:auto!important; min-height:0!important; padding:5px 6px!important;
+    flex-wrap:nowrap!important; gap:3px!important; align-items:stretch!important;
+    background:linear-gradient(180deg,rgba(9,19,32,.92),rgba(4,8,14,.85))!important;
+    border:1px solid var(--line)!important;
+  }
+  .topbar .tb-title{ display:none!important; } /* タイトルはタイトル画面にあるので省略 */
+  .topbar .tb-clock{ display:none!important; }
+  .topbar .tb-pills{
+    display:flex!important; flex-direction:row!important; flex-wrap:nowrap!important;
+    gap:3px!important; width:100%!important; margin:0!important;
+  }
+  .topbar .tb-pills > *{
+    flex:1 1 0!important; min-width:0!important; margin:0!important;
+    padding:3px 2px!important; overflow:hidden!important;
+  }
+  /* 上部バー内の文字を極小に（確実に収める） */
+  .topbar .top-action-btn b,.topbar .zone-pill b{ font-size:6.5px!important; letter-spacing:.04em!important; line-height:1.1!important; }
+  .topbar .top-action-btn .sub,.topbar .zone-pill span{ font-size:7px!important; letter-spacing:0!important; line-height:1.15!important; white-space:nowrap!important; }
+  .topbar .top-action-btn .glyph{ font-size:13px!important; right:1px!important; bottom:-3px!important; opacity:.18!important; }
+
+  /* --- コマンドデッキ --- */
+  .command-panel{
+    padding:8px 8px 9px!important;
+    clip-path:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)!important;
+  }
+  .command-panel.active{ animation:none!important; }
+  .cmd-instructions{ font-size:8px!important; margin-bottom:5px!important; letter-spacing:.08em!important; }
+  .cmd-mode-tag{ font-size:7px!important; padding:3px 8px 2px!important; left:14px!important; }
+
+  .cmd-row-battle{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:4px!important; }
+  .cmd-menu-row{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:4px!important; }
+  .cmd-explore-big{ width:100%!important; padding:7px 9px!important; margin-bottom:5px!important; }
+
+  .cmd-btn{ padding:6px 5px!important; min-height:0!important; }
+  .cmd-btn b{ font-size:8.5px!important; letter-spacing:.02em!important; line-height:1.15!important; }
+  .cmd-btn .sub{ font-size:6.5px!important; letter-spacing:0!important; line-height:1.1!important; }
+  .cmd-btn .glyph{ font-size:24px!important; right:-2px!important; bottom:-6px!important; }
+  .cmd-explore-big .arrow{ font-size:20px!important; }
+  .cmd-explore-big b{ font-size:11px!important; }
+  .cmd-explore-big .sub{ font-size:7px!important; }
+
+  /* --- パネル共通（見出し・本文の縮小） --- */
+  .hud-panel{ backdrop-filter:none!important; -webkit-backdrop-filter:none!important; }
+  .hud-panel .ph{ padding:4px 8px!important; }
+  .hud-panel .ph .pt{ font-size:8px!important; letter-spacing:.12em!important; }
+  .hud-panel .ph .pm{ font-size:7px!important; }
+  .hud-panel .pbody{ padding:7px 8px!important; }
+
+  /* --- OPERATOR（プレイヤー） --- */
+  .player-status .status-name #player-name{ font-size:13px!important; }
+  .player-status .status-name .lv{ font-size:8px!important; }
+  .player-status .status-name .lv b{ font-size:11px!important; }
+  .bar-wrap{ height:13px!important; }
+  .bar-wrap .label{ font-size:7px!important; }
+  .bar-wrap .label span{ font-size:7px!important; }
+  .exp-bar{ height:4px!important; }
+  .gold-row{ margin-top:5px!important; }
+  .gold-row .mini b{ font-size:6.5px!important; }
+  .gold-row .mini span{ font-size:9px!important; }
+  .gear-grid{ gap:4px!important; margin-top:5px!important; }
+  .gear-grid .slot{ padding:5px 6px!important; }
+  .gear-grid .slot b{ font-size:6.5px!important; }
+  .gear-grid .slot .val{ font-size:9px!important; }
+  .gear-grid .slot .sub{ font-size:7px!important; }
+  .gear-grid .slot .num{ font-size:8px!important; }
+  .upgrade-entry-btn{ font-size:7px!important; padding:2px 5px!important; }
+
+  /* --- CORE SYSTEMS（炉心） --- */
+  .reactor-status .system-list{ gap:2px!important; }
+  .reactor-status .system-row{ padding:4px 2px!important; font-size:9px!important; }
+  .reactor-status .system-row > span:first-child{ font-size:9px!important; }
+  .reactor-status .system-row .stat{ font-size:7.5px!important; padding:1px 5px!important; }
+  .repair-foot{ font-size:7px!important; padding-top:5px!important; }
+  .repair-foot span{ font-size:7px!important; }
+  .repair-progress{ font-size:13px!important; }
+  .reactor-action-btn b{ font-size:9px!important; }
+  .reactor-action-btn .sub{ font-size:6.5px!important; }
+  .reactor-action-btn .glyph{ font-size:24px!important; }
+
+  /* --- バトルログ --- */
+  .message-log #message-log-inner{ min-height:0!important; max-height:96px!important; overflow-y:auto!important; }
+  .message-log .msg-line{ font-size:8.5px!important; line-height:1.45!important; }
+  .message-log .msg-line:nth-child(n+5){ display:none!important; } /* スマホは最新4件 */
+
+  /* --- 敵ターゲット（戦闘時、フィールド直下に） --- */
+  .enemy-status{
+    position:static!important; inset:auto!important; transform:none!important;
+    width:auto!important; margin:7px 6px 0!important; padding:7px 9px!important;
+  }
+  .enemy-status .ename{ font-size:11px!important; }
+  .enemy-status .enemy-tier{ font-size:7px!important; }
+
+  /* --- ストーリーウインドウ：フィールド下側に固定表示 --- */
+  .story-overlay{ position:fixed!important; inset:0!important; z-index:60!important; }
+  .story-window{
+    position:fixed!important; left:6px!important; right:6px!important; bottom:8px!important;
+    top:auto!important; width:auto!important; max-width:none!important; transform:none!important;
+    min-height:120px!important; max-height:42vh!important; overflow-y:auto!important; z-index:70!important;
+    padding:12px 13px 16px!important;
+  }
+  .story-window .sw-body,.story-window p{ font-size:11px!important; line-height:1.7!important; }
+  .story-window .sw-title{ font-size:9px!important; }
+  .story-window .sw-tag,.story-window .sw-hint{ font-size:7.5px!important; }
+  .story-window .sw-next{ font-size:9px!important; }
+
+  /* モーダル類（図鑑・依頼・改修など）は全画面寄せで可読性確保 */
+  .modal-window,.dex-window,.quest-window,.upgrade-window{
+    font-size:11px!important;
+  }
+}
+
+/* 横画面スマホ：従来の横レイアウトを尊重しつつ自動拡大だけ無効化 */
+@media (max-width:900px) and (orientation:landscape){
+  html{ -webkit-text-size-adjust:none!important; text-size-adjust:none!important; }
+}
+
 </style>
 </head>
 <body>
+<script>
+/* ============================================================
+   ★スマホ縦レイアウト：レンダリング解像度ヘルパー
+   PC・横画面では従来どおり window 全面。
+   スマホ縦のときだけ「画面幅の正方形」を返し、3Dを正方形領域に収める。
+   （PC版の挙動は一切変えない）
+============================================================ */
+window.RENDER_DIM = function(){
+  try{
+    var portrait = window.matchMedia('(max-width:680px) and (orientation:portrait)').matches;
+    if (portrait){
+      var side = Math.max(2, Math.round(window.innerWidth));
+      return { w: side, h: side };
+    }
+  }catch(e){}
+  return { w: Math.max(2, window.innerWidth), h: Math.max(2, window.innerHeight) };
+};
+</script>
 <div id="game-root">
   <div id="zone-atmosphere"></div>
   <div id="zone-atmosphere-next"></div>
@@ -3717,7 +3841,8 @@ class Scene3D {
   }
   // ============ ポストプロセス（ブルーム＋色収差＋グレイン） ============
   initPost() {
-    const w = Math.max(2, window.innerWidth), h = Math.max(2, window.innerHeight);
+    const _d = (window.RENDER_DIM ? window.RENDER_DIM() : { w: window.innerWidth, h: window.innerHeight });
+    const w = Math.max(2, _d.w), h = Math.max(2, _d.h);
     const pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
     const post = {
       rtScene: new THREE.WebGLRenderTarget(w, h, pars),
@@ -3796,8 +3921,9 @@ class Scene3D {
     this.post = post;
   }
   handleResize() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const dim = (window.RENDER_DIM ? window.RENDER_DIM() : { w: window.innerWidth, h: window.innerHeight });
+    const w = dim.w;
+    const h = dim.h;
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
@@ -7577,40 +7703,14 @@ function isMobileLikeDevice() {
 function isPortraitViewport() {
   return window.matchMedia('(orientation: portrait)').matches || window.innerHeight > window.innerWidth;
 }
-
-function isStandaloneDisplayMode() {
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
-function updateMobileMiniConsole() {
-  // v72: 実機でstandalone判定が通らない端末があるため、スマホ横画面なら強制的にミニ制御卓化する。
-  const isMini = isMobileLikeDevice() && !isPortraitViewport();
-  document.documentElement.classList.toggle('mobile-mini-console', isMini);
-  document.documentElement.classList.toggle('standalone-mini-console', false);
-  if (document.body) {
-    document.body.classList.toggle('mobile-mini-console', isMini);
-    document.body.classList.toggle('standalone-mini-console', false);
-  }
-  if (isMini) {
-    const scale = Math.max(0.34, Math.min(0.46, window.innerHeight / 1000));
-    document.documentElement.style.setProperty('--mini-console-scale', scale.toFixed(3));
-  } else {
-    document.documentElement.style.removeProperty('--mini-console-scale');
-  }
-}
 function updateOrientationGate() {
-  // v74: スマホ用レイアウトは縦横どちらでも表示するため、姿勢ゲートは無効。
-  updateMobileMiniConsole();
   const gate = document.getElementById('orientation-gate');
   const status = document.getElementById('orientation-status');
-  if (gate) {
-    gate.classList.remove('active');
-    gate.setAttribute('aria-hidden', 'true');
-  }
-  if (status) {
-    status.textContent = document.documentElement.classList.contains('mobile-mini-console')
-      ? 'MINI CONSOLE MODE ONLINE'
-      : 'ORIENTATION GATE DISABLED';
-  }
+  if (!gate) return;
+  const shouldBlock = false; /* ★スマホ縦レイアウト対応：横画面強制を解除 */
+  gate.classList.toggle('active', shouldBlock);
+  gate.setAttribute('aria-hidden', shouldBlock ? 'false' : 'true');
+  if (status) status.textContent = shouldBlock ? 'WAITING FOR LANDSCAPE SIGNAL' : 'LANDSCAPE SIGNAL CONFIRMED';
 }
 async function requestImmersiveLandscape() {
   const status = document.getElementById('orientation-status');
@@ -7632,7 +7732,6 @@ async function requestImmersiveLandscape() {
   updateOrientationGate();
 }
 window.addEventListener('resize', updateOrientationGate);
-window.addEventListener('pageshow', updateOrientationGate);
 window.addEventListener('orientationchange', () => setTimeout(updateOrientationGate, 180));
 document.addEventListener('DOMContentLoaded', () => {
   updateOrientationGate();
@@ -9955,18 +10054,15 @@ ${flavor}`;
     if (changed) this.updateQuestAttention();
   }
   updateQuestAttention() {
-    const buttons = [document.getElementById('quest-btn'), document.getElementById('top-quest-btn')].filter(Boolean);
-    if (!buttons.length) return;
+    const btn = document.getElementById('quest-btn');
+    if (!btn) return;
     const closed = !!(game && game.finalProcurementClosed);
     const lockedByObservation = !!(game && !game.mutantObservationUnlocked);
-    const claimable = !closed && !lockedByObservation && (game.quests || []).some(q => q.done);
-    buttons.forEach(btn => {
-      btn.classList.toggle('attention', claimable);
-      btn.classList.toggle('quest-closed', closed || lockedByObservation);
-      btn.disabled = closed || lockedByObservation || game.state !== 'IDLE';
-      const sub = btn.querySelector('.sub');
-      if (sub) sub.textContent = claimable ? '報酬受領可' : (closed ? '処理完了' : (lockedByObservation ? '観測待機' : (btn.id === 'top-quest-btn' ? '依頼' : 'クエスト')));
-    });
+    btn.classList.toggle('attention', !closed && !lockedByObservation && (game.quests || []).some(q => q.done));
+    btn.classList.toggle('quest-closed', closed || lockedByObservation);
+    btn.disabled = closed || lockedByObservation || game.state !== 'IDLE';
+    const sub = btn.querySelector('.sub');
+    if (sub) sub.textContent = closed ? '処理完了' : (lockedByObservation ? '観測待機' : 'クエスト');
   }
   openQuestMenu() {
     if (!game.mutantObservationUnlocked) {
