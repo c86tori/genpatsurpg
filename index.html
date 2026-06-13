@@ -1870,181 +1870,172 @@ button{font-family:inherit;color:inherit}
 
 
 /* ============================================================
-   ★スマホ縦レイアウト（PC版には影響しない／後勝ちで上書き）
-   - フィールド = 画面幅いっぱいの正方形
-   - その下に：上部バー → コマンド → バトルログ → OPERATOR → CORE SYSTEMS を縦積み
-   - 文字はスマホの都合を無視して確実に縮小（text-size-adjust固定）
-   - 縦スクロールでHUD全体を見られる
+   ★スマホ縦レイアウト v2（PC版不変／後勝ち上書き）
+   構成（上から）:
+     [1列] 上部バー（OBSERVED/STORY/REQUEST/ZONE 横1行）
+     [1列] 正方形フィールド（画面幅 = 高さ）
+     [1列] コマンド（探索/装備改修/アイテム/休息 横1行）
+     [2列] 左=BATTLE LOG + OPERATOR / 右=CORE SYSTEMS（右下は空き）
+   最優先：画面にぴったり収める。文字はいくらでも縮小可（自動拡大も無効）。
 ============================================================ */
 @media (max-width:680px) and (orientation:portrait){
 
-  /* iOS等の自動拡大を無効化し、指定サイズを確実に効かせる */
+  /* 自動拡大を完全無効化（指定サイズを確実に効かせる） */
   html{ -webkit-text-size-adjust:none!important; text-size-adjust:none!important; }
 
-  /* 全体を縦スクロール可能な通常フローへ */
-  html,body{ position:static!important; overflow-y:auto!important; overflow-x:hidden!important;
+  /* 縦スクロール可能な通常フローへ */
+  html,body{ position:static!important; overflow-x:hidden!important; overflow-y:auto!important;
     height:auto!important; min-height:100%!important; background:#04070c!important; }
 
-  #game-root{ position:static!important; inset:auto!important; width:100%!important; height:auto!important;
-    min-height:100vh!important; overflow:visible!important; }
+  #game-root{ position:static!important; inset:auto!important; width:100%!important;
+    height:auto!important; min-height:100vh!important; overflow:visible!important; }
 
-  /* 画面フレーム装飾はスマホでは隠す */
   .frame-corner{ display:none!important; }
 
-  /* --- フィールド：画面幅の正方形（上部固定エリア） --- */
-  #three-canvas{
-    position:fixed!important; top:0!important; left:0!important;
-    width:100vw!important; height:100vw!important; /* 正方形 */
-    inset:auto!important; z-index:1!important;
-  }
-  #zone-atmosphere,#zone-atmosphere-next{
-    position:fixed!important; top:0!important; left:0!important;
+  /* --- フィールド：画面幅の正方形。上部バーの下に固定表示 --- */
+  /* 上部バーの実測高さに合わせて top を変数化（既定42px、はみ出れば下で調整） */
+  :root{ --m-topbar-h: 40px; }
+  #three-canvas,#zone-atmosphere,#zone-atmosphere-next{
+    position:fixed!important; left:0!important; top:var(--m-topbar-h)!important;
     width:100vw!important; height:100vw!important; inset:auto!important; z-index:1!important;
   }
 
-  /* --- HUD：正方形フィールドの下に通常フローで縦積み --- */
+  /* --- HUD全体：縦フロー。上部バーぶん＋フィールドぶんを空けて始める --- */
   #hud{
-    position:static!important; inset:auto!important; display:block!important;
-    width:100%!important; height:auto!important; z-index:10!important;
-    margin-top:100vw!important; /* 正方形フィールドのぶんだけ下げる */
-    padding:0 0 24px!important; pointer-events:auto!important;
+    position:static!important; inset:auto!important; z-index:10!important;
+    display:block!important; width:100%!important; height:auto!important;
+    margin:0!important; padding:0 0 20px!important; pointer-events:auto!important;
   }
-  /* phase-shifting等でdisplay:noneにされてもスマホでは積みを維持 */
   #hud.phase-shifting{ display:block!important; }
 
-  /* 各パネルを絶対配置から通常フローの帯へ */
-  .topbar,.player-status,.reactor-status,.message-log,.command-panel{
+  /* 既定は絶対配置解除（各パネル共通） */
+  .topbar,.player-status,.reactor-status,.message-log,.command-panel,.enemy-status{
     position:static!important; inset:auto!important; left:auto!important; right:auto!important;
     top:auto!important; bottom:auto!important; transform:none!important;
     width:auto!important; max-width:none!important; min-width:0!important;
-    margin:7px 6px 0!important; box-sizing:border-box!important;
+    box-sizing:border-box!important;
   }
 
-  /* 並び順を指定（flexのorderではなくDOM順だが、念のためhud内をflex化して制御） */
-  #hud{ display:flex!important; flex-direction:column!important; }
-  .topbar{ order:1!important; }
-  .command-panel{ order:2!important; }
-  .message-log{ order:3!important; display:block!important; }
-  .player-status{ order:4!important; }
-  .reactor-status{ order:5!important; }
-  .enemy-status{ order:0!important; } /* 戦闘時の敵ターゲットは最上段（フィールド直下） */
-
-  /* --- 上部バー：4項目を横1行に強制（文字を縮めてでも収める） --- */
+  /* ===== 1) 上部バー：画面最上部に固定、横1行 ===== */
   .topbar{
-    height:auto!important; min-height:0!important; padding:5px 6px!important;
-    flex-wrap:nowrap!important; gap:3px!important; align-items:stretch!important;
-    background:linear-gradient(180deg,rgba(9,19,32,.92),rgba(4,8,14,.85))!important;
-    border:1px solid var(--line)!important;
+    position:fixed!important; top:0!important; left:0!important; right:0!important; z-index:40!important;
+    height:var(--m-topbar-h)!important; min-height:0!important; padding:3px 4px!important;
+    display:flex!important; flex-wrap:nowrap!important; gap:3px!important; align-items:stretch!important;
+    background:linear-gradient(180deg,rgba(9,19,32,.96),rgba(4,8,14,.92))!important;
+    border-bottom:1px solid var(--line)!important;
   }
-  .topbar .tb-title{ display:none!important; } /* タイトルはタイトル画面にあるので省略 */
-  .topbar .tb-clock{ display:none!important; }
-  .topbar .tb-pills{
-    display:flex!important; flex-direction:row!important; flex-wrap:nowrap!important;
-    gap:3px!important; width:100%!important; margin:0!important;
-  }
-  .topbar .tb-pills > *{
-    flex:1 1 0!important; min-width:0!important; margin:0!important;
-    padding:3px 2px!important; overflow:hidden!important;
-  }
-  /* 上部バー内の文字を極小に（確実に収める） */
-  .topbar .top-action-btn b,.topbar .zone-pill b{ font-size:6.5px!important; letter-spacing:.04em!important; line-height:1.1!important; }
-  .topbar .top-action-btn .sub,.topbar .zone-pill span{ font-size:7px!important; letter-spacing:0!important; line-height:1.15!important; white-space:nowrap!important; }
-  .topbar .top-action-btn .glyph{ font-size:13px!important; right:1px!important; bottom:-3px!important; opacity:.18!important; }
+  .topbar .tb-title,.topbar .tb-clock{ display:none!important; }
+  .topbar .tb-pills{ display:flex!important; flex-direction:row!important; flex-wrap:nowrap!important;
+    gap:3px!important; width:100%!important; margin:0!important; }
+  .topbar .tb-pills > *{ flex:1 1 0!important; min-width:0!important; margin:0!important;
+    padding:2px 2px!important; overflow:hidden!important; display:flex!important;
+    flex-direction:column!important; justify-content:center!important; }
+  .topbar .top-action-btn b,.topbar .zone-pill b{ font-size:6px!important; letter-spacing:.02em!important; line-height:1.05!important; }
+  .topbar .top-action-btn .sub,.topbar .zone-pill span{ font-size:6.5px!important; letter-spacing:0!important; line-height:1.1!important; white-space:nowrap!important; overflow:hidden!important; text-overflow:ellipsis!important; }
+  .topbar .top-action-btn .glyph{ display:none!important; }
 
-  /* --- コマンドデッキ --- */
+  /* ===== 2) フィールドぶんの空白を作る（HUD先頭に下駄） ===== */
+  #hud::before{
+    content:""!important; display:block!important;
+    height:calc(var(--m-topbar-h) + 100vw)!important; /* 上部バー＋正方形フィールド */
+    width:100%!important;
+  }
+
+  /* ===== 3) コマンド：フィールド直下、横1行 ===== */
   .command-panel{
-    padding:8px 8px 9px!important;
-    clip-path:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)!important;
+    display:block!important; margin:6px 5px 0!important; padding:7px 7px 8px!important;
+    clip-path:polygon(0 9px,9px 0,calc(100% - 9px) 0,100% 9px,100% 100%,0 100%)!important;
   }
   .command-panel.active{ animation:none!important; }
-  .cmd-instructions{ font-size:8px!important; margin-bottom:5px!important; letter-spacing:.08em!important; }
-  .cmd-mode-tag{ font-size:7px!important; padding:3px 8px 2px!important; left:14px!important; }
+  .cmd-instructions{ font-size:7.5px!important; margin-bottom:4px!important; letter-spacing:.06em!important; }
+  .cmd-mode-tag{ font-size:6.5px!important; padding:2px 7px 2px!important; left:12px!important; }
+  .cmd-row-battle,.cmd-menu-row{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:3px!important; }
+  .cmd-explore-big{ width:100%!important; padding:6px 8px!important; margin-bottom:4px!important; }
+  .cmd-btn{ padding:5px 4px!important; min-height:0!important; }
+  .cmd-btn b{ font-size:8px!important; letter-spacing:.01em!important; line-height:1.1!important; }
+  .cmd-btn .sub{ font-size:6px!important; letter-spacing:0!important; line-height:1.05!important; }
+  .cmd-btn .glyph{ font-size:20px!important; right:-2px!important; bottom:-5px!important; opacity:.14!important; }
+  .cmd-explore-big .arrow{ font-size:17px!important; }
+  .cmd-explore-big b{ font-size:10px!important; }
+  .cmd-explore-big .sub{ font-size:6.5px!important; }
 
-  .cmd-row-battle{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:4px!important; }
-  .cmd-menu-row{ display:grid!important; grid-template-columns:repeat(4,1fr)!important; gap:4px!important; }
-  .cmd-explore-big{ width:100%!important; padding:7px 9px!important; margin-bottom:5px!important; }
-
-  .cmd-btn{ padding:6px 5px!important; min-height:0!important; }
-  .cmd-btn b{ font-size:8.5px!important; letter-spacing:.02em!important; line-height:1.15!important; }
-  .cmd-btn .sub{ font-size:6.5px!important; letter-spacing:0!important; line-height:1.1!important; }
-  .cmd-btn .glyph{ font-size:24px!important; right:-2px!important; bottom:-6px!important; }
-  .cmd-explore-big .arrow{ font-size:20px!important; }
-  .cmd-explore-big b{ font-size:11px!important; }
-  .cmd-explore-big .sub{ font-size:7px!important; }
-
-  /* --- パネル共通（見出し・本文の縮小） --- */
-  .hud-panel{ backdrop-filter:none!important; -webkit-backdrop-filter:none!important; }
-  .hud-panel .ph{ padding:4px 8px!important; }
-  .hud-panel .ph .pt{ font-size:8px!important; letter-spacing:.12em!important; }
-  .hud-panel .ph .pm{ font-size:7px!important; }
-  .hud-panel .pbody{ padding:7px 8px!important; }
-
-  /* --- OPERATOR（プレイヤー） --- */
-  .player-status .status-name #player-name{ font-size:13px!important; }
-  .player-status .status-name .lv{ font-size:8px!important; }
-  .player-status .status-name .lv b{ font-size:11px!important; }
-  .bar-wrap{ height:13px!important; }
-  .bar-wrap .label{ font-size:7px!important; }
-  .bar-wrap .label span{ font-size:7px!important; }
-  .exp-bar{ height:4px!important; }
-  .gold-row{ margin-top:5px!important; }
-  .gold-row .mini b{ font-size:6.5px!important; }
-  .gold-row .mini span{ font-size:9px!important; }
-  .gear-grid{ gap:4px!important; margin-top:5px!important; }
-  .gear-grid .slot{ padding:5px 6px!important; }
-  .gear-grid .slot b{ font-size:6.5px!important; }
-  .gear-grid .slot .val{ font-size:9px!important; }
-  .gear-grid .slot .sub{ font-size:7px!important; }
-  .gear-grid .slot .num{ font-size:8px!important; }
-  .upgrade-entry-btn{ font-size:7px!important; padding:2px 5px!important; }
-
-  /* --- CORE SYSTEMS（炉心） --- */
-  .reactor-status .system-list{ gap:2px!important; }
-  .reactor-status .system-row{ padding:4px 2px!important; font-size:9px!important; }
-  .reactor-status .system-row > span:first-child{ font-size:9px!important; }
-  .reactor-status .system-row .stat{ font-size:7.5px!important; padding:1px 5px!important; }
-  .repair-foot{ font-size:7px!important; padding-top:5px!important; }
-  .repair-foot span{ font-size:7px!important; }
-  .repair-progress{ font-size:13px!important; }
-  .reactor-action-btn b{ font-size:9px!important; }
-  .reactor-action-btn .sub{ font-size:6.5px!important; }
-  .reactor-action-btn .glyph{ font-size:24px!important; }
-
-  /* --- バトルログ --- */
-  .message-log #message-log-inner{ min-height:0!important; max-height:96px!important; overflow-y:auto!important; }
-  .message-log .msg-line{ font-size:8.5px!important; line-height:1.45!important; }
-  .message-log .msg-line:nth-child(n+5){ display:none!important; } /* スマホは最新4件 */
-
-  /* --- 敵ターゲット（戦闘時、フィールド直下に） --- */
-  .enemy-status{
-    position:static!important; inset:auto!important; transform:none!important;
-    width:auto!important; margin:7px 6px 0!important; padding:7px 9px!important;
+  /* ===== 4) 2列ゾーン：左=BATTLE LOG+OPERATOR / 右=CORE SYSTEMS =====
+     3パネルは JS で .m-twocol ラッパに内包し、CSS Grid で2列配置する。 */
+  .m-twocol{
+    display:grid!important;
+    grid-template-columns: 1fr 1fr!important;
+    grid-auto-rows:min-content!important;
+    gap:6px!important; margin:6px 5px 0!important; align-items:start!important;
   }
-  .enemy-status .ename{ font-size:11px!important; }
-  .enemy-status .enemy-tier{ font-size:7px!important; }
+  .m-twocol .message-log{ grid-column:1!important; grid-row:1!important; margin:0!important; }
+  .m-twocol .player-status{ grid-column:1!important; grid-row:2!important; margin:0!important; }
+  .m-twocol .reactor-status{ grid-column:2!important; grid-row:1 / span 2!important; margin:0!important; align-self:start!important; }
 
-  /* --- ストーリーウインドウ：フィールド下側に固定表示 --- */
+  /* 2列内パネル共通：原寸維持せず幅100%・文字縮小で確実に収める */
+  .m-twocol .hud-panel{ width:100%!important; backdrop-filter:none!important; -webkit-backdrop-filter:none!important; display:block!important; }
+  .hud-panel .ph{ padding:3px 7px!important; }
+  .hud-panel .ph .pt{ font-size:7px!important; letter-spacing:.1em!important; }
+  .hud-panel .ph .pm{ font-size:6px!important; }
+  .hud-panel .pbody{ padding:6px 7px!important; }
+
+  /* BATTLE LOG */
+  .message-log{ display:block!important; }
+  .message-log #message-log-inner{ min-height:0!important; max-height:none!important; }
+  .message-log .msg-line{ font-size:7.5px!important; line-height:1.4!important; padding-left:6px!important; }
+  .message-log .msg-line:nth-child(n+5){ display:none!important; }
+
+  /* OPERATOR */
+  .player-status .status-name #player-name{ font-size:11px!important; }
+  .player-status .status-name .lv{ font-size:7px!important; }
+  .player-status .status-name .lv b{ font-size:10px!important; }
+  .player-status .bar-wrap{ height:11px!important; }
+  .player-status .bar-wrap .label,.player-status .bar-wrap .label span{ font-size:6px!important; }
+  .player-status .exp-bar{ height:3px!important; }
+  .gold-row{ margin-top:4px!important; gap:4px!important; }
+  .gold-row .mini b{ font-size:5.5px!important; }
+  .gold-row .mini span{ font-size:8px!important; }
+  .gear-grid{ gap:3px!important; margin-top:4px!important; grid-template-columns:1fr 1fr!important; }
+  .gear-grid .slot{ padding:4px 5px!important; }
+  .gear-grid .slot b{ font-size:5.5px!important; }
+  .gear-grid .slot .val{ font-size:7.5px!important; }
+  .gear-grid .slot .sub{ font-size:6px!important; }
+  .gear-grid .slot .num{ font-size:7px!important; }
+  .upgrade-entry-btn{ font-size:6px!important; padding:2px 4px!important; }
+
+  /* CORE SYSTEMS */
+  .reactor-status .system-list{ gap:1px!important; }
+  .reactor-status .system-row{ padding:3px 2px!important; font-size:8px!important; }
+  .reactor-status .system-row > span:first-child{ font-size:8px!important; }
+  .reactor-status .system-row .stat{ font-size:6.5px!important; padding:1px 4px!important; }
+  .repair-foot{ font-size:6px!important; padding-top:4px!important; }
+  .repair-foot span{ font-size:6px!important; }
+  .repair-progress{ font-size:11px!important; }
+  .reactor-action-btn b{ font-size:8px!important; }
+  .reactor-action-btn .sub{ font-size:6px!important; }
+  .reactor-action-btn .glyph{ font-size:20px!important; }
+
+  /* ===== 敵ターゲット（戦闘時）：フィールド直下・コマンドの上 ===== */
+  .enemy-status{
+    display:none; margin:6px 5px 0!important; padding:6px 8px!important;
+  }
+  .enemy-status.active{ display:block!important; }
+  .enemy-status .ename{ font-size:10px!important; }
+  .enemy-status .enemy-tier{ font-size:6px!important; }
+  .enemy-status .bar-wrap{ height:11px!important; }
+  .enemy-status .bar-wrap .label,.enemy-status .bar-wrap .label span{ font-size:6px!important; }
+
+  /* ===== ストーリーウインドウ：下半分に固定表示 ===== */
   .story-overlay{ position:fixed!important; inset:0!important; z-index:60!important; }
   .story-window{
-    position:fixed!important; left:6px!important; right:6px!important; bottom:8px!important;
-    top:auto!important; width:auto!important; max-width:none!important; transform:none!important;
-    min-height:120px!important; max-height:42vh!important; overflow-y:auto!important; z-index:70!important;
-    padding:12px 13px 16px!important;
+    position:fixed!important; left:5px!important; right:5px!important; bottom:6px!important; top:auto!important;
+    width:auto!important; max-width:none!important; transform:none!important;
+    min-height:110px!important; max-height:44vh!important; overflow-y:auto!important; z-index:70!important;
+    padding:11px 12px 15px!important;
   }
-  .story-window .sw-body,.story-window p{ font-size:11px!important; line-height:1.7!important; }
-  .story-window .sw-title{ font-size:9px!important; }
-  .story-window .sw-tag,.story-window .sw-hint{ font-size:7.5px!important; }
-  .story-window .sw-next{ font-size:9px!important; }
-
-  /* モーダル類（図鑑・依頼・改修など）は全画面寄せで可読性確保 */
-  .modal-window,.dex-window,.quest-window,.upgrade-window{
-    font-size:11px!important;
-  }
-}
-
-/* 横画面スマホ：従来の横レイアウトを尊重しつつ自動拡大だけ無効化 */
-@media (max-width:900px) and (orientation:landscape){
-  html{ -webkit-text-size-adjust:none!important; text-size-adjust:none!important; }
+  .story-window .sw-body,.story-window p{ font-size:10.5px!important; line-height:1.65!important; }
+  .story-window .sw-title{ font-size:8.5px!important; }
+  .story-window .sw-tag,.story-window .sw-hint{ font-size:7px!important; }
+  .story-window .sw-next{ font-size:8.5px!important; }
 }
 
 </style>
@@ -2067,6 +2058,57 @@ window.RENDER_DIM = function(){
   }catch(e){}
   return { w: Math.max(2, window.innerWidth), h: Math.max(2, window.innerHeight) };
 };
+
+/* ============================================================
+   ★スマホ2列ラッパ：BATTLE LOG + OPERATOR（左列）/ CORE SYSTEMS（右列）を
+   1つの .m-twocol グリッドで包む。スマホ縦のときだけDOMを組み替える。
+   PC・横画面では元のDOM（#hud直下）に戻す。冪等。
+============================================================ */
+(function(){
+  function isPhonePortrait(){
+    try{ return window.matchMedia('(max-width:680px) and (orientation:portrait)').matches; }catch(e){ return false; }
+  }
+  function applyTwoCol(){
+    var hud = document.getElementById('hud');
+    if (!hud) return;
+    function directChild(sel){
+      for (var k=0;k<hud.children.length;k++){ if (hud.children[k].matches && hud.children[k].matches(sel)) return hud.children[k]; }
+      return null;
+    }
+    var log = directChild('.message-log');
+    var op  = directChild('.player-status');
+    var core = directChild('.reactor-status');
+    var existing = directChild('.m-twocol');
+
+    if (isPhonePortrait()){
+      if (existing) return; /* 既に組み済み */
+      if (!log || !op || !core) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'm-twocol';
+      /* コマンドパネルの直後に差し込む（フィールド→コマンド→2列 の順） */
+      var cmd = directChild('.command-panel');
+      if (cmd && cmd.nextSibling) hud.insertBefore(wrap, cmd.nextSibling);
+      else hud.appendChild(wrap);
+      /* 左列: log, op / 右列: core （DOM順は grid-row/column で制御） */
+      wrap.appendChild(log);
+      wrap.appendChild(op);
+      wrap.appendChild(core);
+    } else {
+      /* PC・横画面：ラッパを解体して #hud 直下へ戻す */
+      if (!existing) return;
+      while (existing.firstChild){ hud.insertBefore(existing.firstChild, existing); }
+      existing.remove();
+    }
+  }
+  window.__applyMobileTwoCol = applyTwoCol;
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', applyTwoCol);
+  } else {
+    applyTwoCol();
+  }
+  window.addEventListener('resize', applyTwoCol);
+  window.addEventListener('orientationchange', function(){ setTimeout(applyTwoCol, 60); });
+})();
 </script>
 <div id="game-root">
   <div id="zone-atmosphere"></div>
