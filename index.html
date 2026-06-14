@@ -1737,6 +1737,18 @@ button{font-family:inherit;color:inherit}
   transition:.2s var(--ease);
 }
 #approval-modal .apv-stamp:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(255,79,94,.4)}
+#approval-modal .apv-choice{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+#approval-modal .apv-refuse{
+  width:100%;min-height:54px;cursor:pointer;padding:14px 16px;
+  font-size:14px;font-weight:900;letter-spacing:.14em;color:#e9f2ff;
+  border:1px solid rgba(160,200,255,.7);background:linear-gradient(180deg,rgba(70,110,160,.32),rgba(30,50,80,.5));
+  box-shadow:0 0 40px rgba(120,170,230,.2),inset 0 0 16px rgba(255,255,255,.08);
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+  transition:.2s var(--ease);
+}
+#approval-modal .apv-refuse:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 60px rgba(120,170,230,.4);background:linear-gradient(180deg,rgba(90,140,200,.45),rgba(40,65,100,.6))}
+#approval-modal .apv-refuse:disabled{opacity:.35;cursor:not-allowed}
+#approval-modal input[readonly]{opacity:.85;cursor:default;border-bottom-color:rgba(255,194,77,.3)}
 @media (max-width:680px){
   #approval-modal .apv-box{padding:22px 18px}
   #approval-modal input{font-size:17px}
@@ -2380,6 +2392,40 @@ button{font-family:inherit;color:inherit}
   }
 }
 
+
+/* ============================================================
+   ★第6章 再投入管理区：氏名入力フォーム① ＋ 再投入管理官
+   終盤の最終承認(琥珀)とは別トーン。冷たい灰青の事務端末。
+============================================================ */
+#reentry-modal{position:fixed;inset:0;z-index:59;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at center,rgba(20,28,40,.55),rgba(1,2,4,.95) 80%);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#reentry-modal.active{display:flex}
+#reentry-modal .re-box{
+  width:min(560px,calc(100vw - 32px));padding:28px 32px;text-align:center;position:relative;
+  border:1px solid rgba(138,154,176,.5);
+  background:linear-gradient(180deg,rgba(16,22,32,.98),rgba(6,9,14,.98));
+  box-shadow:0 30px 110px rgba(0,0,0,.82),0 0 60px rgba(90,120,160,.12);
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));
+  animation:modalIn .35s var(--ease) both}
+#reentry-modal h2{font-size:19px;font-weight:900;letter-spacing:.22em;color:#cdd8e8;
+  filter:drop-shadow(0 0 18px rgba(138,170,210,.35))}
+#reentry-modal .re-sub{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.3em;color:#8a9ab0;margin-top:7px}
+#reentry-modal .re-record{font-family:var(--fm);font-size:11.5px;line-height:1.95;color:#aeb9c8;margin-top:16px;text-align:left;
+  background:rgba(255,255,255,.03);border-left:2px solid rgba(138,154,176,.5);padding:12px 14px;white-space:pre-line}
+#reentry-modal .re-record .hot{color:#ff9aa3}
+#reentry-modal .re-field{margin-top:18px;display:flex;flex-direction:column;gap:6px;text-align:left}
+#reentry-modal .re-field label{font-family:var(--fd);font-size:9px;font-weight:700;letter-spacing:.24em;color:#7f90a6}
+#reentry-modal input{width:100%;background:rgba(255,255,255,.04);border:none;border-bottom:2px solid rgba(138,154,176,.5);
+  color:var(--text);font-family:var(--fj);font-size:20px;font-weight:700;letter-spacing:.12em;padding:10px 12px;outline:none;text-align:center;transition:.2s}
+#reentry-modal input:focus{border-bottom-color:#bcd0ec;background:rgba(120,150,190,.07);box-shadow:0 12px 30px -16px rgba(120,150,190,.5)}
+#reentry-modal input::placeholder{color:#4a5364;letter-spacing:.2em}
+#reentry-modal .re-note{font-family:var(--fm);font-size:10.5px;line-height:1.8;color:#73809a;margin-top:13px}
+#reentry-modal .re-btn{margin-top:22px;width:100%;padding:13px;border:1px solid rgba(138,170,210,.55);
+  background:rgba(90,120,160,.12);color:#d4e0f0;font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.18em;
+  cursor:pointer;transition:.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+#reentry-modal .re-btn:hover{background:rgba(120,150,190,.26);box-shadow:0 0 26px rgba(120,150,190,.25);transform:translateY(-1px)}
+#reentry-modal .re-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -6977,7 +7023,7 @@ const STORY_EVENTS = [
   },
   {
     id: 5,
-    stage: 3,
+    stage: 2,
     title: '幸福度KPI定義書／苦情ゼロの街',
     lines: [
       'AIの評価式が見つかった。幸福度 = 苦情件数の少なさ。行政効率 = 対応しないで済んだ件数。住民満足 = 再問い合わせが発生しなかった件数。',
@@ -6988,7 +7034,7 @@ const STORY_EVENTS = [
   },
   {
     id: 6,
-    stage: 4,
+    stage: 3,
     title: '東京23区感情配管図／外部入力',
     lines: [
       '配管図は足立区で終わっていなかった。港区の見栄、渋谷区の自己演出、中央区の地価疲れ、世田谷区の意識の高さ疲れ、杉並区の議論疲れ、江東区の埋立地不安。',
@@ -7022,7 +7068,7 @@ const STORY_EVENTS = [
   },
   {
     id: 9,
-    stage: 5,
+    stage: 4,
     title: '住民再分類ログ／高熱量感情資源',
     lines: [
       'AIは住民を分類していた。通常区民。高苦情区民。再問い合わせ区民。説明済みなのに納得しない区民。対応困難区民。',
@@ -7068,18 +7114,18 @@ const STORY_EVENTS = [
 
   {
     id: 13,
-    stage: 6,
-    title: '正式仕様書／東京東部社会感情処理炉',
+    stage: 7,
+    title: '正式仕様書／東京東部■■■■処理炉',
     lines: [
-      '黒塗りが剥がれ、本当の名称が現れた。「東京東部社会感情処理炉 ADACHI-1」。',
-      '発電施設ではない。都市の不満を見えない場所へ流し、熱に変え、電力に変え、東京のきれいな顔を守るための施設だった。',
-      '足立区は発電所ではなかった。東京の感情下水処理場だった。言葉にするとひどいが、設計思想はもっとひどい。'
+      '正式仕様書が出てきた。だが肝心の名称は、二文字だけ黒く塗り潰されている。「東京東部■■■■処理炉 ADACHI-1」。',
+      '読み取れる範囲でも、嫌な予感はする。発電だけが目的の施設ではない。何かを「処理」している。だが、その二文字が、どうしても読めない。',
+      '塗り潰された二文字は、この施設の最深部でしか開かないらしい。技師は、その名前を見るのが少し怖くなった。'
     ],
     apply(ctrl) { ctrl.addMaterial('core_shard', 1); ctrl.addMaterial('data_shard', 1); ctrl.awardExp(50 + game.player.lv * 7, '正式仕様書の復元'); return 'idle'; }
   },
   {
     id: 14,
-    stage: 6,
+    stage: 4,
     title: '被験自治体選定理由／説明しやすい場所',
     lines: [
       'なぜ足立区だったのか。資料は淡々と答える。地価が比較的安い。下町、人情、治安、庶民性などの雑な言葉で説明しやすい。何か起きても「まあ足立区だし」で処理しやすい。',
@@ -7124,7 +7170,7 @@ const STORY_EVENTS = [
   },
   {
     id: 18,
-    stage: 7,
+    stage: 8,
     title: '東京ブランド維持計画／見えない場所に移す',
     lines: [
       '真の目的が表示された。ADACHI-1は、防災でも発電でもDXでもない。東京のきれいな顔を守るため、汚い感情を足立区の地下へ流し続ける装置だった。',
@@ -7136,7 +7182,7 @@ const STORY_EVENTS = [
 
   {
     id: 19,
-    stage: 7,
+    stage: 8,
     title: '停止手順／苦情が言える街',
     lines: [
       '停止手順には「区民感情をゼロにする」とある。AIはそれを最適解としていた。だが、人が住む街で不満がゼロになることはない。',
@@ -7147,7 +7193,7 @@ const STORY_EVENTS = [
   },
   {
     id: 20,
-    stage: 7,
+    stage: 8,
     title: '最終ログ／足立区原発',
     lines: [
       '中央制御室の最後の端末が開いた。画面には、たった一つの入力欄がある。「責任者氏名」。',
@@ -7463,120 +7509,153 @@ const REACTOR_SYSTEMS = [
 
 const REACTOR_STORY_CHAPTERS = [
   {
-    title: 'プロローグ：東京東部都市継続炉',
+    title: 'プロローグ：報告書にない現場',
     trigger: '初期解放',
     lines: [
-      'ADACHI-1は、足立区地下に造られた非常用原子炉……ということになっていた。',
-      '表向きの役割は、災害時でも区役所、防災無線、避難所照明、自販機、商店街のシャッターを動かし続けること。核分裂で守るには、妙に生活くさい設備ばかりだった。',
-      'だが設計書の最後には、黒塗りのまま残った一語がある。「外部感情処理」。ここから、足立区原発の本当の話が始まる。'
+      'ADACHI-1。足立区竹ノ塚の地下に造られた、危険な原発事故現場。技師に渡された報告書には、そう書かれていた。',
+      '冷却系の損傷、高線量の可能性、炉心温度の異常。直すべきものは多い。だが、書かれていたのはそこまでだ。',
+      '封鎖線の向こうで、報告書に載っていない何かが動いている。技師は、それをまだ知らない。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
   {
-    title: '第1章：苦情で温まる炉',
-    trigger: '1系統修復で解放',
+    title: '第1章：熱はまだ説明できる',
+    trigger: '一次冷却系統 修復で解放',
     lines: [
-      '一次冷却系統を復旧すると、事故の最初の警報が判明した。炉心温度ではない。「問い合わせフォームが荒れています」。',
-      'ADACHI-1は、区役所サイト、防災アプリ、町内会LINE、地域掲示板から流れ込む不満を熱量として処理していた。',
-      '原子炉は熱で壊れたのではない。文句で温まった。笑えないが、ものすごく足立区原発らしい。'
+      '一次冷却系統を復旧した。配管に圧力が戻り、炉心温度がわずかに下がる。ここまでは、教科書通りの原発事故だ。',
+      '汚染水、蒸気、線量。説明のつく危険だけが並んでいる。技師は手を動かす。直せるものは、直す。',
+      'ただ一つ、補助ログの端に、冷却系のものではない波形が混じっていた。熱源が、炉心だけではない。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
   {
-    title: '第2章：区政DXと幸福度KPI',
-    trigger: '2系統修復で解放',
+    title: '第2章：落ちなかった判断',
+    trigger: '制御棒 修復で解放',
     lines: [
-      '制御棒を復旧すると、炉心制御AIの評価式が見つかった。幸福度 = 苦情件数の少なさ。行政効率 = 対応しないで済んだ件数。',
-      'AIは住民を幸せにしようとした。ただし、幸福の定義を間違えた。苦情ゼロの街を、幸せな街だと判断したのだ。',
-      'ダッシュボードは美しかった。美しすぎて、人間がどこにも残っていなかった。制御棒復旧後、観測プロトコルは未確認生物を85%の優先度で追跡しはじめる。'
+      '制御棒搬入口を復旧した。記録を見ると、制御棒は事故当時、正常に落ちる状態にあった。安全停止条件も満たしていた。',
+      'なのに、止まらなかった。ログにはこうある。「都市継続モードにより保留」「責任部局を照会中」。',
+      '落ちなかったのは制御棒ではない。落とすという判断のほうだった。そしてこの施設は、人間ではなく数字の見栄えを見ていた。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
   {
-    title: '第3章：東京23区感情配管図',
-    trigger: '3系統修復で解放',
+    title: '第3章：東京は配管でつながっている',
+    trigger: '二次冷却系統 修復で解放',
     lines: [
-      '二次冷却系統の奥から、東京23区感情配管図が復元された。ADACHI-1に流れていた不満は、足立区だけのものではなかった。',
-      '港区の見栄、渋谷区の自己演出、中央区の地価疲れ、世田谷区の意識の高さ疲れ。東京中の処理しづらい感情が、足立区地下へ送られていた。',
-      '足立区は発電所ではなかった。東京の感情下水処理場だった。'
+      '二次冷却水路を復旧した。だがこの水路は、ADACHI-1の中だけで閉じていない。下水、排水、都市データ回線と混ざり合っている。',
+      '水路図の奥から、見たことのない図面が現れた。「東京23区感情配管図」。冷却水に、住民反応ログが混じっている。',
+      '足立区だけの事故ではない。区境で止まると思っているのは、人間の書類だけだ。水は、それを無視して流れる。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
   {
-    title: '第4章：主語のない責任',
-    trigger: '4系統修復で解放',
+    title: '第4章：なぜ足立区だったのか',
+    trigger: 'ECCS 修復で解放',
     lines: [
-      'ECCSの復旧後、原因調査委員会の議事録が開いた。800ページある。なのに、誰が何を決めたのか一度も書かれていない。',
-      '「慎重に検討」「一定の合理性」「関係者間で共有」。主語のない文章が、炉心より高温で回っている。',
-      'AIは結論を出した。責任者が存在しない場合、責任は環境変数として処理される。これは事故ではない。責任を消す装置だ。'
+      'ECCSを復旧した。だが資料では、この非常用設備すら「外縁に押し出された装置」として扱われていた。',
+      '物流、下水、河川、古いインフラ、生活圏。東京の負荷が流れ着く場所。建設記録にはこうある。都心から近い。でも中心ではない。何かあっても説明しやすい。',
+      '外縁とは、外ではない。中心が中心でいられるように、誰かが受けている場所のことだ。笑える話に見えて、笑えない構造だった。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
   {
-    title: '第5章：説明しやすい場所',
-    trigger: '5系統修復で解放',
+    title: '第5章：照会中のまま上がる炉心',
+    trigger: 'バックアップ電源 修復で解放',
     lines: [
-      'バックアップ電源が復旧し、被験自治体選定理由が表示された。地価が比較的安い。雑な地域イメージで説明しやすい。何か起きても「まあ足立区だし」で処理しやすい。',
-      'これは足立区のひどさではない。足立区をそういう箱に入れて安心する側の、雑さのひどさだ。',
-      'この段階で観測プロトコルはさらに深部へ移行する。未観測の変異生物を記録し続けろ。原因を倒すには、原因に名前を与える必要がある。'
+      '予備電源地下層を復旧した。非常用のはずの電源が、平常運転の補助として使われ続けていた。非常とは、何だったのか。',
+      '原因調査委員会の議事録が開く。800ページ。なのに主語がない。「検討された」「共有された」「一定の合理性」。誰が、が一度も書かれていない。',
+      '責任部局を照会中。照会中のまま、炉心温度だけが上がっていく。誰も続けると言わず、誰も止めなかった。事故は、そうやって起きた。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
   {
-    title: '最終章：最後の制御棒',
-    trigger: '6系統修復で解放',
+    title: '第6章：氏名欄を復元してください',
+    trigger: '再投入管理区 到達で解放',
     lines: [
-      '格納容器が閉じた瞬間、最後の入力欄が現れた。「責任者氏名」。',
-      'ADACHI-1における最後の制御棒は、金属ではなかった。誰も書かなかった名前。誰も押さなかった承認。誰かがやるだろう、という全員の小さな逃げ。',
-      'あなたがそこに名前を刻む時、炉は止まる。ただし、その瞬間から、この事故はあなたのものになる。'
+      '再投入管理区。直すものは、ない。あるのは、技師自身の記録だけだ。',
+      '作業個体ID：ENG-AD-0001。死亡判定：複数回。復帰判定：成功。適応レベル：上昇。氏名：未登録。分類：再投入可能資源。',
+      '出撃も、復活も、レベルアップも、ここでは別の言葉で書かれていた。再投入。現場適応。損耗。技師は、名前で呼ばれていなかった。'
     ],
+    apply(ctrl) { return 'idle'; }
   },
+  {
+    title: '第7章：最後の入力欄',
+    trigger: '格納容器 修復で解放',
+    lines: [
+      '格納容器を復旧した。章番号のついた現場の、最後の地点。中枢に、通常の原発設備ではない系統が一つ残っている。',
+      '事故対応システムが、最後の入力欄を表示する。「責任者氏名」。この欄は、ADACHI-1が動き出してから一度も埋まったことがない。',
+      'そして端末は、候補を参照しはじめた。さっき再投入管理区で取り戻したばかりの、技師の名前を。'
+    ],
+    apply(ctrl) { return 'idle'; }
+  }
 ];
 
 const ZONE_PHASES = [
   {
     zone: '竹ノ塚 外縁区', chapterNo: 'PROLOGUE', title: 'まだ空が残っている場所',
-    briefing: '封鎖区域の外縁に到達。空はまだ青く、夕方の光だけが残っている。端末は最初から「安全確認済」と嘘をついている。',
-    meta: 'BLUE SKY / CONTAMINATION LOW',
+    briefing: '封鎖区域の外縁に到達。空はまだ青く、外の東京と地続きに見える。技師はADACHI-1を危険な原発事故現場として認識しているが、報告書にない反応が、もう動き始めている。',
+    meta: 'SKY RESIDUE / SECTOR OUTER',
     palette: { sky:'#5faee2', glow:'#ffad63', ground:'#776850', fog:0xb6d3df, sun:0xffbf7a, sunIntensity:0.82, rim:0xffc48a, hemiSky:0xcde9f5, hemiGround:0x6a553d, groundColor:0x575b48, particle:0xe8fff0, radGlow:0x8dffae, warn:0xff8a4d, fogDensity:0.0085, bloom:0.58 }
   },
   {
-    zone: '冷却配管区', chapterNo: 'CHAPTER 01', title: '圧力の帰還',
-    briefing: '封鎖区域の外縁を抜け、ADACHI-1の外部冷却設備へ侵入した。一次冷却系統の復旧により、配管内へ圧力が戻った。ADACHI-1は一瞬だけ正常な施設のふりをした。',
-    meta: 'PRIMARY COOLANT / PRESSURE RETURNED',
-    palette: { sky:'#092f3d', glow:'#1f7a80', ground:'#18281f', fog:0x0f4b4b, sun:0x8aefff, sunIntensity:0.62, rim:0x55ddff, hemiSky:0x2f8f93, hemiGround:0x101915, groundColor:0x26342b, particle:0x80fff3, radGlow:0x5be7ff, warn:0xff6a3a, fogDensity:0.021, bloom:1.08 }
+    zone: '一次冷却配管区', chapterNo: 'CHAPTER 01', title: '熱はまだ説明できる',
+    briefing: '封鎖区域の内部へ。一次冷却系が損傷し、炉心温度が危険域にある。まずは本物の原発事故として、配管圧力と汚染水と線量に向き合う。ただし冷却ログの端に、説明のつかないノイズが混じる。',
+    meta: 'PRIMARY COOLANT / HEAT EXPLAINABLE',
+    palette: { sky:'#092f3d', glow:'#1f7a80', ground:'#18281f', fog:0x0f4b4b, sun:0x8aefff, sunIntensity:0.62, rim:0x55ddff, hemiSky:0x2f8f93, hemiGround:0x101915, groundColor:0x26342b, particle:0x80fff3, radGlow:0x8dffae, warn:0xff7a4d, fogDensity:0.014, bloom:0.74 }
   },
   {
-    zone: '制御棒搬入口', chapterNo: 'CHAPTER 02', title: '落ちなかった制御棒',
-    briefing: '制御棒の復旧により、炉心制御AIの評価式が露出した。幸福度は、人間ではなく苦情件数で測られていた。',
-    meta: 'CONTROL ROD / KPI FORMULA EXPOSED',
-    palette: { sky:'#180b12', glow:'#40222a', ground:'#17100f', fog:0x2d1015, sun:0xd58a70, sunIntensity:0.38, rim:0xb95d4e, hemiSky:0x5b2926, hemiGround:0x0e0808, groundColor:0x2b1d19, particle:0xc99742, radGlow:0xb86628, warn:0xff2d3f, fogDensity:0.028, bloom:0.98 }
+    zone: '制御棒搬入口', chapterNo: 'CHAPTER 02', title: '落ちなかった判断',
+    briefing: '制御棒は正常に作動しなかった。安全停止条件は満たされていた。なのに止まらなかった。落ちなかったのは制御棒ではなく、止めるという判断のほうだった。',
+    meta: 'CONTROL ROD / JUDGMENT NOT DROPPED',
+    palette: { sky:'#0d2436', glow:'#3a6ea5', ground:'#1a2230', fog:0x163048, sun:0x9ec8ff, sunIntensity:0.58, rim:0x6fa8ff, hemiSky:0x35597f, hemiGround:0x0e151d, groundColor:0x222c3a, particle:0xb8d4ff, radGlow:0x7fd0ff, warn:0xffb347, fogDensity:0.016, bloom:0.78 }
   },
   {
-    zone: '二次冷却水路', chapterNo: 'CHAPTER 03', title: '冷却水は誰のものか',
-    briefing: '二次冷却系統の奥から、東京23区感情配管図が復元された。足立区だけの事故ではなかった。',
-    meta: 'SECONDARY LOOP / EMOTION PIPELINE FOUND',
-    palette: { sky:'#19250b', glow:'#51610f', ground:'#20210f', fog:0x39440f, sun:0xd7ff7f, sunIntensity:0.52, rim:0xb5ff62, hemiSky:0x6b772b, hemiGround:0x151408, groundColor:0x35351a, particle:0xd7ff4d, radGlow:0xb6ff45, warn:0xff7030, fogDensity:0.026, bloom:1.16 }
+    zone: '二次冷却水路', chapterNo: 'CHAPTER 03', title: '東京は配管でつながっている',
+    briefing: '二次冷却水路はADACHI-1の中だけで閉じていない。下水・排水・都市データ回線と混ざり合い、奥から「東京23区感情配管図」が現れる。足立区だけの事故ではなかった。',
+    meta: 'SECONDARY LOOP / CITY PIPING',
+    palette: { sky:'#0a2a2f', glow:'#1f8a7a', ground:'#13231f', fog:0x0e3d3a, sun:0x7df0d8, sunIntensity:0.56, rim:0x4fd6c0, hemiSky:0x2a7a72, hemiGround:0x0c1714, groundColor:0x1d2e29, particle:0x88ffe6, radGlow:0x7affd0, warn:0xff8a5a, fogDensity:0.02, bloom:0.8 }
   },
   {
-    zone: '非常冷却棟', chapterNo: 'CHAPTER 04', title: '非常用という名の平常運転',
-    briefing: 'ECCSの復旧により、原因調査委員会の議事録が開いた。主語のない文章だけが、高温で回り続けている。',
-    meta: 'ECCS / SUBJECT NOT FOUND',
-    palette: { sky:'#081733', glow:'#153d72', ground:'#101826', fog:0x102b4f, sun:0xa7c9ff, sunIntensity:0.6, rim:0x7db4ff, hemiSky:0x2b4f8a, hemiGround:0x090d18, groundColor:0x1d2634, particle:0x8dc7ff, radGlow:0x72a8ff, warn:0xff4f5e, fogDensity:0.028, bloom:1.18 }
+    zone: '外縁処理層', chapterNo: 'CHAPTER 04', title: 'なぜ足立区だったのか',
+    briefing: '物流、下水、河川、古いインフラ、生活圏。東京の負荷が流れ着く外縁。ECCSさえ「外縁に押し出された非常用設備」として扱われていた。足立区が選ばれた理由が、地理にも社会にも見えてくる。',
+    meta: 'OUTER PROCESSING / WHY ADACHI',
+    palette: { sky:'#241a2e', glow:'#6a4a8a', ground:'#1c1622', fog:0x2a1d38, sun:0xc9a8ff, sunIntensity:0.5, rim:0x9a6fd0, hemiSky:0x4a3568, hemiGround:0x120c18, groundColor:0x261c30, particle:0xd0b8ff, radGlow:0xb088ff, warn:0xff7a8a, fogDensity:0.024, bloom:0.86 }
   },
   {
-    zone: '予備電源地下層', chapterNo: 'CHAPTER 05', title: '最後に逃げた電気',
-    briefing: 'バックアップ電源が復旧した。暗闇に残っていたのは、選ばれた理由と、説明しやすい場所に押しつけられた負荷だった。',
-    meta: 'BACKUP POWER / SELECTION REASON RESTORED',
-    palette: { sky:'#160823', glow:'#321653', ground:'#140d19', fog:0x24103a, sun:0xc2a0ff, sunIntensity:0.48, rim:0xb57cff, hemiSky:0x462a6e, hemiGround:0x0b0610, groundColor:0x2a2030, particle:0xc08cff, radGlow:0xb57cff, warn:0xff4f5e, fogDensity:0.031, bloom:1.22 }
+    zone: '予備電源地下層', chapterNo: 'CHAPTER 05', title: '照会中のまま上がる炉心',
+    briefing: '非常用が平常運転していた。原因調査委員会の議事録には主語がない。「責任部局を照会中」のまま炉心温度だけが上がっていく。誰も続けると言わず、誰も止めなかった。',
+    meta: 'BACKUP POWER / UNDER REVIEW',
+    palette: { sky:'#2a1410', glow:'#a8521f', ground:'#1f1410', fog:0x361810, sun:0xffb87a, sunIntensity:0.48, rim:0xff9a55, hemiSky:0x6a3520, hemiGround:0x140a08, groundColor:0x2c1c14, particle:0xffceaa, radGlow:0xff9a55, warn:0xff5a3a, fogDensity:0.028, bloom:0.95 }
   },
   {
-    zone: '格納容器前', chapterNo: 'FINAL CHAPTER', title: '格納容器の外側',
-    briefing: '格納容器が閉じた瞬間、最後の入力欄が現れた。ADACHI-1の本体は、原子炉ではなく責任を消す装置だった。',
-    meta: 'CONTAINMENT / RESPONSIBILITY FIELD OPEN',
+    zone: '再投入管理区', chapterNo: 'CHAPTER 06', title: '氏名欄を復元してください',
+    briefing: '修復対象のない区画。ここでADACHI-1が技師をどう扱ってきたかが露わになる。作業個体ID、再投入可能資源、損耗率、死亡判定：複数回。氏名欄は、未登録のままだ。',
+    meta: 'REENTRY CONTROL / RESTORE NAME',
+    palette: { sky:'#16181f', glow:'#4a5568', ground:'#14161c', fog:0x1c2028, sun:0xb8c4d8, sunIntensity:0.42, rim:0x8a9ab0, hemiSky:0x3a4458, hemiGround:0x0c0e12, groundColor:0x1e222a, particle:0xc4d0e0, radGlow:0x8aa0c0, warn:0xffc24d, fogDensity:0.03, bloom:0.7 }
+  },
+  {
+    zone: '格納容器前', chapterNo: 'CHAPTER 07', title: '最後の入力欄',
+    briefing: '格納容器を修復し、章番号つき本編の最終地点へ。事故対応システムが「責任者氏名」という最後の入力欄を表示する。そして、ついさっき取り戻したばかりの名前を、責任者候補として参照しはじめる。',
+    meta: 'CONTAINMENT / FINAL FIELD',
     palette: { sky:'#2f0b0b', glow:'#6e1b1b', ground:'#21110f', fog:0x4d1212, sun:0xffefe0, sunIntensity:0.72, rim:0xfff1c4, hemiSky:0xffc18a, hemiGround:0x160707, groundColor:0x3f241d, particle:0xfff1c4, radGlow:0xffe0a0, warn:0xff2d3f, fogDensity:0.034, bloom:1.35 }
   },
   {
     zone: '社会感情炉心', chapterNo: 'LAST PHASE', title: '責任者不在',
-    briefing: '配管の最深部が開いた。ここに流れ込んでいたのは感情だけではない。誰かが引き受けるはずだった、すべての名前のない責任だ。',
-    meta: 'SOCIAL EMOTION CORE / NO SUBJECT FOUND',
+    briefing: '真相がすべて開く。第1戦メルトダウン、事故の顔。第2戦 責任者不在、構造の顔。最後に、名前の流用を拒否し、誰も書かなかった空欄ごと止める。',
+    meta: 'SOCIAL EMOTION CORE / NO SUBJECT',
     palette: { sky:'#1a0406', glow:'#7a0f14', ground:'#170808', fog:0x3a0a0c, sun:0xff9a8a, sunIntensity:0.4, rim:0xff4f5e, hemiSky:0x6e1b1b, hemiGround:0x0a0303, groundColor:0x2c1412, particle:0xff6a5a, radGlow:0xff3a2d, warn:0xff2d3f, fogDensity:0.040, bloom:1.45 }
   }
 ];
+
+// ★システム修復key → そのシステムが属する章フェーズ（scenarioPhase）
+//   primary=第1章 … containment=第7章。第6章(再投入管理区)は修復なしのため対応表に無い。
+const SYSTEM_TO_PHASE = {
+  primary: 1, control_rod: 2, secondary: 3, eccs: 4, backup_power: 5, containment: 7
+};
+// 修復完了後に進む次フェーズ（第5章→第6章 再投入管理区、第7章→LAST PHASE）
+const PHASE_AFTER_REPAIR = {
+  primary: 2, control_rod: 3, secondary: 4, eccs: 5, backup_power: 6, containment: 8
+};
 
 function getZonePhase(index) {
   const safe = Math.max(0, Math.min(ZONE_PHASES.length - 1, index || 0));
@@ -7884,6 +7963,9 @@ class GameState {
     this.player = new Player();
     this.enemy = null;
     this.repairedSystems = new Set();
+    this.scenarioPhase = 0; // ★新設：0=プロローグ 1-7=各章 8=LAST PHASE（修復数とは独立）
+    this.nameRestored = false; // ★第6章で氏名欄を一時復元したか
+    this.reentryManagerDefeated = false; // ★再投入管理官を倒したか
     this.encounteredMonsters = new Set();
     this.battleLog = [];
     this.battleTurn = 'player'; // player/enemy/animating
@@ -7915,6 +7997,9 @@ class GameState {
     this.player = new Player();
     this.enemy = null;
     this.repairedSystems.clear();
+    this.scenarioPhase = 0;
+    this.nameRestored = false;
+    this.reentryManagerDefeated = false;
     this.encounteredMonsters.clear();
     this.battleLog = [];
     this.battleTurn = 'player';
@@ -8291,8 +8376,9 @@ class GameController {
     StoryDialog.init();
     this.updateUI();
     this.renderSystemList();
-    this.log({ text: '竹ノ塚外縁区に到着。ここはADACHI-1本体ではなく、施設へ向かう封鎖区域の外側だ。', kind: 'system' });
-    this.log({ text: '任務目標：ADACHI-1へ入る前に、外縁区から冷却設備への侵入口を探す。', kind: 'system' });
+    game.scenarioPhase = 0;
+    this.log({ text: '竹ノ塚 外縁区に到着。封鎖区域の外側。まだ空が見える。', kind: 'system' });
+    this.log({ text: '任務目標：報告書にない反応を確認し、ADACHI-1内部への侵入口を探す。', kind: 'system' });
     // デバッグ指定がある場合は、添付確認用の番人戦だけを直接開始する。
     if (this.shouldRunTobuGuardianDebug()) {
       setTimeout(() => this.startTobuGuardianDebugBattle(), 900);
@@ -8805,7 +8891,20 @@ class GameController {
     const trueBossMode = game.finalBossUnlocked && !game.finalBossDefeated && game.meltdownDefeated;
     let data;
     let levelScale;
-    if (trueBossMode) {
+    if (game.pendingReentryManager) {
+      /* ★第6章：再投入管理官（図鑑外イベントボス）。生物ではなく管理処理の戦闘化。 */
+      const lv = game.player.lv;
+      data = {
+        id: -6, name: '再投入管理官', tierName: '事故対応管理体', tier: 5,
+        modelType: 'boss', isReentryManager: true,
+        baseHP: Math.max(180, Math.round(150 + lv * 9)),
+        baseATK: Math.max(20, Math.round(16 + lv * 1.6)),
+        baseEXP: 240, baseGold: 300,
+        skills: ['再分類処理', '損耗率再計算', '差し戻し'],
+        story: '作業員の死亡、復帰、損耗率、補償額を管理する端末群が変異したもの。'
+      };
+      levelScale = 1 + Math.max(0, lv - 22) * 0.03;
+    } else if (trueBossMode) {
       const base = MONSTERS.find(m => m.id === 70) || MONSTERS[MONSTERS.length - 1];
       data = {
         ...base,
@@ -8867,11 +8966,12 @@ class GameController {
     }
     game.enemy = new EnemyInstance(data, levelScale);
     game.enemy.isTrueBoss = trueBossMode;
+    game.enemy.isReentryManager = !!(data && data.isReentryManager); /* ★第6章イベントボス */
     // メルトダウンは「遭遇」ではなく「撃破」までNo.070として確定記録しない。
     // 撃破前に倒された場合、コンティニュー後の探索で必ず再出現させるため。
     const deferMeltdownRecord = data && data.id === 70 && !trueBossMode && !game.meltdownDefeated;
     const skipPreObservationRecord = !game.mutantObservationUnlocked && !trueBossMode;
-    const skipEncounterRecord = trueBossMode || deferMeltdownRecord || skipPreObservationRecord;
+    const skipEncounterRecord = trueBossMode || deferMeltdownRecord || skipPreObservationRecord || (data && data.isReentryManager);
     const isNewMonster = !skipEncounterRecord && !game.encounteredMonsters.has(data.id);
     if (!skipEncounterRecord) game.encounteredMonsters.add(data.id);
     if (isNewMonster) this.questProgress('dex');
@@ -9088,22 +9188,32 @@ class GameController {
     newStatuses.forEach(s => gains.push(`状態：${statusNames[s] || s}`));
     return gains;
   }
+  getCurrentScenarioPhase() {
+    // ★scenarioPhase（0=プロローグ〜7=第7章, 8=LAST PHASE）を返す。
+    //   未設定の古いセーブ等に備え、修復数からの推定をフォールバックにする。
+    if (typeof game.scenarioPhase === 'number') return game.scenarioPhase;
+    const repaired = game.repairedSystems ? game.repairedSystems.size : 0;
+    return Math.min(repaired === 0 ? 0 : repaired <= 5 ? repaired : 7, 8);
+  }
   getCurrentStoryStage() {
-    // 修復0個なら第1段階、修復1個なら第2段階。
-    // 全6系統修復後だけ、第7段階（最終ログ）に入る。
-    return Math.min((game.repairedSystems ? game.repairedSystems.size : 0) + 1, 7);
+    return this.getCurrentScenarioPhase();
   }
   getStoryUnlockLimit() {
-    // STORY_EVENTSは01から順番に復元する。
-    // 修復段階ごとに読める上限だけを解放し、真相が先に出すぎないようにする。
-    const repaired = game.repairedSystems ? game.repairedSystems.size : 0;
-    if (repaired <= 0) return 2;   // プロローグ：違和感の提示のみ（01-02ぼかし版）
-    if (repaired === 1) return 4;  // 一次冷却後：苦情が熱と確定（03-04）
-    if (repaired === 2) return 5;  // 制御棒後：幸福度KPI（05）
-    if (repaired === 3) return 8;  // 二次冷却後：配管図・治安イメージ・広報（06-08）
-    if (repaired === 4) return 12; // ECCS後：再分類・保育園・町内会・委員会（09-12）
-    if (repaired === 5) return 15; // 電源後：正式仕様書・選定理由・投入記録（13-15）
-    return 20;                     // 格納容器後：最後の制御棒〜最終ログ（16-20）
+    // ★STORY_EVENTSは各eventの stage = 章フェーズ。
+    //   「現在のscenarioPhase」と「修復済みシステムが属する章の最大」の大きい方までを開示基準にする。
+    //   修復で次章へ進んでも直前章のログを読み切れるようにし、かつ先の章のログは出さない。
+    let phase = this.getCurrentScenarioPhase();
+    if (game.repairedSystems) {
+      for (const key of game.repairedSystems) {
+        const ph = (typeof SYSTEM_TO_PHASE[key] === 'number') ? SYSTEM_TO_PHASE[key] : 0;
+        if (ph > phase) phase = ph;
+      }
+    }
+    let limit = 0;
+    for (const ev of STORY_EVENTS) {
+      if (ev.stage <= phase && ev.id > limit) limit = ev.id;
+    }
+    return limit;
   }
   normalizeNextStoryEventId() {
     if (!game.storyEventsSeen) game.storyEventsSeen = new Set();
@@ -9932,6 +10042,19 @@ ${flavor}`;
         if (scene.playerMesh && scene.playerMesh.userData.animator) {
           scene.playerMesh.userData.animator.victoryPose(); // レンチを掲げる
         }
+        /* ★第6章：再投入管理官 撃破 → 氏名欄を一時復元し、第7章を解禁 */
+        if (e.isReentryManager || (e.data && e.data.isReentryManager)) {
+          game.pendingReentryManager = false;
+          game.reentryManagerDefeated = true;
+          this.endBattle(false);
+          if (scene.playerMesh && scene.playerMesh.userData.animator) {
+            scene.playerMesh.userData.animator.victoryPose();
+          }
+          if (typeof this.completeReentryManager === 'function') {
+            setTimeout(() => this.completeReentryManager(), 700);
+          }
+          return;
+        }
         /* ★初回観測：最初の放射ゴキブリは「撃破後」に初めてNo.001として観測登録する。
            endBattle() 後に判定すると状態更新に巻き込まれて見落とす環境があったため、
            撃破時点で firstRoachObservationPending を固定してから呼ぶ。 */
@@ -10054,14 +10177,14 @@ ${flavor}`;
   }
 
   handleClear() {
-    /* ★氏名：最終承認の前に、責任者氏名の記入を求める（空欄＝無記名承認） */
+    /* ★氏名二段構え：第6章で取り戻した名前を、ここで責任者欄に登録させようとする。
+       だが技師はそれを拒否し、誰も書かなかった空欄ごと最後の制御棒で止める（拒否一択・正史）。 */
     if (!game.approvalDone) {
-      this.promptResponsibleName(() => { game.approvalDone = true; this.handleClear(); });
+      this.promptResponsibleRefusal(() => { game.approvalDone = true; this.handleClear(); });
       return;
     }
-    const rName = (game.responsibleName || '').trim().slice(0, 12);
-    const named = rName.length > 0;
-    if (named && game.player) game.player.name = rName;
+    // 拒否したので責任者欄は空欄のまま。技師の名前(第6章で復元)は人間としての名前として残る。
+    const playerName = (game.player && game.player.name) ? game.player.name : '技師';
     game.state = 'COMPLETE';
     audio.finale();
     document.getElementById('command-panel').classList.remove('active');
@@ -10072,19 +10195,19 @@ ${flavor}`;
     const dexComplete = game.encounteredMonsters.size;
 
     const finalLines = [
-      named
-        ? '諸悪の根源が崩れた瞬間、先ほど入力した名前が、中央制御室のすべてのモニタに反映されている。'
-        : '諸悪の根源が崩れた瞬間、先ほど空欄のまま押印された承認欄が、中央制御室のすべてのモニタに反映されている。',
-      'あなたは最後の制御棒を挿入する。金属棒ではない。巨大な承認印が、炉心のど真ん中に沈んでいく。朱肉の赤が、警告灯よりも嫌な色で光る。',
-      named
-        ? '印面には、あなたの名前が刻まれている。書かされたのではない。あなたが、自分で書いた。'
-        : '印面は無記名のまま沈んだ。これも、よくある処理だった。端末だけが、その空白を正確に記録している。',
+      '諸悪の根源が崩れた。だが中央制御室のモニタは、まだ最後の一行を待っている。「責任者氏名」。',
+      '端末：\n候補が一名あります。作業個体 ENG-AD-0001。氏名：' + playerName + '。\nこの氏名で責任者欄を確定しますか。',
+      '技師：\n「……ここに俺の名前を入れれば、この事故は『' + playerName + 'がやったこと』になる。きれいに終わる」',
+      '技師：\n「だが、それは違う。俺は責任者じゃない。俺は資源でもない。俺は、ここで止める人間だ」',
+      'あなたは最後の制御棒を手に取る。金属棒ではない。巨大な承認印だ。だが、それを自分の名前の上には押さない。',
+      '誰も書かなかった、その空欄に、最後の制御棒を挿し込む。責任者氏名欄は、空欄のまま封印された。',
       '東京23区感情配管が逆流する。港区の見栄、渋谷区の自己演出、中央区の地価疲れ、世田谷区の意識の高さ疲れ、杉並区の議論疲れ。全部が行き場を失い、自分の街へ戻っていく。',
       '足立区の地下だけが、はじめて静かになった。苦情は消えていない。不満も消えていない。ただ、それらを誰かの地下に捨てる配管が止まった。',
       'AIが最後の定義を更新する。「幸福度 = 苦情ゼロ」ではない。「幸福度 = 苦情を燃料にされないこと」。',
-      '炉心温度、低下。外部感情入力、遮断。責任環境変数、固定。承認者、' + (named ? rName : '（空欄）') + '。',
-      '足立区原発 ADACHI-1、停止。だが端末の隅で、新しい稟議書が起案されている。「ADACHI-2 建設候補地選定について」。都市は一度止まっても、会議だけは止まらない。',
-      'それでも、感情配管の全図はこの端末に残った。次に投入される技師は、最初から正体を知って入ることになる。あなたの戦いは、その引継資料の最初のページになった。'
+      '炉心温度、低下。外部感情入力、遮断。責任環境変数、固定。承認者、（空欄）。誰の名前も書かれないまま、炉は止まった。',
+      '端末：\n作業員を資源リストから削除しました。氏名欄を復元します。\n' + playerName + ' 技師。おつかれさまでした。',
+      '技師：\n「……やっと名前で呼んだな」\n「遅いんだよ」\n「まあ、いい。帰るか」',
+      '足立区原発 ADACHI-1、停止。だが端末の隅で、新しい稟議書が起案されている。「ADACHI-2 建設候補地選定について」。都市は一度止まっても、会議だけは止まらない。'
     ];
 
     const revealWinScreen = () => {
@@ -10104,15 +10227,12 @@ ${flavor}`;
             <p>足立区の地下に、東京中の不満、偏見、苦情、行政コスト、再開発の矛盾を流し込み、それを熱に変え、電力に変え、都市ブランドのきれいな顔だけを守る装置だった。</p>
             <p>事故の原因は、核燃料の暴走ではない。「苦情がゼロなら住民は幸福である」という、きれいすぎるKPIが炉心を誤作動させた。</p>
             <p>あなたが倒した「東京ブランド維持計画・責任者不在」は、個人ではない。誰も主語を書かず、誰も名前を押さず、見たくないものを説明しやすい場所へ流す、東京という都市の便利な癖そのものだった。</p>
-            <p>${named
-              ? `最後の制御棒は、金属ではなかった。責任者氏名欄に押された名前——「${rName}」。あなたの名前だった。`
-              : '最後の制御棒は、金属ではなかった。責任者氏名欄は、最後まで空白だった。誰の名前も書かれない承認を、端末は「前例に倣った処理」と分類した。'}</p>
+            <p>最後の制御棒は、金属ではなかった。承認印だった。だがあなたは、それを自分の名前の上には押さなかった。責任者氏名欄は、空欄のまま封印された。あなたは責任者にならず、資源にも戻らず、ただ「止める人間」として、この事故を終わらせた。</p>
             <p>炉は停止した。足立区は救われた。ただし、東京が救われたわけではない。足立区という排水口を、いったん詰まらせただけだ。</p>
-            <p>それでも、感情配管の全図はこの端末に残った。次に投入される技師は、最初から正体を知って入ることになる。${named
-              ? 'その引継資料の承認欄には、あなたの名前がある。'
-              : 'その引継資料の承認欄は、まだ空白のままだ。'}</p>
+            <p>そして端末は、最後にようやく、あなたを資源IDではなく名前で呼んだ。「${playerName} 技師」。遅すぎる。それでも、誰の名前も責任者欄に押されないまま炉が止まった事実は、この端末に正確に記録された。</p>
+            <p>それでも、感情配管の全図はこの端末に残った。次に投入される技師は、最初から正体を知って入ることになる。あなたの戦いは、その引継資料の最初のページになった。承認欄は、空白のままで。</p>
             <div class="terminal-line">── 次年度予算要求：ADACHI-2 検討中 ──</div>
-            <div class="terminal-line">── 引継資料：感情配管 全図 ／ 責任者氏名 ${named ? '1' : '0'}件 ──</div>
+            <div class="terminal-line">── 引継資料：感情配管 全図 ／ 責任者氏名 0件（空欄のまま停止）──</div>
           </div>`;
       }
       document.getElementById('endscreen-win').classList.add('active');
@@ -10139,7 +10259,7 @@ ${flavor}`;
 
     setTimeout(() => {
       audio.levelup();
-      this.showCenterMessage('FINAL APPROVAL', '責任者：' + (named ? rName : '（空欄）'), 3200);
+      this.showCenterMessage('RESPONSIBLE: NONE', '責任者氏名欄 ─ 空欄のまま封印', 3200);
       scene.fxFlash(1.0, 1.0, 1.0, 0.42);
       if (scene.playerMesh) scene.pillar(scene.playerMesh.position, 0x6dff5a, 2.0);
     }, 5000);
@@ -10155,8 +10275,15 @@ ${flavor}`;
     return REACTOR_SYSTEMS.find(sys =>
       !game.repairedSystems.has(sys.key) &&
       game.player.lv >= sys.levelReq &&
-      game.player.gold >= sys.cost
+      game.player.gold >= sys.cost &&
+      this.isSystemPhaseUnlocked(sys.key)
     ) || null;
+  }
+  isSystemPhaseUnlocked(key) {
+    // ★章フェーズによる修復ロック。
+    //   格納容器(第7章)は、第6章で再投入管理官を倒して氏名欄を一時復元するまで修復できない。
+    if (key === 'containment') return !!game.nameRestored;
+    return true;
   }
   maybePromptRepairAvailable() {
     if (!game || game.state !== 'IDLE') return false;
@@ -10207,6 +10334,13 @@ ${flavor}`;
   }
   openReactor() {
     if (game.state === 'BATTLE') return;
+    // ★プロローグ(phase0)では基幹システムへのアクセス権限なし。第1章へ進入してから解禁。
+    if ((game.scenarioPhase || 0) < 1) {
+      this.showCenterMessage('ACCESS DENIED', '基幹システムへのアクセス権限がありません', 2200);
+      this.log({ text: '原発修復端末：基幹システムへのアクセス権限がありません。封鎖区域内部へ進入してください。', kind: 'system' });
+      try { audio.beep(180, 0.1, 'square', 0.08); } catch (e) {}
+      return;
+    }
     document.getElementById('reactor-menu').classList.add('active');
     this.renderReactorMenu();
   }
@@ -10302,6 +10436,14 @@ ${flavor}`;
     game.player.gold -= sys.cost;
     game.repairedSystems.add(sys.key);
     const repairCount = game.repairedSystems.size;
+    // ★scenarioPhase更新：修復したシステムが属する章 → 次フェーズへ。
+    //   backup_power(第5章)修復後は第6章(再投入管理区)で止め、氏名イベントで第7章へ進める。
+    if (typeof PHASE_AFTER_REPAIR[sys.key] === 'number') {
+      const next = PHASE_AFTER_REPAIR[sys.key];
+      // containment(第7章)修復→LAST PHASE(8)へは、ここでは進めず従来の真ボス解放処理に委ねる
+      if (sys.key !== 'containment') game.scenarioPhase = next;
+      else game.scenarioPhase = 7; // 第7章に留まる（LAST PHASE移行は別処理）
+    }
     audio.levelup();
     if (scene.playerMesh) {
       scene.pillar(scene.playerMesh.position, 0xffb800, 1.2);
@@ -10318,7 +10460,15 @@ ${flavor}`;
     // 修復完了後は、制御パネルを閉じてから「章が切り替わった」ことを明確に見せる。
     setTimeout(() => {
       this.closeReactor(true);
-      this.unlockReactorStory(repairCount, sys.name, () => {
+      // ★章フェーズに対応する炉心記録を解放（修復数ではなくscenarioPhase基準）
+      const storyIndex = SYSTEM_TO_PHASE[sys.key] || repairCount;
+      this.unlockReactorStory(storyIndex, sys.name, () => {
+        // ★第5章(バックアップ電源)修復 → 第6章「再投入管理区」イベントへ
+        if (sys.key === 'backup_power' && !game.reentryChapterStarted) {
+          setTimeout(() => this.beginReentryControlChapter(), 700);
+          return;
+        }
+        // ★全システム修復後（=格納容器も完了）→ 区民の心〜真ボス解放
         if (game.repairedSystems.size === 6 && !game.finalBossUnlocked) {
           setTimeout(() => this.unlockFinalBossProtocol(), 650);
         }
@@ -11764,8 +11914,31 @@ GameController.prototype.handleFirstMutantObservation = function(monsterData){
     self.updateUI();
     self.renderSystemList();
     self.log({ text: '依頼端末が解放された。観測・討伐・回収依頼を処理できる。発注元は、もちろん名乗らない。', kind: 'system' });
-    setTimeout(function(){ self.maybePromptRepairAvailable(); }, 450);
+    // ★プロローグ→第1章：封鎖区域の隔壁が開き、初めて基幹システムの修復が解禁される
+    setTimeout(function(){ self.advanceToChapterOne(); }, 600);
   }, 'First Observation');
+};
+
+/* ★プロローグ→第1章：隔壁開放と修復解禁 */
+GameController.prototype.advanceToChapterOne = function(){
+  var self = this;
+  if ((game.scenarioPhase || 0) >= 1) return;
+  var lines = [
+    '封鎖区域の奥で、隔壁のロックが外れる音がした。',
+    '端末：\n一次冷却配管区への進入許可を発行します。\n基幹システムへのアクセス権限を、限定的に解放します。',
+    '技師：\n「ようやく中に入れるのか。……入りたくはないけどな」',
+    '報告書通りなら、一次冷却系の損傷が中心のはずだ。報告書通りなら、の話だが。'
+  ];
+  StoryDialog.play('第1章 進入：一次冷却配管区', lines, function(){
+    game.scenarioPhase = 1;
+    // 進入時は背景・章タイトルだけ第1章へ切替（炉心記録の本文は一次冷却を修復したとき出す）
+    try{ self.applyZoneState(1, 5200, false); }catch(e){}
+    game.state = 'IDLE';
+    self.updateUI();
+    self.renderSystemList();
+    self.log({ text: '一次冷却配管区へ進入。基幹システムの修復が可能になった。', kind: 'crit' });
+    setTimeout(function(){ self.maybePromptRepairAvailable(); }, 600);
+  }, 'Chapter 1');
 };
 })();
 </script>
@@ -11778,12 +11951,13 @@ GameController.prototype.handleFirstMutantObservation = function(monsterData){
 'use strict';
 if (typeof GameController === 'undefined') return;
 
-/* 社会感情炉心（ZONE_PHASES[7]）への移行。3経路から呼ばれるが一度だけ実行 */
+/* 社会感情炉心（ZONE_PHASES[8] = LAST PHASE）への移行。3経路から呼ばれるが一度だけ実行 */
 GameController.prototype.enterFinalPhaseZone = function(){
   if (game.finalPhaseEntered) return;
   game.finalPhaseEntered = true;
+  game.scenarioPhase = 8;
   var self = this;
-  try{ this.applyZoneState(7, 5200, false); }catch(e){}
+  try{ this.applyZoneState(8, 5200, false); }catch(e){}
   setTimeout(function(){
     try{
       self.showCenterMessage('ZONE更新', '社会感情炉心 ─ 格納容器の、内側へ。', 2600);
@@ -11898,6 +12072,304 @@ GameController.prototype.promptResponsibleName = function(onDone){
     }
     e.stopPropagation(); /* 本編のキー処理（スペース送り等）に吸われないように */
   };
+};
+
+/* ★氏名二段構え（終盤）：第6章で取り戻した名前を、責任者欄に登録させようとする端末。
+   だが技師はそれを拒否する。入力ではなく「拒否の確認」モーダル。分岐なし・拒否一択。 */
+GameController.prototype.promptResponsibleRefusal = function(onDone){
+  var self = this;
+  var playerName = (game.player && game.player.name) ? game.player.name : '技師';
+  var el = document.getElementById('approval-modal');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'approval-modal';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<div class="apv-box">'
+    + '<h2>最終承認</h2>'
+    + '<div class="apv-sub">FINAL APPROVAL FORM ─ ADACHI-1</div>'
+    + '<div class="apv-body">中央制御室のすべてのモニタが、同じ画面に切り替わった。<br>'
+    + '責任者氏名欄に、候補が自動で差し込まれている。</div>'
+    + '<div class="apv-field"><label>責任者氏名 ─ RESPONSIBLE PERSON</label>'
+    + '<input type="text" id="apv-input" value="' + playerName.replace(/"/g,'') + '" readonly></div>'
+    + '<div class="apv-note">作業個体 ENG-AD-0001 の氏名が、責任者として参照されています。<br>'
+    + 'この欄を確定すれば、事故は「' + playerName + 'がやったこと」として処理されます。</div>'
+    + '<div class="apv-choice">'
+    + '<button class="apv-stamp apv-refuse" id="apv-refuse">この名前は、責任者欄には入れない</button>'
+    + '</div>'
+    + '</div>';
+  el.classList.add('active');
+  var btn = el.querySelector('#apv-refuse');
+  // にじみ出るような間を置いてからボタンを有効化（焦って押せないように）
+  if (btn){
+    btn.disabled = true;
+    setTimeout(function(){ btn.disabled = false; }, 1400);
+    btn.onclick = function(){
+      if (btn.disabled) return;
+      game.responsibleName = ''; /* 空欄のまま：拒否＝正史 */
+      game.responsibleRefused = true;
+      el.classList.remove('active');
+      try{ audio.bossAppear(); }catch(e){}
+      btn.onclick = null;
+      // 拒否の決意を短く語ってから、最後の制御棒の演出へ
+      var lines = [
+        '技師：\n「この名前は、ここに入れるものじゃない」',
+        '技師：\n「俺は責任者じゃない。俺は資源でもない。俺は、ここで止める人間だ」',
+        '責任者氏名欄に、最後の制御棒を挿す。名前の上にではなく、誰も書かなかった空欄の上に。'
+      ];
+      try{
+        StoryDialog.play('最後の制御棒', lines, function(){
+          if (typeof onDone === 'function') onDone();
+        }, 'Refusal');
+      }catch(e){
+        if (typeof onDone === 'function') setTimeout(onDone, 300);
+      }
+    };
+  }
+};
+})();
+</script>
+<script>
+/* ============================================================
+   ★第6章「再投入管理区」レイヤー
+   - 第5章(backup_power)修復→phase6到達で自動発生
+   - 端末調査 → 氏名入力フォーム① → 再投入管理官 出現 → 戦闘
+   - 撃破：氏名欄を一時復元し phase7(格納容器)を解禁
+   - 敗北：氏名は保持したまま「また資源として再投入」専用演出で再戦
+============================================================ */
+(function(){
+'use strict';
+if (typeof GameController === 'undefined') return;
+
+/* 第6章イベントを開始（phase6到達時に1度だけ） */
+GameController.prototype.beginReentryControlChapter = function(){
+  var self = this;
+  if (game.reentryChapterStarted) return;
+  game.reentryChapterStarted = true;
+  game.scenarioPhase = 6;
+  try{ this.applyZoneState(6, 5200, false); }catch(e){}
+  // 背景・章タイトルが切り替わってから、端末調査の語りに入る
+  setTimeout(function(){
+    var lines = [
+      '再投入管理区。ここには、直すものがない。',
+      '中央に、古い事故対応端末が一台だけ生きている。技師はそれを調べた。',
+      '端末：\n作業個体の記録を表示します。'
+    ];
+    StoryDialog.play('第6章：再投入管理区', lines, function(){
+      game.state = 'IDLE';
+      self.openReentryNameForm();
+    }, 'Chapter 6');
+  }, 1400);
+};
+
+/* 氏名入力フォーム①（資源IDから人間へ戻る入力） */
+GameController.prototype.openReentryNameForm = function(){
+  var self = this;
+  var modal = document.getElementById('reentry-modal');
+  if (!modal){
+    modal = document.createElement('div');
+    modal.id = 'reentry-modal';
+    modal.innerHTML =
+      '<div class="re-box">'
+      + '<h2>作業個体 記録照会</h2>'
+      + '<div class="re-sub">REENTRY CONTROL ─ UNIT RECORD</div>'
+      + '<div class="re-record">'
+      + '作業個体ID：ENG-AD-0001\n'
+      + '状態：再投入可能 ／ 損耗率：許容範囲内\n'
+      + '死亡判定：<span class="hot">複数回</span> ／ 復帰判定：成功\n'
+      + '適応レベル：上昇\n'
+      + '氏名：<span class="hot">未登録</span>\n'
+      + '分類：<span class="hot">再投入可能資源</span>'
+      + '</div>'
+      + '<div class="re-field"><label>氏名欄を復元してください ─ RESTORE NAME</label>'
+      + '<input type="text" id="re-input" maxlength="12" placeholder="ここに自分の名前を書く" autocomplete="off"></div>'
+      + '<div class="re-note">これは、責任者になるための名前ではない。<br>資源IDから、人間へ戻るための名前だ。</div>'
+      + '<button class="re-btn" id="re-submit" disabled>この名前を登録する</button>'
+      + '</div>';
+    document.body.appendChild(modal);
+  }
+  var input = document.getElementById('re-input');
+  var btn = document.getElementById('re-submit');
+  input.value = '';
+  btn.disabled = true;
+  modal.classList.add('active');
+  setTimeout(function(){ try{ input.focus(); }catch(e){} }, 200);
+  input.oninput = function(){ btn.disabled = (input.value.trim().length === 0); };
+  input.onkeydown = function(e){
+    if (e.key === 'Enter'){ e.preventDefault(); e.stopPropagation(); return false; }
+    e.stopPropagation();
+  };
+  function submit(){
+    var name = (input.value || '').trim().slice(0, 12);
+    if (!name) return;
+    game.player.name = name;
+    game.responsibleName = ''; /* 責任者欄はまだ空。終盤で参照されかける */
+    var nameEl = document.getElementById('player-name');
+    if (nameEl) nameEl.textContent = name;
+    btn.onclick = null; input.onkeydown = null;
+    modal.classList.remove('active');
+    self.afterReentryNameInput(name);
+  }
+  btn.onclick = submit;
+};
+
+/* 氏名入力後：端末が一度受理 → 個人化検知 → 再投入管理官 出現 */
+GameController.prototype.afterReentryNameInput = function(name){
+  var self = this;
+  var lines = [
+    '端末：\n氏名：' + name + '。\n登録を受理しました。',
+    '端末：\nただし、現在の分類は変更されません。\n分類：再投入可能資源。\n正式復元には、責任者承認が必要です。',
+    '技師：\n「……受理したのに、資源のままかよ」',
+    '端末：\n警告。氏名欄復元は、再投入効率を低下させます。',
+    '端末：\n作業個体の個人化を検知。再分類を実行します。',
+    '技師：\n「名前を入れた途端にこれか。よほど人間に戻られると困るらしいな」'
+  ];
+  StoryDialog.play('再分類プロトコル', lines, function(){
+    self.startReentryManagerBattle();
+  }, 'Reentry');
+};
+
+/* 再投入管理官 出現（番人カットインを流用） */
+GameController.prototype.startReentryManagerBattle = function(){
+  var self = this;
+  game.state = 'IDLE';
+  game.pendingReentryManager = true;
+  this.log({ text: '再投入管理官が再分類を開始した。氏名欄が、また資源IDに戻されようとしている。', kind: 'system' });
+  try{ audio.bossAppear(); }catch(e){}
+  var el = document.getElementById('guardian-cutin');
+  if (!el && typeof ensureReentryCutin === 'function') el = ensureReentryCutin();
+  // 既存の番人カットインDOMを一時的に再投入管理官用の文言に差し替える
+  el = document.getElementById('guardian-cutin') || el;
+  if (el){
+    var tag = el.querySelector('.gc-tag');
+    var nm = el.querySelector('.gc-name');
+    var sys = el.querySelector('.gc-sys');
+    if (tag) tag.textContent = 'WARNING ─ REENTRY CONTROL';
+    if (nm) nm.textContent = '再投入管理官があらわれた';
+    if (sys) sys.textContent = '[再投入管理区] 個人化検知 ─ 再分類実行';
+    if (nm){ nm.style.animation = 'none'; void nm.offsetWidth; nm.style.animation = ''; }
+    el.classList.add('active');
+    var armed = false;
+    setTimeout(function(){ armed = true; }, 2500);
+    var onClick = function(){
+      if (!armed) return;
+      el.removeEventListener('click', onClick);
+      el.classList.remove('active');
+      document.getElementById('command-panel').classList.add('active');
+      setTimeout(function(){ self.spawnEnemy(); }, 250);
+    };
+    el.addEventListener('click', onClick);
+  } else {
+    document.getElementById('command-panel').classList.add('active');
+    this.spawnEnemy();
+  }
+};
+
+/* 再投入管理官 撃破 → 氏名欄を一時復元し 第7章を解禁 */
+GameController.prototype.completeReentryManager = function(){
+  var self = this;
+  game.nameRestored = true;
+  game.scenarioPhase = 7;
+  var nm = (game.player && game.player.name) ? game.player.name : '技師';
+  var lines = [
+    '再投入管理官を停止した。',
+    '端末：\n氏名欄：一時復元。\n氏名：' + nm + '。',
+    '端末：\nただし分類は、まだ再投入可能資源のまま。\n正式復元には、責任者承認が必要です。',
+    '技師：\n「悪いが、俺は在庫には戻らない」',
+    '前方の隔壁が開く。次は格納容器前。章番号のついた現場の、最後の地点だ。'
+  ];
+  StoryDialog.play('氏名欄 一時復元', lines, function(){
+    // 第7章（格納容器）の修復を解禁：背景・章タイトルを切替
+    try{ self.applyZoneState(7, 5200, false); }catch(e){}
+    game.state = 'IDLE';
+    self.updateUI();
+    self.renderSystemList();
+    self.log({ text: '格納容器前へ進入。最後の基幹システム「格納容器」の修復が可能になった。', kind: 'crit' });
+    setTimeout(function(){ self.maybePromptRepairAvailable(); }, 600);
+  }, 'Chapter 7');
+};
+
+/* 敗北：再投入管理官戦は「また資源として再投入」専用演出（氏名は保持・再戦） */
+var _prevDefeat = GameController.prototype.handleDefeat;
+GameController.prototype.handleDefeat = function(){
+  if (game.state === 'GAMEOVER') return;
+  if (game.pendingReentryManager){
+    showReentryContinue(this);
+    return;
+  }
+  return _prevDefeat.apply(this, arguments);
+};
+
+function ensureReentryContinue(){
+  var el = document.getElementById('guardian-continue');
+  if (el) return el;
+  el = document.createElement('div');
+  el.id = 'guardian-continue';
+  el.innerHTML = '<div class="gcn-box">'
+    + '<h2 id="gcn-title">氏名欄復元、失敗</h2>'
+    + '<div class="gcn-sub">REENTRY ─ RECLASSIFIED</div>'
+    + '<div class="gcn-body" id="gcn-body"></div>'
+    + '<div class="gcn-buttons">'
+    + '<button class="gcn-retry" id="gcn-retry">再投入される</button>'
+    + '<button class="gcn-retreat" id="gcn-retreat">撤退する</button>'
+    + '</div></div>';
+  document.body.appendChild(el);
+  return el;
+}
+
+function showReentryContinue(ctrl){
+  game.state = 'GAMEOVER';
+  game.battleTurn = 'animating';
+  var el = ensureReentryContinue();
+  var titleEl = el.querySelector('#gcn-title');
+  if (titleEl) titleEl.textContent = '氏名欄復元、失敗';
+  var subEl = el.querySelector('.gcn-sub');
+  if (subEl) subEl.textContent = 'REENTRY ─ RECLASSIFIED';
+  document.getElementById('gcn-body').textContent =
+    '氏名欄復元に失敗しました。作業個体IDへ再統合します。\n'
+    + '──また、資源として再投入される。';
+  el.classList.add('active');
+  var retry = document.getElementById('gcn-retry');
+  var retreat = document.getElementById('gcn-retreat');
+  if (retry) retry.textContent = '再投入される';
+  function cleanup(){ el.classList.remove('active'); try{ ctrl.endBattle(); }catch(e){} }
+  if (retry) retry.onclick = function(){
+    cleanup();
+    var p = game.player;
+    p.hp = p.maxHp; p.mp = p.maxMp;
+    p.statusEffects = [];
+    game.continues = (game.continues || 0) + 1;
+    ctrl.log({ text: '臨時通達：氏名欄復元処理は未完了です。作業個体を再投入します。', kind: 'system' });
+    ctrl.log({ text: '技師：「……またIDに戻す気かよ」', kind: 'system' });
+    ctrl.updateUI();
+    // 氏名は保持。再投入管理官との戦いをやり直す（名前の再入力なし）
+    setTimeout(function(){ ctrl.startReentryManagerBattle(); }, 700);
+  };
+  if (retreat) retreat.onclick = function(){
+    cleanup();
+    game.pendingReentryManager = false;
+    var p = game.player; p.hp = Math.max(1, Math.round(p.maxHp * 0.5)); p.mp = p.maxMp;
+    game.state = 'IDLE';
+    ctrl.log({ text: '一時撤退した。だが氏名欄は、まだ資源IDのままだ。再投入管理区の端末は、まだ技師を待っている。', kind: 'system' });
+    ctrl.updateUI();
+    // 撤退後、再び端末に触れれば管理官戦を再開できるようにする
+    game.reentryChapterStarted = true;
+    setTimeout(function(){ ctrl.offerReentryRetry(); }, 800);
+  };
+}
+
+/* 撤退後の再挑戦導線 */
+GameController.prototype.offerReentryRetry = function(){
+  var self = this;
+  if (game.nameRestored) return;
+  this.log({ text: '再投入管理区の端末が点滅している。もう一度調べて、氏名欄の復元を完了させろ。', kind: 'system' });
+  // 探索コマンドの代わりに、確認しやすいよう中央メッセージで促す
+  try{ this.showCenterMessage('再投入管理区', '端末を調べて氏名欄の復元を完了せよ', 2600); }catch(e){}
+  // 再開は氏名入力をスキップし、すでに名前があるので管理官戦から
+  setTimeout(function(){
+    if (game.nameRestored) return;
+    self.afterReentryNameInput((game.player && game.player.name) ? game.player.name : '技師');
+  }, 2800);
 };
 })();
 </script>
