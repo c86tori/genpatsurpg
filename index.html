@@ -14024,5 +14024,265 @@ GameController.prototype.issueScouter = function(){
 })();
 </script>
 
+
+<!-- ============================================================
+   v109 patch: name-event blackout cleanup + debug level/phase controls
+============================================================ -->
+<style id="adachi-v109-name-debug-style">
+/* 名前入力・責任者欄モーダルは、章隔壁や死亡暗転より必ず前面に出す */
+#reentry-modal.active,
+#approval-modal.active{
+  z-index:260!important;
+}
+#adachi-name-focus-veil{
+  position:fixed;inset:0;z-index:34;display:none;pointer-events:none;opacity:0;
+  background:
+    radial-gradient(circle at 50% 46%,rgba(91,231,255,.12),transparent 28%),
+    radial-gradient(circle at 58% 58%,rgba(255,194,77,.08),transparent 24%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px),
+    rgba(0,2,6,.62);
+  mix-blend-mode:normal;
+}
+#adachi-name-focus-veil::before{
+  content:"";position:absolute;inset:-4%;opacity:.38;
+  background:
+    linear-gradient(90deg,transparent 0 18%,rgba(91,231,255,.13) 20%,transparent 24%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 7px);
+  filter:blur(.4px);
+  animation:nameFocusNoise .58s steps(2,end) infinite;
+}
+body.adachi-name-event-focus #adachi-name-focus-veil{
+  display:block;animation:nameFocusIn .48s cubic-bezier(.2,.9,.15,1) forwards;
+}
+body.adachi-name-event-closing #adachi-name-focus-veil{
+  display:block;animation:nameFocusOut .38s ease forwards;
+}
+body.adachi-name-event-focus #game-root{
+  filter:brightness(.55) saturate(.6) blur(1.1px);
+  transition:filter .38s cubic-bezier(.2,.9,.15,1);
+}
+body.adachi-name-event-focus #story-window.active,
+body.adachi-name-event-focus .story-window.active{
+  filter:none!important;
+}
+@keyframes nameFocusIn{
+  0%{opacity:0;filter:blur(10px) brightness(2);transform:scale(1.02)}
+  35%{opacity:.72;filter:blur(1px) brightness(1.2);transform:translateX(3px) scale(1.006)}
+  58%{opacity:.48;filter:blur(2px) brightness(.75);transform:translateX(-4px) scale(1.01)}
+  100%{opacity:.82;filter:blur(0) brightness(.95);transform:translateX(0) scale(1)}
+}
+@keyframes nameFocusOut{
+  0%{opacity:.82;filter:blur(0)}
+  100%{opacity:0;filter:blur(10px)}
+}
+@keyframes nameFocusNoise{
+  0%,100%{transform:translate(0,0);opacity:.26}
+  25%{transform:translate(7px,-2px);opacity:.42}
+  50%{transform:translate(-5px,2px);opacity:.22}
+  75%{transform:translate(3px,4px);opacity:.36}
+}
+#dbg-panel .dbg-input{
+  width:54px;background:rgba(255,255,255,.06);border:1px solid rgba(91,231,255,.35);color:#eaf6ff;
+  font-family:var(--fm);font-size:10px;padding:4px 6px;outline:none;
+}
+#dbg-panel .dbg-mini-label{font-family:var(--fm);font-size:8px;color:#8fb0c4;align-self:center;letter-spacing:.08em}
+#dbg-panel .dbg-row.phase-debug button{min-width:42px}
+</style>
+<script id="adachi-v109-name-debug-patch">
+(function(){
+'use strict';
+if (typeof GameController === 'undefined') return;
+
+function ctrl(){ return window.controller || window.gameController || (window.game && window.game.controller) || null; }
+function ensureNameVeil(){
+  var v=document.getElementById('adachi-name-focus-veil');
+  if(!v){ v=document.createElement('div'); v.id='adachi-name-focus-veil'; document.body.appendChild(v); }
+  return v;
+}
+function clearResidualDarkLayers(){
+  try{
+    var bo=document.getElementById('chapter-blackout');
+    if(bo){ bo.classList.remove('on','closed','open'); }
+    var card=document.getElementById('chapter-shift');
+    if(card){ card.classList.remove('hold','out','active','chapter-front'); }
+    var veil=document.getElementById('adachi-death-veil');
+    if(veil){ veil.classList.remove('on'); }
+    document.body.classList.remove('adachi-death-mode','adachi-death-recover');
+    var hud=document.getElementById('hud');
+    if(hud){ hud.classList.remove('adachi-death-mode','story-front','phase-shifting'); hud.style.zIndex=''; }
+    ['story-overlay','story-window'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){ el.classList.remove('chapter-front'); el.style.zIndex=''; }
+    });
+  }catch(e){}
+}
+function enterNameFocus(){
+  clearResidualDarkLayers();
+  ensureNameVeil();
+  document.body.classList.remove('adachi-name-event-closing');
+  document.body.classList.add('adachi-name-event-focus');
+}
+function exitNameFocus(){
+  document.body.classList.remove('adachi-name-event-focus');
+  document.body.classList.add('adachi-name-event-closing');
+  setTimeout(function(){ document.body.classList.remove('adachi-name-event-closing'); }, 420);
+}
+function watchModalClose(el){
+  if(!el || el.__adachiNameWatch) return;
+  el.__adachiNameWatch = true;
+  var mo = new MutationObserver(function(){
+    if(!el.classList.contains('active')) exitNameFocus();
+  });
+  mo.observe(el,{attributes:true,attributeFilter:['class']});
+}
+window.ADACHI_NAME_EVENT_FX = { enter:enterNameFocus, exit:exitNameFocus, clear:clearResidualDarkLayers };
+
+/* 第6章の氏名入力フォーム：残った章隔壁を消し、入力欄を前面へ */
+var _v109OpenReentryNameForm = GameController.prototype.openReentryNameForm;
+GameController.prototype.openReentryNameForm = function(){
+  enterNameFocus();
+  var r = _v109OpenReentryNameForm.apply(this, arguments);
+  setTimeout(function(){ watchModalClose(document.getElementById('reentry-modal')); }, 0);
+  return r;
+};
+var _v109AfterReentryNameInput = GameController.prototype.afterReentryNameInput;
+GameController.prototype.afterReentryNameInput = function(name){
+  exitNameFocus();
+  clearResidualDarkLayers();
+  return _v109AfterReentryNameInput.apply(this, arguments);
+};
+
+/* 終盤の責任者氏名欄：こちらも章隔壁より前面へ */
+if (GameController.prototype.promptResponsibleName){
+  var _v109PromptResponsibleName = GameController.prototype.promptResponsibleName;
+  GameController.prototype.promptResponsibleName = function(onDone){
+    enterNameFocus();
+    var r = _v109PromptResponsibleName.apply(this, arguments);
+    setTimeout(function(){ watchModalClose(document.getElementById('approval-modal')); }, 0);
+    return r;
+  };
+}
+if (GameController.prototype.promptResponsibleRefusal){
+  var _v109PromptResponsibleRefusal = GameController.prototype.promptResponsibleRefusal;
+  GameController.prototype.promptResponsibleRefusal = function(onDone){
+    enterNameFocus();
+    var r = _v109PromptResponsibleRefusal.apply(this, arguments);
+    setTimeout(function(){ watchModalClose(document.getElementById('approval-modal')); }, 0);
+    return r;
+  };
+}
+
+function setDebugLevel(lv){
+  var c=ctrl();
+  if(typeof game === 'undefined' || !game || !game.player) return;
+  lv=Math.max(1,Math.min(99,parseInt(lv,10)||1));
+  var p=game.player;
+  var oldArmorHp = 0;
+  try{ oldArmorHp = (p.getArmor && p.getArmor().hpBonus) ? p.getArmor().hpBonus : 0; }catch(e){}
+  p.lv=lv;
+  p.exp=0;
+  p.maxHp=30 + (lv-1)*7 + oldArmorHp;
+  p.maxMp=12 + (lv-1)*4;
+  p.atk=8 + (lv-1)*2;
+  p.def=4 + (lv-1);
+  p.hp=p.maxHp; p.mp=p.maxMp;
+  p.tempDef=0; p.statusEffects=[]; p.skills=[];
+  try{ p.checkSkills(); }catch(e){}
+  try{ if(c){ c.updateUI(); c.renderSystemList(); c.renderReactorMenu && c.renderReactorMenu(); c.showCenterMessage('DEBUG LV '+lv,'技師レベルを設定',1500); } }catch(e){}
+}
+function cleanupBattleForDebug(){
+  try{
+    if(game.enemy){ game.enemy=null; }
+    game.pendingGuardianRepair=null;
+    game.pendingReentryManager=false;
+    game.unseeableBattle=false;
+    game._awaitingRoachRematch=false;
+    game._v107UnseeableDeathRunning=false;
+    game._v108UnseeableDeathRunning=false;
+    game.battleTurn='player';
+    game.state='IDLE';
+    if(typeof scene !== 'undefined' && scene && scene.enemyMesh){ scene.scene.remove(scene.enemyMesh); scene.enemyMesh=null; }
+    if(typeof scene !== 'undefined' && scene && scene.setBattleCamera) scene.setBattleCamera(false);
+    var es=document.getElementById('enemy-status'); if(es) es.classList.remove('active');
+    var cmd=document.getElementById('command-panel'); if(cmd) cmd.classList.add('active');
+    var ml=document.getElementById('message-log'); if(ml) ml.classList.add('active');
+    clearResidualDarkLayers();
+  }catch(e){}
+}
+function setRepairedForPhase(phase){
+  var keys=[];
+  if(phase>=2) keys.push('primary');
+  if(phase>=3) keys.push('control_rod');
+  if(phase>=4) keys.push('secondary');
+  if(phase>=5) keys.push('eccs');
+  if(phase>=6) keys.push('backup_power');
+  if(phase>=8) keys.push('containment');
+  game.repairedSystems = new Set(keys);
+  game.guardiansDefeated = new Set(keys.filter(function(k){return k!=='containment';}));
+  if(phase>=8) game.guardiansDefeated.add('containment');
+}
+function setStoryForPhase(phase){
+  game.storyUnlocked = new Set([0]);
+  for(var i=1;i<=Math.min(phase,7);i++) game.storyUnlocked.add(i);
+}
+function jumpPhase(phase){
+  var c=ctrl(); if(typeof game === 'undefined' || !game || !c) return;
+  phase=Math.max(0,Math.min(8,parseInt(phase,10)||0));
+  cleanupBattleForDebug();
+  game.scenarioPhase=phase;
+  setRepairedForPhase(phase);
+  setStoryForPhase(phase);
+  game.scouterIssued = phase>=1;
+  game.mutantObservationUnlocked = phase>=1;
+  game.firstMutantIntroShown = phase>=1;
+  game.firstEncounterIntroPlayed = true;
+  game.prologueT1ObjectiveActive = false;
+  game.prologueT1ObjectiveDone = phase>=1;
+  game.prologueT1Kills = phase>=1 ? 4 : 0;
+  game.reentryChapterStarted = phase>=6;
+  game.nameRestored = phase>=7;
+  game.reentryManagerDefeated = phase>=7;
+  game.citizenHeartObtained = phase>=8;
+  game.finalBossPending = false;
+  game.finalBossUnlocked = phase>=8;
+  game.finalPhaseEntered = phase>=8;
+  if(!game.encounteredMonsters) game.encounteredMonsters=new Set();
+  if(phase>=1){ for(var m=1;m<=Math.min(10+phase*5,70);m++) game.encounteredMonsters.add(m); }
+  try{ c.initQuests && c.initQuests(); }catch(e){}
+  var minLv=[1,5,8,12,16,22,24,30,35][phase] || 1;
+  if(game.player.lv < minLv) setDebugLevel(minLv);
+  try{ c.applyZoneState(phase,1200,false); }catch(e){}
+  try{ c.updateUI(); c.renderSystemList(); c.renderReactorMenu && c.renderReactorMenu(); }catch(e){}
+  try{ c.showCenterMessage('DEBUG PHASE '+phase,(ZONE_PHASES[phase]&&ZONE_PHASES[phase].zone)||'ZONE',1800); }catch(e){}
+  try{ c.log({text:'DEBUG: '+((ZONE_PHASES[phase]&&ZONE_PHASES[phase].chapterNo)||phase)+' / '+((ZONE_PHASES[phase]&&ZONE_PHASES[phase].zone)||'ZONE')+' から開始できる状態に設定。',kind:'system'}); }catch(e){}
+}
+window.ADACHI_DEBUG = window.ADACHI_DEBUG || {};
+window.ADACHI_DEBUG.setLevel=setDebugLevel;
+window.ADACHI_DEBUG.jumpPhase=jumpPhase;
+window.ADACHI_DEBUG.clearResidualDarkLayers=clearResidualDarkLayers;
+
+function injectDebugButtons(){
+  var d=document.getElementById('dbg-panel');
+  if(!d || document.getElementById('dbg-level-custom')) return;
+  var sec=document.createElement('div'); sec.className='dbg-sec'; sec.textContent='LEVEL / CHAPTER START';
+  var row1=document.createElement('div'); row1.className='dbg-row';
+  row1.innerHTML='<span class="dbg-mini-label">LV</span>'
+    + '<button data-lv="1">1</button><button data-lv="5">5</button><button data-lv="10">10</button><button data-lv="20">20</button><button data-lv="30">30</button><button data-lv="40">40</button>'
+    + '<input class="dbg-input" id="dbg-level-custom" type="number" min="1" max="99" value="1"><button id="dbg-level-apply">設定</button>';
+  var row2=document.createElement('div'); row2.className='dbg-row phase-debug';
+  var labels=['P0','C1','C2','C3','C4','C5','C6','C7','LAST'];
+  row2.innerHTML=labels.map(function(l,i){return '<button data-phase-start="'+i+'">'+l+'</button>';}).join('');
+  d.appendChild(sec); d.appendChild(row1); d.appendChild(row2);
+  row1.querySelectorAll('button[data-lv]').forEach(function(b){ b.onclick=function(){ setDebugLevel(b.getAttribute('data-lv')); }; });
+  var apply=document.getElementById('dbg-level-apply');
+  if(apply) apply.onclick=function(){ var v=document.getElementById('dbg-level-custom'); setDebugLevel(v ? v.value : 1); };
+  row2.querySelectorAll('button[data-phase-start]').forEach(function(b){ b.onclick=function(){ jumpPhase(b.getAttribute('data-phase-start')); }; });
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(injectDebugButtons,60); });
+else setTimeout(injectDebugButtons,60);
+document.addEventListener('keydown', function(e){ if(e.key==='d'||e.key==='D') setTimeout(injectDebugButtons,80); });
+})();
+</script>
+
 </body>
 </html>
