@@ -11900,33 +11900,60 @@ $('ts-tk').textContent = HEADLINES.join('　◆　') + '　◆　';
 ============================================================ */
 var phase = 'gate';
 var TITLE_BGM = null;
+var BGM_UNLOCKED = false;
 function bgmStatus(msg){
   window.__bgmStatus = msg;
   var el = document.getElementById('dbg-bgm-status');
   if (el) el.textContent = 'BGM: ' + msg;
   try{ console.log('[BGM]', msg); }catch(e){}
 }
-function startTitleBGM(){
-  if (TITLE_BGM) { try{ TITLE_BGM.play(); bgmStatus('再開'); }catch(e){ bgmStatus('再開失敗 '+e); } return; }
+function ensureBGMEl(){
+  if (TITLE_BGM) return TITLE_BGM;
+  TITLE_BGM = new Audio('sound/genpatsu_top_m.mp3');
+  TITLE_BGM.loop = true;
+  TITLE_BGM.preload = 'auto';
+  TITLE_BGM.volume = 0.0;
+  TITLE_BGM.addEventListener('canplay', function(){ bgmStatus('再生可能（canplay）'); });
+  TITLE_BGM.addEventListener('playing', function(){ bgmStatus('再生中（playing）'); });
+  TITLE_BGM.addEventListener('error', function(){
+    var err = TITLE_BGM.error;
+    bgmStatus('読込エラー code=' + (err? err.code : '?'));
+  });
+  return TITLE_BGM;
+}
+/* ★起動ゲートのクリック内で呼ぶ：その場で一瞬だけ再生→即停止し、Safariに音声を「解禁」させる */
+function unlockTitleBGM(){
   try{
-    TITLE_BGM = new Audio('sound/genpatsu_top_m.mp3');
-    TITLE_BGM.loop = true;
-    TITLE_BGM.volume = 0.0;
-    bgmStatus('読込開始 sound/genpatsu_top_m.mp3');
-    TITLE_BGM.addEventListener('canplay', function(){ bgmStatus('再生可能（canplay）'); });
-    TITLE_BGM.addEventListener('playing', function(){ bgmStatus('再生中（playing）vol=' + TITLE_BGM.volume.toFixed(2)); });
-    TITLE_BGM.addEventListener('error', function(){
-      var err = TITLE_BGM.error;
-      bgmStatus('読込エラー code=' + (err? err.code : '?') + '（ファイルが見つからない/形式エラーの可能性）');
-    });
-    var p = TITLE_BGM.play();
+    var a = ensureBGMEl();
+    a.muted = true;
+    var p = a.play();
     if (p && p.then){
-      p.then(function(){ bgmStatus('play()成功'); })
-       .catch(function(err){ bgmStatus('play()拒否: ' + (err && err.name ? err.name : err) + '（自動再生制限の可能性）'); });
+      p.then(function(){
+        // 解禁成功：いったん止めて頭出し（本番はtitleDropで鳴らす）
+        a.pause(); a.currentTime = 0; a.muted = false;
+        BGM_UNLOCKED = true;
+        bgmStatus('解禁済み（クリックで許可取得）');
+      }).catch(function(err){
+        a.muted = false;
+        bgmStatus('解禁失敗: ' + (err && err.name ? err.name : err));
+      });
     } else {
-      bgmStatus('play()呼び出し（Promise非対応ブラウザ）');
+      a.pause(); a.currentTime = 0; a.muted = false; BGM_UNLOCKED = true;
+      bgmStatus('解禁済み（Promise非対応）');
     }
-    // フェードイン
+  }catch(e){ bgmStatus('解禁例外: ' + e); }
+}
+/* 実際に鳴らす（フェードイン） */
+function startTitleBGM(){
+  var a = ensureBGMEl();
+  try{
+    a.muted = false;
+    a.volume = 0.0;
+    var p = a.play();
+    if (p && p.then){
+      p.then(function(){ bgmStatus('再生開始'); })
+       .catch(function(err){ bgmStatus('play()拒否: ' + (err && err.name ? err.name : err)); });
+    }
     var target = 0.55, step = 0.03;
     var fi = setInterval(function(){
       if (!TITLE_BGM){ clearInterval(fi); return; }
@@ -11954,6 +11981,7 @@ function openGate(){
   phase = 'boot';
   audioInit();
   if (AC && AC.state === 'suspended') AC.resume();
+  unlockTitleBGM(); // ★クリックの瞬間に音声を解禁（Safari対策）。実際の再生はロゴ出現後。
   beep(880, 0.07, 0.05); setTimeout(function(){ beep(1320, 0.1, 0.05); }, 90);
   startAmbience();
   $('ts-flash').classList.add('go');
