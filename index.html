@@ -13753,21 +13753,273 @@ GameController.prototype.questProgress = function(type, payload){
 </script>
 
 
-<script id="adachi-v107-first-battle-item-guard">
+<!-- ============================================================
+     v108 patch: 死亡暗転をノイズ崩壊演出へ／死亡ウインドウ前面化／
+     初回ゴキブリ戦を防御力無視で4被弾確定死亡に修正
+============================================================ -->
+<style id="adachi-v108-death-noise-style">
+#adachi-death-veil{
+  z-index:64!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(circle at 52% 48%, rgba(91,231,255,.10), transparent 24%),
+    radial-gradient(circle at 50% 54%, rgba(255,79,94,.12), transparent 34%),
+    rgba(0,0,0,.0)!important;
+  opacity:0!important;
+  overflow:hidden!important;
+  transition:none!important;
+}
+#adachi-death-veil::before{
+  content:'';position:absolute;inset:-12%;pointer-events:none;opacity:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(91,231,255,.04) 0 2px, transparent 2px 9px);
+  mix-blend-mode:screen;
+  animation:adachiDeathNoise 1.9s steps(7,end) forwards;
+}
+#adachi-death-veil::after{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:
+    linear-gradient(90deg, transparent 0 14%, rgba(91,231,255,.20) 17%, transparent 21%),
+    linear-gradient(180deg, transparent 0 42%, rgba(255,255,255,.14) 44%, transparent 47%),
+    radial-gradient(ellipse at center, transparent 18%, rgba(0,0,0,.86) 70%, #000 100%);
+  mix-blend-mode:screen;
+  animation:adachiDeathTear 2.2s cubic-bezier(.2,.9,.15,1) forwards;
+}
+#adachi-death-veil.on{
+  display:block!important;
+  animation:adachiDeathVeilIn 2.15s cubic-bezier(.2,.9,.15,1) forwards!important;
+}
+body.adachi-death-mode #three-canvas,
+body.adachi-death-mode #zone-atmosphere,
+body.adachi-death-mode #zone-atmosphere-next{
+  filter:none!important;
+  animation:adachiVisionCollapse 2.15s cubic-bezier(.2,.9,.15,1) forwards!important;
+  transform-origin:50% 52%!important;
+}
+body.adachi-death-mode #hud{
+  position:fixed!important;inset:0!important;z-index:150!important;
+}
+body.adachi-death-mode #hud > *:not(#story-overlay):not(#story-window){
+  opacity:0!important;pointer-events:none!important;transition:opacity .55s ease!important;
+}
+body.adachi-death-mode #story-overlay.active{
+  position:fixed!important;inset:0!important;z-index:190!important;
+  background:rgba(0,0,0,.06)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  opacity:1!important;pointer-events:auto!important;
+}
+body.adachi-death-mode #story-window.active{
+  position:fixed!important;z-index:210!important;opacity:1!important;visibility:visible!important;
+  filter:none!important;box-shadow:0 0 44px rgba(91,231,255,.18),0 22px 84px rgba(0,0,0,.92)!important;
+}
+body.adachi-death-mode #scouter-panel{z-index:220!important}
+body.adachi-death-recover #adachi-death-veil.on{
+  animation:adachiDeathRecover .95s cubic-bezier(.2,.9,.15,1) forwards!important;
+}
+@keyframes adachiDeathVeilIn{
+  0%{opacity:0;background-color:rgba(0,0,0,0)}
+  16%{opacity:.18;background-color:rgba(0,0,0,.10)}
+  32%{opacity:.34;background-color:rgba(0,0,0,.20)}
+  52%{opacity:.58;background-color:rgba(0,0,0,.42)}
+  74%{opacity:.82;background-color:rgba(0,0,0,.68)}
+  100%{opacity:.92;background-color:rgba(0,0,0,.88)}
+}
+@keyframes adachiVisionCollapse{
+  0%{filter:brightness(1) blur(0) contrast(1);transform:translate(0,0) scale(1)}
+  12%{filter:brightness(.92) blur(.5px) contrast(1.1);transform:translate(3px,-2px) scale(1.002)}
+  21%{filter:brightness(.84) blur(1px) contrast(1.25);transform:translate(-5px,2px) scale(1.006)}
+  36%{filter:brightness(.64) blur(1.7px) contrast(1.38) saturate(.7);transform:translate(4px,4px) scale(1.014)}
+  56%{filter:brightness(.38) blur(2.6px) contrast(1.55) saturate(.45);transform:translate(-3px,1px) scale(1.026)}
+  76%{filter:brightness(.18) blur(3.2px) contrast(1.3) saturate(.25);transform:translate(1px,-2px) scale(1.038)}
+  100%{filter:brightness(.055) blur(4px) contrast(1.15) saturate(.1);transform:translate(0,0) scale(1.048)}
+}
+@keyframes adachiDeathNoise{
+  0%{opacity:0;transform:translate(0,0)}
+  12%{opacity:.20;transform:translate(4px,-2px)}
+  24%{opacity:.40;transform:translate(-8px,3px)}
+  38%{opacity:.24;transform:translate(12px,1px)}
+  54%{opacity:.50;transform:translate(-5px,-5px)}
+  72%{opacity:.32;transform:translate(9px,4px)}
+  100%{opacity:.08;transform:translate(0,0)}
+}
+@keyframes adachiDeathTear{
+  0%{opacity:0;transform:translateX(-12%)}
+  18%{opacity:.28;transform:translateX(7%)}
+  34%{opacity:.18;transform:translateX(-5%)}
+  58%{opacity:.42;transform:translateX(4%)}
+  100%{opacity:.22;transform:translateX(0)}
+}
+@keyframes adachiDeathRecover{
+  0%{opacity:.92;background-color:rgba(0,0,0,.9)}
+  45%{opacity:.74;background-color:rgba(0,0,0,.65)}
+  100%{opacity:0;background-color:rgba(0,0,0,0)}
+}
+</style>
+<script id="adachi-v108-death-noise-patch">
 (function(){
 'use strict';
 if (typeof GameController === 'undefined') return;
-var _v107UseItem = GameController.prototype.useItem;
-GameController.prototype.useItem = function(itemKey){
-  if (game && game.unseeableBattle && !game.scouterIssued){
+
+function ensureDeathVeil108(){
+  var v=document.getElementById('adachi-death-veil');
+  if(!v){ v=document.createElement('div'); v.id='adachi-death-veil'; document.body.appendChild(v); }
+  return v;
+}
+function setDeathMode108(on){
+  var hud=document.getElementById('hud');
+  var v=ensureDeathVeil108();
+  if(on){
+    document.body.classList.remove('adachi-death-recover');
+    document.body.classList.add('adachi-death-mode');
+    if(hud) hud.classList.add('adachi-death-mode');
+    v.classList.add('on');
+  }else{
+    document.body.classList.add('adachi-death-recover');
+    setTimeout(function(){
+      v.classList.remove('on');
+      document.body.classList.remove('adachi-death-mode','adachi-death-recover');
+      if(hud) hud.classList.remove('adachi-death-mode');
+    }, 950);
+  }
+}
+function forceStoryWindowFront(){
+  var hud=document.getElementById('hud');
+  var ov=document.getElementById('story-overlay');
+  var win=document.getElementById('story-window');
+  if(hud){ hud.style.zIndex='150'; }
+  if(ov){ ov.style.zIndex='190'; ov.style.opacity='1'; }
+  if(win){ win.style.zIndex='210'; win.style.opacity='1'; win.style.visibility='visible'; }
+}
+
+var _v108ResolveEnemyAttack = GameController.prototype.resolveEnemyAttack;
+GameController.prototype.resolveEnemyAttack = function(action){
+  if(game && game.unseeableBattle && !game.scouterIssued){
     var self=this;
-    try{ this.closeSubMenu(); }catch(e){}
-    game.battleTurn='animating'; this.updateUI();
-    var prompt = this.engineerPrompt || function(lines, cb){ if(window.engTypewrite) window.engTypewrite(String(lines||'')); setTimeout(cb, 800); };
-    prompt.call(this, '手探りで所持品を探した。\nだが、噛まれた場所も、相手の位置も、まだわからない。', function(){ self.startEnemyTurn(); });
+    var hits=(game._unseeHits||0)+1;
+    game._unseeHits=hits;
+    var p=game.player;
+    var before=Math.max(0, p.hp||0);
+    var targetHp;
+    if(hits>=4){
+      targetHp=0;
+    }else{
+      targetHp=Math.max(1, Math.ceil(p.maxHp * (1 - hits/4)));
+      if(targetHp>=before) targetHp=Math.max(1, before - Math.max(1, Math.ceil(p.maxHp/4)));
+    }
+    p.hp=Math.max(0,targetHp);
+    var real=Math.max(1, before - p.hp);
+    try{ audio.damage(); }catch(e){}
+    game.battleTookDamage=true;
+    try{
+      var flashEl=document.getElementById('screen-flash'); if(flashEl){ flashEl.classList.add('hit'); setTimeout(function(){ flashEl.classList.remove('hit'); },70); }
+      if(scene && scene.fxCA) scene.fxCA(0.018 + hits*0.004);
+      if(scene && scene.flashMesh) scene.flashMesh(scene.playerMesh);
+      if(scene && scene.shake) scene.shake(0.24 + hits*.05,0.22);
+      if(scene && scene.playerMesh && scene.playerMesh.userData && scene.playerMesh.userData.animator) scene.playerMesh.userData.animator.hitFlinch();
+      if(this.spawnDamageNumber && scene && scene.playerMesh) this.spawnDamageNumber(scene.playerMesh.position.clone().setY(scene.playerMesh.position.y+1.7), real, hits>=4?'crit':'dmg');
+      if(scene && scene.burst && scene.playerMesh) scene.burst(scene.playerMesh.position.clone().setY(scene.playerMesh.position.y+1.0),0xff6633,25,0.4);
+    }catch(e){}
+    var hurtLines=[
+      '右肩が裂けた。\nなのに、何が通ったのか見えない。',
+      '足元で何かが跳ねた。\n次の瞬間、作業服の内側が熱い。',
+      '見えない。\n見えないのに、向こうは正確に俺を噛んでいる。',
+      '今のは避けられない。\n避ける対象が、まだ存在していない。'
+    ];
+    game.player.tempDef=0;
+    game.battleTurn='animating';
+    this.updateUI();
+    var prompt = this.engineerPrompt || window.engineerPrompt;
+    (prompt ? prompt.bind(this) : function(lines,done){ if(done) done(); })(hurtLines[Math.min(hits-1,hurtLines.length-1)], function(){
+      if(game.player.hp<=0) self.handleDefeat();
+      else self.endEnemyTurn();
+    });
     return;
   }
-  return _v107UseItem.apply(this, arguments);
+  return _v108ResolveEnemyAttack.apply(this, arguments);
+};
+
+var _v108SpawnEnemy = GameController.prototype.spawnEnemy;
+GameController.prototype.spawnEnemy = function(){
+  var ret=_v108SpawnEnemy.apply(this, arguments);
+  try{
+    if(game && game.unseeableBattle && !game.scouterIssued){
+      game._unseeHits=0;
+    }
+  }catch(e){}
+  return ret;
+};
+
+GameController.prototype.handleUnseeableDefeat = function(){
+  var self=this;
+  if(!game || game._v108UnseeableDeathRunning) return;
+  game._v108UnseeableDeathRunning=true;
+  game._v107UnseeableDeathRunning=true;
+  game.state='GAMEOVER'; game.battleTurn='animating';
+  var command=document.getElementById('command-panel'); if(command) command.classList.remove('active');
+  try{ if(scene.playerMesh && scene.playerMesh.userData && scene.playerMesh.userData.animator) scene.playerMesh.userData.animator.hitFlinch(); }catch(e){}
+  setDeathMode108(true);
+  var lines=[
+    '視界が暗転した。痛みの方向だけが、最後にわかった。',
+    '死亡判定を実行します。',
+    '端末：\n判定結果：却下。\n当該作業個体は「再投入可能資源」に分類されています。死亡として処理できません。',
+    '技師：\n「……死んだのに、死んでないことにされるのか」',
+    '端末：\n労働災害として登録するには、責任者氏名が必要です。\n責任者氏名欄：空欄。登録不可。再投入で代替します。',
+    '端末：\n死因候補：変異生物を視認できなかったこと。\n高線量および感情漏出帯域により、対象は可視光で捉えられていません。',
+    '端末：\n視認補助端末を支給します。対象の輪郭、種別、観測データを表示します。'
+  ];
+  setTimeout(function(){
+    if(typeof StoryDialog !== 'undefined' && StoryDialog.play){
+      StoryDialog.play('死亡判定：却下', lines, function(){ self.issueScouter(); }, 'Death Report');
+      setTimeout(forceStoryWindowFront, 50);
+    }else{
+      self.issueScouter();
+    }
+  }, 1150);
+};
+
+GameController.prototype.issueScouter = function(){
+  var self=this;
+  game.scouterIssued=true;
+  game.unseeableBattle=false;
+  game._awaitingRoachRematch=true;
+  game._v107UnseeableDeathRunning=false;
+  game._v108UnseeableDeathRunning=false;
+  game._unseeHits=0;
+  game._unseeMissIdx=0;
+  game.mutantObservationUnlocked=false;
+  try{ if(game.encounteredMonsters) game.encounteredMonsters.delete(1); }catch(e){}
+  var p=game.player;
+  p.hp=p.maxHp; p.mp=p.maxMp; p.statusEffects=[];
+  game.continues=(game.continues||0)+1;
+  game.enemy=null;
+  if(scene.enemyMesh){ try{ scene.scene.remove(scene.enemyMesh); }catch(e){} scene.enemyMesh=null; }
+  try{ scene.setBattleCamera(false); }catch(e){}
+  game.battleTurn='player'; game.state='IDLE';
+  if(typeof ensureScouterUI==='function') ensureScouterUI();
+  else {
+    var el=document.getElementById('scouter-panel');
+    if(!el){ el=document.createElement('div'); el.id='scouter-panel'; el.innerHTML='<div class="sc-frame"><div class="sc-scan"></div><div class="sc-flash"></div><div class="sc-head"><span class="sc-title">SIGHT-AID</span><span class="sc-id" id="sc-id">NO.--</span></div><div class="sc-art" id="sc-art"><div class="sc-noimg">NO IMAGE<br>観測データ取得中</div><canvas class="sc-noise-canvas" width="160" height="90"></canvas><div class="sc-tear"></div></div><div class="sc-name" id="sc-name">―</div><div class="sc-tier" id="sc-tier">―</div><div class="sc-stats" id="sc-stats"></div><div class="sc-bio" id="sc-bio"></div><div class="sc-voice" id="sc-voice"></div></div>'; document.body.appendChild(el); }
+  }
+  if(this.bootScouter) this.bootScouter();
+  var hud=document.getElementById('hud'); if(hud) hud.classList.add('active');
+  var cmd=document.getElementById('command-panel'); if(cmd) cmd.classList.remove('active');
+  var ml=document.getElementById('message-log'); if(ml) ml.classList.remove('active');
+  setTimeout(function(){
+    var sc=document.getElementById('scouter-panel');
+    if(sc){ sc.classList.remove('show','booting'); sc.classList.add('issued'); }
+    setDeathMode108(false);
+    setTimeout(function(){
+      if(ml) ml.classList.add('active');
+      if(cmd) cmd.classList.add('active');
+      self.updateUI();
+      try{ self.renderSystemList(); }catch(e){}
+      var prompt=self.engineerPrompt || window.engineerPrompt;
+      (prompt ? prompt.bind(self) : function(lines,done){ if(done) done(); })('再投入完了。\n右下の端末は、一度沈黙した。次に出るときは、対象を映すはずだ。', function(){
+        game.state='IDLE'; self.updateUI();
+      });
+    }, 980);
+  }, 2400);
 };
 })();
 </script>
