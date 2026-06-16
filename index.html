@@ -11944,22 +11944,34 @@ function unlockTitleBGM(){
   }catch(e){ bgmStatus('解禁例外: ' + e); }
 }
 /* 実際に鳴らす（フェードイン） */
-function startTitleBGM(){
+function fadeInBGM(){
+  var target = 0.55, step = 0.03;
+  var fi = setInterval(function(){
+    if (!TITLE_BGM){ clearInterval(fi); return; }
+    TITLE_BGM.volume = Math.min(target, TITLE_BGM.volume + step);
+    if (TITLE_BGM.volume >= target) clearInterval(fi);
+  }, 60);
+}
+function startTitleBGM(retry){
   var a = ensureBGMEl();
   try{
     a.muted = false;
     a.volume = 0.0;
     var p = a.play();
     if (p && p.then){
-      p.then(function(){ bgmStatus('再生開始'); })
-       .catch(function(err){ bgmStatus('play()拒否: ' + (err && err.name ? err.name : err)); });
+      p.then(function(){ bgmStatus('再生開始'); fadeInBGM(); })
+       .catch(function(err){
+         var name = (err && err.name) ? err.name : ('' + err);
+         bgmStatus('play()拒否: ' + name + (retry?'（リトライ後）':'（リトライします）'));
+         // 読み込み待ちが原因のことがあるので、一度だけ待って再挑戦
+         if (!retry){
+           try{ a.load(); }catch(e){}
+           setTimeout(function(){ startTitleBGM(true); }, 900);
+         }
+       });
+    } else {
+      fadeInBGM();
     }
-    var target = 0.55, step = 0.03;
-    var fi = setInterval(function(){
-      if (!TITLE_BGM){ clearInterval(fi); return; }
-      TITLE_BGM.volume = Math.min(target, TITLE_BGM.volume + step);
-      if (TITLE_BGM.volume >= target) clearInterval(fi);
-    }, 60);
   }catch(e){ bgmStatus('例外: ' + e); }
 }
 function stopTitleBGM(){
@@ -11987,6 +11999,8 @@ function openGate(){
   $('ts-flash').classList.add('go');
   setTimeout(function(){ $('ts-flash').classList.remove('go'); }, 520);
   $('ts-gate').classList.add('off');
+  // ★BGMを早めに先読み開始（GitHub等のネット遅延対策）
+  try{ ensureBGMEl().load(); bgmStatus('先読み開始'); }catch(e){}
   setTimeout(runBoot, 420);
 }
 $('ts-gate').addEventListener('click', openGate);
