@@ -13416,5 +13416,361 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else start();
 })();
 </script>
+
+
+<!-- ============================================================
+     v107 patch: 初回不可視戦闘の4被弾敗北／SIGHT-AID暗転起動／
+     放射ゴキブリ再戦／T1×4討伐で第1章へ
+============================================================ -->
+<style id="adachi-v107-first-battle-style">
+#adachi-death-veil{
+  position:fixed;inset:0;z-index:80;display:none;pointer-events:none;
+  background:#000;opacity:0;transition:opacity .45s ease;
+}
+#adachi-death-veil.on{display:block;opacity:.96}
+body.adachi-death-mode #three-canvas,
+body.adachi-death-mode #zone-atmosphere,
+body.adachi-death-mode #zone-atmosphere-next{filter:brightness(.08) blur(2px)!important}
+body.adachi-death-mode #hud{z-index:90!important}
+body.adachi-death-mode #hud > *:not(#story-overlay):not(#story-window){
+  opacity:0!important;pointer-events:none!important;transition:opacity .25s ease!important;
+}
+body.adachi-death-mode #story-overlay.active{
+  position:fixed!important;inset:0!important;z-index:92!important;
+  background:rgba(0,0,0,.12)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+body.adachi-death-mode #story-window.active{position:fixed!important;z-index:94!important}
+body.adachi-death-mode #scouter-panel{z-index:120!important}
+body.adachi-engineer-wait #eng-speech{border-left-color:rgba(255,194,77,.78);box-shadow:0 0 24px rgba(255,194,77,.10) inset;cursor:pointer}
+body.adachi-engineer-wait #eng-speech::after{
+  content:'CLICK';position:absolute;right:10px;bottom:6px;font-family:var(--fm);font-size:8px;letter-spacing:.18em;color:var(--amber);
+  animation:blink 1s steps(1) infinite;
+}
+#eng-speech{position:relative}
+</style>
+<script id="adachi-v107-first-battle-patch">
+(function(){
+'use strict';
+if (typeof GameController === 'undefined') return;
+
+function ctrl(){ return window.controller || window.gameController || (window.game && window.game.controller) || null; }
+function ensureDeathVeil(){
+  var v=document.getElementById('adachi-death-veil');
+  if(!v){ v=document.createElement('div'); v.id='adachi-death-veil'; document.body.appendChild(v); }
+  return v;
+}
+function setDeathMode(on){
+  var hud=document.getElementById('hud');
+  var v=ensureDeathVeil();
+  document.body.classList.toggle('adachi-death-mode', !!on);
+  if(hud) hud.classList.toggle('adachi-death-mode', !!on);
+  if(on){ v.classList.add('on'); }
+  else { v.classList.remove('on'); setTimeout(function(){ if(!document.body.classList.contains('adachi-death-mode')) v.style.display=''; }, 500); }
+}
+
+/* ENGINEER欄をクリック待ちテキストとして使う。ログには流さず、次ターンへ自動進行しない。 */
+function engineerPrompt(lines, onDone){
+  var el=document.getElementById('eng-speech');
+  if(!el){ if(typeof onDone==='function') onDone(); return; }
+  lines = Array.isArray(lines) ? lines.slice() : [String(lines||'')];
+  var idx=0, timer=null, charDelay=36, armed=false;
+  document.body.classList.add('adachi-engineer-wait');
+  function tick(text, i, cursor){
+    if(i>=text.length){ timer=null; armed=true; return; }
+    var ch=text.charAt(i);
+    cursor.insertAdjacentText('beforebegin', ch);
+    try{ if(ch.trim() && window.audio && audio.typewriter) audio.typewriter(); }catch(e){}
+    timer=setTimeout(function(){ tick(text, i+1, cursor); }, charDelay);
+  }
+  function show(){
+    armed=false;
+    if(timer){ clearTimeout(timer); timer=null; }
+    el.textContent='';
+    var cursor=document.createElement('span'); cursor.className='cursor'; cursor.textContent='▍';
+    el.appendChild(cursor);
+    tick(String(lines[idx]||''),0,cursor);
+  }
+  function finish(){
+    document.body.classList.remove('adachi-engineer-wait');
+    el.removeEventListener('click', click);
+    document.removeEventListener('keydown', key);
+    if(timer){ clearTimeout(timer); timer=null; }
+    if(typeof onDone==='function') onDone();
+  }
+  function click(e){
+    if(e){ e.preventDefault(); e.stopPropagation(); }
+    if(timer){
+      var text=String(lines[idx]||'');
+      if(timer){ clearTimeout(timer); timer=null; }
+      el.textContent=text;
+      var cursor=document.createElement('span'); cursor.className='cursor'; cursor.textContent='▍'; el.appendChild(cursor);
+      armed=true;
+      return;
+    }
+    if(!armed) return;
+    idx++;
+    if(idx>=lines.length) finish();
+    else show();
+  }
+  function key(e){
+    if(!document.body.classList.contains('adachi-engineer-wait')) return;
+    if(e.key===' '||e.key==='Enter'||e.key==='z'||e.key==='Z') click(e);
+  }
+  el.addEventListener('click', click);
+  document.addEventListener('keydown', key);
+  show();
+}
+
+GameController.prototype.engineerPrompt = function(lines, onDone){ engineerPrompt(lines, onDone); };
+
+/* 不可視戦のプレイヤー攻撃：CENTER表示ではなくENGINEER欄へ。クリック後に敵ターン。 */
+var _v107ResolvePlayerAttack = GameController.prototype.resolvePlayerAttack;
+GameController.prototype.resolvePlayerAttack = function(){
+  if(game && game.unseeableBattle && !game.scouterIssued){
+    var self=this;
+    try{ audio.attack(); }catch(e){}
+    var missLines=[
+      'あたらない\nそこにいるはずなのに',
+      '手応えがない。\n目の前を殴ったはずなのに、レンチだけが空を切った。',
+      '輪郭がつかめない。\nいる。なのに、画面にも目にも乗ってこない。',
+      '照準が滑る。\n虫一匹の位置すら、現場の端末は説明できない。'
+    ];
+    var i=(game._unseeMissIdx=(game._unseeMissIdx||0))%missLines.length; game._unseeMissIdx++;
+    try{ if(scene.enemyMesh) this.spawnDamageNumber(scene.enemyMesh.position.clone().setY(scene.enemyMesh.position.y+1.7),'MISS','miss'); }catch(e){}
+    try{ scene.punch(0.45,0.2); }catch(e){}
+    game.battleTurn='animating'; this.updateUI();
+    engineerPrompt(missLines[i], function(){ self.startEnemyTurn(); });
+    return;
+  }
+  return _v107ResolvePlayerAttack.apply(this, arguments);
+};
+
+/* 不可視戦の逃走・スキルもENGINEER欄クリック待ちへ。 */
+var _v107PlayerRun = GameController.prototype.playerRun;
+GameController.prototype.playerRun = function(){
+  if(game && game.unseeableBattle && !game.scouterIssued){
+    var self=this;
+    game.battleTurn='animating'; this.updateUI();
+    engineerPrompt('逃げ場がわからない。\n後ろに下がったはずなのに、距離だけが変わっていない。', function(){ self.startEnemyTurn(); });
+    return;
+  }
+  return _v107PlayerRun.apply(this, arguments);
+};
+var _v107UseSkill = GameController.prototype.useSkill;
+GameController.prototype.useSkill = function(skillKey){
+  if(game && game.unseeableBattle && !game.scouterIssued){
+    var self=this; try{ this.closeSubMenu(); }catch(e){}
+    game.battleTurn='animating'; this.updateUI();
+    engineerPrompt('狙いが定まらない。\n対象が見えないまま、技だけが空転している。', function(){ self.startEnemyTurn(); });
+    return;
+  }
+  return _v107UseSkill.apply(this, arguments);
+};
+
+/* 敵ターンは4回目の被弾で必ず死亡。攻撃ログはENGINEER欄に出さない。 */
+var _v107ResolveEnemyAttack = GameController.prototype.resolveEnemyAttack;
+GameController.prototype.resolveEnemyAttack = function(action){
+  if(game && game.unseeableBattle && !game.scouterIssued){
+    var self=this;
+    var hits=(game._unseeHits=(game._unseeHits||0)+1);
+    var p=game.player;
+    var dmg = hits >= 4 ? Math.max(1, p.hp) : Math.max(1, Math.ceil(p.maxHp/4));
+    try{ audio.damage(); }catch(e){}
+    var real=p.takeDamage(dmg);
+    game.battleTookDamage=true;
+    try{
+      var flashEl=document.getElementById('screen-flash'); if(flashEl){ flashEl.classList.add('hit'); setTimeout(function(){ flashEl.classList.remove('hit'); },70); }
+      scene.fxCA(0.014); scene.flashMesh(scene.playerMesh); scene.shake(0.25,0.22);
+      if(scene.playerMesh && scene.playerMesh.userData && scene.playerMesh.userData.animator) scene.playerMesh.userData.animator.hitFlinch();
+      this.spawnDamageNumber(scene.playerMesh.position.clone().setY(scene.playerMesh.position.y+1.7), real, 'dmg');
+      scene.burst(scene.playerMesh.position.clone().setY(scene.playerMesh.position.y+1.0),0xff6633,25,0.4);
+    }catch(e){}
+    var hurtLines=[
+      '右肩が裂けた。\nなのに、何が通ったのか見えない。',
+      '足元で何かが跳ねた。\n次の瞬間、作業服の内側が熱い。',
+      '見えない。\n見えないのに、向こうは正確に俺を噛んでいる。',
+      '今のは避けられない。\n避ける対象が、まだ存在していない。'
+    ];
+    game.player.tempDef=0;
+    this.updateUI();
+    game.battleTurn='animating';
+    engineerPrompt(hurtLines[Math.min(hits-1,hurtLines.length-1)], function(){
+      if(game.player.hp<=0) self.handleDefeat();
+      else self.endEnemyTurn();
+    });
+    return;
+  }
+  return _v107ResolveEnemyAttack.apply(this, arguments);
+};
+
+/* 初回死亡：下中央のStoryDialogだけを残して暗転。 */
+GameController.prototype.handleUnseeableDefeat = function(){
+  var self=this;
+  if(!game || game._v107UnseeableDeathRunning) return;
+  game._v107UnseeableDeathRunning=true;
+  game.state='GAMEOVER'; game.battleTurn='animating';
+  var command=document.getElementById('command-panel'); if(command) command.classList.remove('active');
+  try{ if(scene.playerMesh && scene.playerMesh.userData && scene.playerMesh.userData.animator) scene.playerMesh.userData.animator.hitFlinch(); }catch(e){}
+  setDeathMode(true);
+  var lines=[
+    '視界が暗転した。痛みの方向だけが、最後にわかった。',
+    '死亡判定を実行します。',
+    '端末：\n判定結果：却下。\n当該作業個体は「再投入可能資源」に分類されています。死亡として処理できません。',
+    '技師：\n「……死んだのに、死んでないことにされるのか」',
+    '端末：\n労働災害として登録するには、責任者氏名が必要です。\n責任者氏名欄：空欄。登録不可。再投入で代替します。',
+    '端末：\n死因候補：変異生物を視認できなかったこと。\n高線量および感情漏出帯域により、対象は可視光で捉えられていません。',
+    '端末：\n視認補助端末を支給します。対象の輪郭、種別、観測データを表示します。'
+  ];
+  StoryDialog.play('死亡判定：却下', lines, function(){
+    self.issueScouter();
+  }, 'Death Report');
+};
+
+/* SIGHT-AID支給：まだ図鑑/依頼は解禁しない。暗転中に右下で起動→収納→暗転解除。 */
+GameController.prototype.issueScouter = function(){
+  var self=this;
+  game.scouterIssued=true;
+  game.unseeableBattle=false;
+  game._awaitingRoachRematch=true;
+  game._v107UnseeableDeathRunning=false;
+  game._unseeHits=0;
+  game._unseeMissIdx=0;
+  /* 観測録と依頼端末は、次の放射ゴキブリを撃破してから解禁する。 */
+  game.mutantObservationUnlocked=false;
+  try{ if(game.encounteredMonsters) game.encounteredMonsters.delete(1); }catch(e){}
+
+  var p=game.player;
+  p.hp=p.maxHp; p.mp=p.maxMp; p.statusEffects=[];
+  game.continues=(game.continues||0)+1;
+  game.enemy=null;
+  if(scene.enemyMesh){ try{ scene.scene.remove(scene.enemyMesh); }catch(e){} scene.enemyMesh=null; }
+  try{ scene.setBattleCamera(false); }catch(e){}
+  game.battleTurn='player'; game.state='IDLE';
+
+  if(typeof ensureScouterUI==='function') ensureScouterUI();
+  else {
+    /* ensureScouterUI は元スクリプト内関数なので、環境差のための最小フォールバック */
+    var el=document.getElementById('scouter-panel');
+    if(!el){ el=document.createElement('div'); el.id='scouter-panel'; el.innerHTML='<div class="sc-frame"><div class="sc-scan"></div><div class="sc-flash"></div><div class="sc-head"><span class="sc-title">SIGHT-AID</span><span class="sc-id" id="sc-id">NO.--</span></div><div class="sc-art" id="sc-art"><div class="sc-noimg">NO IMAGE<br>観測データ取得中</div><canvas class="sc-noise-canvas" width="160" height="90"></canvas><div class="sc-tear"></div></div><div class="sc-name" id="sc-name">―</div><div class="sc-tier" id="sc-tier">―</div><div class="sc-stats" id="sc-stats"></div><div class="sc-bio" id="sc-bio"></div><div class="sc-voice" id="sc-voice"></div></div>'; document.body.appendChild(el); }
+  }
+  if(this.bootScouter) this.bootScouter();
+  var hud=document.getElementById('hud'); if(hud) hud.classList.add('active');
+  var cmd=document.getElementById('command-panel'); if(cmd) cmd.classList.remove('active');
+  var ml=document.getElementById('message-log'); if(ml) ml.classList.remove('active');
+
+  setTimeout(function(){
+    var sc=document.getElementById('scouter-panel');
+    if(sc){ sc.classList.remove('show','booting'); sc.classList.add('issued'); }
+    setDeathMode(false);
+    if(ml) ml.classList.add('active');
+    if(cmd) cmd.classList.add('active');
+    self.updateUI();
+    try{ self.renderSystemList(); }catch(e){}
+    engineerPrompt('再投入完了。\n右下の端末は、一度沈黙した。次に出るときは、対象を映すはずだ。', function(){
+      game.state='IDLE'; self.updateUI();
+    });
+  }, 2400);
+};
+
+/* 放射ゴキブリ再戦時、技師が口悪くコメントしてから戦闘開始。 */
+var _v107SpawnEnemy = GameController.prototype.spawnEnemy;
+GameController.prototype.spawnEnemy = function(){
+  var ret=_v107SpawnEnemy.apply(this, arguments);
+  var self=this;
+  setTimeout(function(){
+    try{
+      if(game && game.enemy && game.enemy.data && Number(game.enemy.data.id)===1 && game.scouterIssued && !game.mutantObservationUnlocked && game._awaitingRoachRematch && !game._roachRematchLineShown){
+        game._roachRematchLineShown=true;
+        game.battleTurn='animating'; self.updateUI();
+        engineerPrompt('見えたぞ。\nゴキブリのくせに、さっきは現場責任者みたいな顔で噛みやがったな。', function(){
+          game.battleTurn='player'; self.updateUI();
+        });
+      }
+    }catch(e){}
+  }, 760);
+  return ret;
+};
+
+/* 初回観測：依頼開始。ただし第1章へは進めず、T1×4討伐をプロローグ目標にする。 */
+GameController.prototype.handleFirstMutantObservation = function(monsterData){
+  var self=this;
+  if(!game || game.mutantObservationUnlocked) return;
+  game.mutantObservationUnlocked=true;
+  game.firstMutantIntroShown=true;
+  game._awaitingRoachRematch=false;
+  if(!game.encounteredMonsters) game.encounteredMonsters=new Set();
+  var wasNew=monsterData && !game.encounteredMonsters.has(monsterData.id);
+  if(monsterData) game.encounteredMonsters.add(monsterData.id);
+  this.initQuests();
+  if(wasNew) this.questProgress('dex');
+  game.prologueT1ObjectiveActive=true;
+  game.prologueT1Kills=0;
+  game.prologueT1ObjectiveDone=false;
+  this.updateUI();
+  try{ this.showCenterMessage('観測録 起動','No.001 放射ゴキブリを暫定登録',2400); }catch(e){}
+  var lines=[
+    '謎の虫を撃破した。',
+    '技師：\n「……見えたら見えたで、腹立つ顔してるな」',
+    '端末：\n生体反応を再照合中。\n候補：ゴキブリ。\n補足：通常のゴキブリは、作業員を死亡判定まで追い込みません。',
+    'No.001\n放射ゴキブリ',
+    '端末：\n外殻からセシウム137由来の反応を検出。下水系統で複数世代の変異が進行したものと推定。',
+    '環境課廃端末より自動通知：\n\n変異生物観測録が解放されました。観測個体の記録提出をお願いします。',
+    '依頼端末が接続されました。',
+    '端末：\n外縁区の安全確認には、T1変異生物4体の沈黙化が必要です。',
+    '技師：\n「沈黙化ね。つまり、うるせえ虫を黙らせろってことだろ」'
+  ];
+  StoryDialog.play('初回観測：No.001 放射ゴキブリ', lines, function(){
+    game.state='IDLE';
+    self.updateUI();
+    self.renderSystemList();
+    self.log({text:'依頼端末が解放された。外縁区駆除依頼：T1変異生物 0/4。',kind:'crit'});
+  }, 'First Observation');
+};
+
+/* T1を4体倒したら、第1章へ進む。 */
+var _v107QuestProgress = GameController.prototype.questProgress;
+GameController.prototype.questProgress = function(type, payload){
+  var ret=_v107QuestProgress.apply(this, arguments);
+  try{
+    if(type==='hunt' && payload && Number(payload.tier)===1 && game && game.prologueT1ObjectiveActive && !game.prologueT1ObjectiveDone){
+      game.prologueT1Kills=(game.prologueT1Kills||0)+1;
+      var n=game.prologueT1Kills;
+      this.log({text:'外縁区駆除依頼：T1変異生物 '+Math.min(n,4)+' / 4',kind:n>=4?'crit':'system'});
+      if(n>=4){
+        var self=this;
+        game.prologueT1ObjectiveDone=true;
+        game.prologueT1ObjectiveActive=false;
+        setTimeout(function waitAdvance(){
+          if(!game || game.state==='BATTLE' || (typeof StoryDialog!=='undefined' && StoryDialog.active)){ setTimeout(waitAdvance,500); return; }
+          self.advanceToChapterOne();
+        }, 900);
+      }
+    }
+  }catch(e){}
+  return ret;
+};
+})();
+</script>
+
+
+<script id="adachi-v107-first-battle-item-guard">
+(function(){
+'use strict';
+if (typeof GameController === 'undefined') return;
+var _v107UseItem = GameController.prototype.useItem;
+GameController.prototype.useItem = function(itemKey){
+  if (game && game.unseeableBattle && !game.scouterIssued){
+    var self=this;
+    try{ this.closeSubMenu(); }catch(e){}
+    game.battleTurn='animating'; this.updateUI();
+    var prompt = this.engineerPrompt || function(lines, cb){ if(window.engTypewrite) window.engTypewrite(String(lines||'')); setTimeout(cb, 800); };
+    prompt.call(this, '手探りで所持品を探した。\nだが、噛まれた場所も、相手の位置も、まだわからない。', function(){ self.startEnemyTurn(); });
+    return;
+  }
+  return _v107UseItem.apply(this, arguments);
+};
+})();
+</script>
+
 </body>
 </html>
