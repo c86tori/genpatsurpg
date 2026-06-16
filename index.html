@@ -11776,6 +11776,8 @@ function titleDrop(){
     sp.style.animationDelay = (Math.random() * 0.55).toFixed(2) + 's';
     sp.classList.add('in');
   });
+  // ★タイトルロゴ「足立区原発」が浮かび上がってからBGM再生（起動ゲートのクリックで音声は既に解禁済み）
+  setTimeout(function(){ startTitleBGM(); }, 700);
   setTimeout(function(){ nz.style.opacity = '.05'; }, 2600);
   setTimeout(function(){
     ui.classList.add('titled');
@@ -11952,7 +11954,6 @@ function openGate(){
   phase = 'boot';
   audioInit();
   if (AC && AC.state === 'suspended') AC.resume();
-  startTitleBGM(); // ★タイトルBGM開始（最初のクリックで自動再生制限を回避）
   beep(880, 0.07, 0.05); setTimeout(function(){ beep(1320, 0.1, 0.05); }, 90);
   startAmbience();
   $('ts-flash').classList.add('go');
