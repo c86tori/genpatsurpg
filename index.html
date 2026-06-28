@@ -580,6 +580,64 @@ button{font-family:inherit;color:inherit}
 .sw-hint{position:absolute;top:10px;right:16px;font-family:var(--fm);font-size:9px;letter-spacing:.2em;color:var(--muted)}
 .sw-title{font-size:14px;font-weight:900;letter-spacing:.1em;color:var(--amber);margin-bottom:10px;text-shadow:0 0 14px rgba(255,194,77,.35)}
 .sw-body{font-size:15.5px;line-height:2;letter-spacing:.03em;color:#e6f2fb;min-height:62px;text-shadow:0 1px 2px rgba(0,0,0,.7);white-space:pre-line}
+
+/* ============ 端末風ブートパネル（プロローグ SYSTEM BOOT 演出） ============ */
+.term-panel{
+  position:absolute;inset:0;z-index:38;display:none;
+  align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 42%,rgba(4,12,20,.4),rgba(0,2,5,.92));
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);pointer-events:auto;
+}
+.term-panel.active{display:flex;animation:termFade .4s var(--ease) both}
+@keyframes termFade{from{opacity:0}to{opacity:1}}
+.term-frame{
+  position:relative;width:min(680px,calc(100vw - 32px));max-height:min(74vh,560px);
+  display:flex;flex-direction:column;
+  border:1px solid rgba(91,231,255,.4);
+  background:linear-gradient(180deg,rgba(5,13,21,.97),rgba(2,6,11,.98));
+  box-shadow:0 30px 100px rgba(0,0,0,.8),0 0 60px rgba(91,231,255,.12),inset 0 0 60px rgba(91,231,255,.03);
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+  padding:0 0 14px;
+}
+.term-corner{position:absolute;width:9px;height:9px;border:1px solid var(--cyan);opacity:.7}
+.term-corner.tc1{top:5px;left:5px;border-right:none;border-bottom:none}
+.term-corner.tc2{top:5px;right:5px;border-left:none;border-bottom:none}
+.term-corner.tc3{bottom:5px;left:5px;border-right:none;border-top:none}
+.term-corner.tc4{bottom:5px;right:5px;border-left:none;border-top:none}
+.term-head{
+  display:flex;align-items:center;gap:10px;padding:11px 18px;
+  border-bottom:1px solid rgba(91,231,255,.18);
+  background:linear-gradient(180deg,rgba(91,231,255,.06),transparent);
+}
+.term-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:termPulse 1.6s infinite}
+@keyframes termPulse{0%,100%{opacity:1}50%{opacity:.35}}
+.term-headline{font-family:var(--fd);font-size:11px;font-weight:900;letter-spacing:.28em;color:var(--cyan);flex:1;text-shadow:0 0 12px rgba(91,231,255,.4)}
+.term-status{font-family:var(--fm);font-size:9px;letter-spacing:.18em;color:var(--green)}
+.term-scroll{
+  flex:1 1 auto;min-height:0;overflow-y:auto;
+  padding:16px 20px 8px;font-family:var(--fm);font-size:12.5px;line-height:1.85;
+  color:#cfe6f5;letter-spacing:.02em;
+}
+.term-scroll::-webkit-scrollbar{width:6px}
+.term-scroll::-webkit-scrollbar-thumb{background:rgba(91,231,255,.3)}
+.term-row{display:flex;gap:10px;margin-bottom:3px;white-space:pre-wrap;word-break:break-word}
+.term-row .tk{color:var(--muted);flex:0 0 auto;min-width:84px;letter-spacing:.06em}
+.term-row .tv{color:#dff0fb;flex:1}
+.term-row.alert .tv{color:var(--amber)}
+.term-row.bad .tv{color:#ff8d97}
+.term-row.good .tv{color:var(--green)}
+.term-row.plain{display:block;color:#a7c4d8}
+.term-row.head{color:var(--cyan);letter-spacing:.16em;margin:10px 0 6px;font-weight:700}
+.term-cursor{display:inline-block;width:8px;height:14px;background:var(--cyan);vertical-align:-2px;margin-left:2px;animation:termPulse 1s steps(2) infinite}
+.term-next{
+  text-align:right;padding:6px 20px 0;font-family:var(--fm);font-size:10px;
+  letter-spacing:.18em;color:var(--cyan);opacity:0;transition:opacity .3s;
+}
+.term-next.show{opacity:.85}
+@media (max-width:560px){
+  .term-scroll{font-size:11px}
+  .term-row .tk{min-width:64px}
+}
 .sw-next{
   position:absolute;right:22px;bottom:10px;font-family:var(--fm);font-size:11px;
   letter-spacing:.16em;color:var(--cyan);opacity:0;
@@ -807,6 +865,62 @@ button{font-family:inherit;color:inherit}
 }
 .reactor-close.locked:hover{background:rgba(255,194,77,.08);box-shadow:0 0 22px rgba(255,194,77,.14);transform:none}
 .reactor-close.nudge{animation:repairCardShake .18s linear 0s 4}
+
+/* ---------- セーブ／ロード端末 ---------- */
+.reactor-save-btn{
+  margin-top:12px;min-height:42px;font-size:12px;font-weight:900;letter-spacing:.18em;cursor:pointer;
+  border:1px solid rgba(109,255,141,.45);background:rgba(109,255,141,.07);color:var(--green);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+  transition:.2s var(--ease);
+}
+.reactor-save-btn:hover{background:rgba(109,255,141,.2);box-shadow:0 0 24px rgba(109,255,141,.2);transform:translateY(-1px)}
+.save-menu{
+  position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
+  background:rgba(0,3,7,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:18px;
+}
+.save-menu.active{display:flex}
+.save-box{width:min(720px,calc(100vw - 34px))}
+.save-scroll{flex:1 1 auto;min-height:0;max-height:min(58vh,520px);overflow-y:auto;margin-top:18px;padding-right:6px}
+.save-scroll::-webkit-scrollbar{width:7px}
+.save-scroll::-webkit-scrollbar-thumb{background:rgba(91,231,255,.3)}
+.save-sec{display:block;margin-top:14px}
+.save-sec:first-child{margin-top:0}
+.save-sec-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;
+  font-family:var(--fd);font-size:9px;font-weight:900;letter-spacing:.22em;color:var(--cyan)}
+.save-sec-head::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(91,231,255,.4),transparent)}
+.save-sec-head .hint{font-family:var(--fj);font-size:9px;font-weight:500;letter-spacing:.06em;color:var(--muted);text-shadow:none}
+.save-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:8px}
+.save-slot{
+  border:1px solid rgba(91,231,255,.2);background:rgba(255,255,255,.035);padding:11px 12px;position:relative;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);
+  transition:.2s var(--ease);cursor:pointer;overflow:hidden;
+}
+.save-slot:hover{border-color:rgba(91,231,255,.7);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(91,231,255,.1)}
+.save-slot.empty{cursor:default;opacity:.55}
+.save-slot.empty:hover{transform:none;border-color:rgba(91,231,255,.2);box-shadow:none}
+.save-slot .ss-label{font-family:var(--fm);font-size:9px;letter-spacing:.14em;color:var(--cyan)}
+.save-slot .ss-main{font-size:13px;font-weight:900;letter-spacing:.04em;color:var(--text);margin-top:5px}
+.save-slot .ss-meta{font-family:var(--fm);font-size:9.5px;color:var(--muted);letter-spacing:.05em;margin-top:4px;line-height:1.5}
+.save-slot.empty .ss-main{color:var(--muted);font-weight:700;letter-spacing:.14em}
+.save-slot .ss-actions{display:flex;gap:6px;margin-top:9px}
+.save-slot .ss-actions button{
+  flex:1;min-height:30px;border:1px solid rgba(91,231,255,.35);background:rgba(91,231,255,.06);color:var(--cyan);
+  font-family:var(--fj);font-size:10px;font-weight:900;cursor:pointer;transition:.2s;
+}
+.save-slot .ss-actions button:hover{background:rgba(91,231,255,.18)}
+.save-slot .ss-actions button.ss-save{border-color:rgba(109,255,141,.45);background:rgba(109,255,141,.07);color:var(--green)}
+.save-slot .ss-actions button.ss-save:hover{background:rgba(109,255,141,.2)}
+.save-slot .ss-actions button.ss-del{flex:0 0 auto;min-width:34px;border-color:rgba(255,79,94,.4);background:rgba(255,79,94,.05);color:#ff9aa3}
+.save-slot .ss-actions button.ss-del:hover{background:rgba(255,79,94,.18)}
+.save-slot.chapter{border-left:3px solid rgba(255,194,77,.6)}
+.save-io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.save-io-btn{
+  min-height:42px;border:1px solid rgba(181,124,255,.45);background:rgba(181,124,255,.08);color:#d8c2ff;
+  font-size:12px;font-weight:900;letter-spacing:.12em;cursor:pointer;transition:.2s var(--ease);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+.save-io-btn:hover{background:rgba(181,124,255,.2);box-shadow:0 0 22px rgba(181,124,255,.18);transform:translateY(-1px)}
+.save-menu.mode-load .save-slot.empty{display:none}
 
 /* PC版：炉心メニューを前面モーダル化し、閉じるボタンを常に表示する */
 @media (min-width:681px){
@@ -1217,6 +1331,25 @@ button{font-family:inherit;color:inherit}
 @supports not (color: color-mix(in srgb,#fff 50%,transparent)){
   .dxv2-tierchip{border-color:var(--tc,rgba(255,194,77,.5))}
 }
+.dxv2-thumb{
+  width:100%;aspect-ratio:1/1;margin:8px 0 4px;position:relative;overflow:hidden;
+  border:1px solid rgba(91,231,255,.15);
+  background:radial-gradient(ellipse at 50% 40%,rgba(14,28,44,.95),rgba(2,6,9,.98));
+  display:flex;align-items:center;justify-content:center;
+}
+.dxv2-thumb img{
+  width:100%;height:100%;object-fit:contain;display:block;
+  image-rendering:pixelated;image-rendering:crisp-edges;
+}
+/* ★T4/T5 のスプライトは縦長(200:278)。正方形枠＋containだと左右が余って幅が狭く見えるため、
+   サムネ枠のアスペクトを画像比率に合わせる。横幅はT1〜T3と同じ100%のまま、高さだけ比率で伸びる。 */
+.dxv2-card.t4 .dxv2-thumb,
+.dxv2-card.t5 .dxv2-thumb{ aspect-ratio:200/278; }
+.dxv2-thumb.empty{
+  font-family:var(--fm);font-size:8.5px;letter-spacing:.14em;
+  color:var(--muted);text-align:center;line-height:1.7;
+}
+.dxv2-card.unseen .dxv2-thumb{opacity:.45}
 .dxv2-name{font-size:14px;font-weight:900;letter-spacing:.04em;margin-top:6px;color:var(--text)}
 .dxv2-card.unseen .dxv2-name{color:var(--muted);letter-spacing:.3em}
 .dxv2-story{font-size:10.5px;color:#a9bfd1;line-height:1.6;margin-top:6px}
@@ -2532,9 +2665,10 @@ button{font-family:inherit;color:inherit}
 #scouter-panel .sc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
 #scouter-panel .sc-title{font-family:var(--fd);font-size:8px;font-weight:800;letter-spacing:.24em;color:#5be7ff}
 #scouter-panel .sc-id{font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:.1em;color:#7fe3ff}
-/* ★ドット絵スペース：パネル横幅そのままの正方形 */
+/* ★変異生物画像スペース：T1〜T3は正方形、T4〜T5は縦長 */
 #scouter-panel .sc-art{width:100%;aspect-ratio:1/1;background:rgba(0,0,0,.45);border:1px solid rgba(91,231,255,.22);
   display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:7px;position:relative}
+#scouter-panel .sc-art.sc-art-tall{aspect-ratio:200/278}
 #scouter-panel .sc-art::after{content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(91,231,255,.05) 2px 3px);pointer-events:none}
 #scouter-panel .sc-noimg{font-family:var(--fm);font-size:8.5px;letter-spacing:.12em;color:#3f5566;text-align:center;line-height:1.6}
@@ -2598,6 +2732,10 @@ button{font-family:inherit;color:inherit}
   border:1px solid rgba(91,231,255,.28);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .eng-screen img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
 .eng-screen .eng-noimg{font-family:var(--fm);font-size:8.5px;letter-spacing:.14em;color:#3f5566;text-align:center;line-height:1.7}
+.eng-face-label{
+  display:block;margin-top:7px;padding-top:6px;border-top:1px solid rgba(91,231,255,.12);
+  color:#7fe3ff;font-size:8px;letter-spacing:.08em;text-shadow:0 0 10px rgba(91,231,255,.28);
+}
 .eng-screen .eng-scan{position:absolute;left:0;right:0;height:2px;top:0;
   background:linear-gradient(90deg,transparent,rgba(91,231,255,.5),transparent);
   animation:engScan 3.2s linear infinite;pointer-events:none}
@@ -2612,6 +2750,39 @@ button{font-family:inherit;color:inherit}
   mix-blend-mode:screen;opacity:0;top:30%}
 .eng-screen::after{content:'';position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(91,231,255,.04) 2px 3px)}
+/* ★技師映像フィード（GIF）＋モニター演出 */
+.eng-screen .eng-feed{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  image-rendering:pixelated;z-index:1;
+  /* CRTっぽい色ずれ・明滅 */
+  filter:saturate(1.15) contrast(1.08) brightness(1.02);
+  animation:engFlicker 5.5s steps(1) infinite, engGlitchShift 7s steps(1) infinite}
+/* 明滅（電源・電波の不安定さ） */
+@keyframes engFlicker{
+  0%,93%,100%{opacity:1}
+  94%{opacity:.82}95%{opacity:1}96%{opacity:.7}97%{opacity:1}98%{opacity:.88}}
+/* 横ずれグリッチ（たまに画面が左右にブレる） */
+@keyframes engGlitchShift{
+  0%,88%,100%{transform:translateX(0)}
+  89%{transform:translateX(-2px)}90%{transform:translateX(3px)}
+  91%{transform:translateX(-1px)}92%{transform:translateX(0)}}
+/* ノイズcanvas（電波混戦・砂嵐） */
+.eng-screen .eng-noise-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;
+  pointer-events:none;mix-blend-mode:screen;opacity:.14;image-rendering:pixelated}
+/* 横方向に走る走査ズレの帯（電波の乱れ） */
+.eng-screen .eng-tear{position:absolute;left:0;right:0;height:10px;z-index:4;pointer-events:none;
+  background:linear-gradient(180deg,rgba(91,231,255,0),rgba(190,230,255,.55),rgba(91,231,255,0));
+  mix-blend-mode:screen;opacity:0;top:30%;
+  animation:engTear 6.5s ease-in-out infinite}
+@keyframes engTear{
+  0%,70%,100%{opacity:0;top:20%}
+  72%{opacity:.6;top:35%}74%{opacity:.2;top:42%}
+  76%{opacity:.7;top:58%}78%{opacity:0;top:72%}}
+/* 画面端の暗がり（ブラウン管の丸み） */
+.eng-screen .eng-vignette{position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%);
+  box-shadow:inset 0 0 18px rgba(0,0,0,.5)}
+/* 既存の走査線アニメ要素を最前面に */
+.eng-screen .eng-scan{z-index:6}
 /* 下：線量＋天気 */
 .eng-meta{display:flex;justify-content:space-between;align-items:stretch;margin-top:9px;gap:8px;
   padding-top:8px;border-top:1px solid rgba(91,231,255,.14)}
@@ -2943,7 +3114,18 @@ window.RENDER_DIM = function(){
         <div class="eng-speech" id="eng-speech"></div>
         <!-- 中：16:9 横長モニター（技師の顔/端末映像用。今はプレースホルダ） -->
         <div class="eng-screen" id="eng-screen">
-          <div class="eng-noimg">NO SIGNAL<br>技師 映像 準備中</div>
+          <video class="eng-video" id="eng-video-a" muted playsinline preload="auto"></video>
+          <video class="eng-video" id="eng-video-b" muted playsinline preload="auto"></video>
+          <div class="eng-fx" id="eng-fx" aria-hidden="true">
+            <div class="engfx-scan2"></div>
+            <div class="engfx-roll"></div>
+            <div class="engfx-glitch"></div>
+            <div class="engfx-flicker"></div>
+          </div>
+          <div class="eng-noimg" id="eng-noimg" style="display:none">NO SIGNAL<br>技師 映像 準備中<span class="eng-face-label" id="eng-face-label">通常／現場確認</span></div>
+          <canvas class="eng-noise-canvas" id="eng-noise-canvas"></canvas>
+          <div class="eng-tear"></div>
+          <div class="eng-vignette"></div>
           <div class="eng-scan"></div>
         </div>
         <!-- 下：左=線量、右=足立区の天気 -->
@@ -2999,6 +3181,20 @@ window.RENDER_DIM = function(){
       <div class="sw-title" id="sw-title">─</div>
       <div class="sw-body" id="sw-body"></div>
       <div class="sw-next" id="sw-next">▼ NEXT</div>
+    </div>
+
+    <!-- 端末風ブートパネル（プロローグ等の SYSTEM BOOT 演出専用） -->
+    <div class="term-panel" id="term-panel" aria-hidden="true">
+      <div class="term-frame">
+        <i class="term-corner tc1"></i><i class="term-corner tc2"></i><i class="term-corner tc3"></i><i class="term-corner tc4"></i>
+        <div class="term-head">
+          <span class="term-dot"></span>
+          <span class="term-headline" id="term-headline">SYSTEM BOOT</span>
+          <span class="term-status" id="term-status">● LIVE</span>
+        </div>
+        <div class="term-scroll" id="term-scroll"></div>
+        <div class="term-next" id="term-next">CLICK / SPACE ▼</div>
+      </div>
     </div>
 
     <!-- 章切り替え演出 -->
@@ -3057,6 +3253,7 @@ window.RENDER_DIM = function(){
     <div class="ending-kicker">ADACHI-1 SHUTDOWN COMPLETE / RESPONSIBILITY FIELD FIXED</div>
     <div class="summary" id="win-summary">─</div>
     <button class="restart secondary" id="win-pokedex">変異生物観測録を見る</button>
+    <button class="restart secondary" id="win-observe" style="display:none">観測を続ける ─ 残存個体</button>
     <button class="restart" id="win-restart">タイトルへ</button>
   </div>
 
@@ -3097,7 +3294,7 @@ window.RENDER_DIM = function(){
 
     <div class="ts-menu">
       <button class="ts-btn primary" id="ts-start">出撃する</button>
-      <button class="ts-btn ghost locked" id="ts-continue">続きから<span class="note">SAVE MODULE: 未実装</span></button>
+      <button class="ts-btn ghost" id="ts-continue">続きから<span class="note">JSON読込対応</span></button>
       <button class="ts-btn ghost" id="ts-dex">観測端末</button>
       <div class="ts-hint">CLICK / ENTER ─ SOUND ON</div>
     </div>
@@ -3948,8 +4145,7 @@ const MONSTERS = [
       "拳銃",
       "警棒乱打"
     ],
-    "story": "持ち場を離れなかった警官。警棒と拳銃を持つが、命令は事故当日のまま止まっている。「止まれ」と言いながら自分が止まれない。規則だけが生き残った人間は怖い。",
-    "sprite": "data:image/png;base64,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"
+    "story": "持ち場を離れなかった警官。警棒と拳銃を持つが、命令は事故当日のまま止まっている。「止まれ」と言いながら自分が止まれない。規則だけが生き残った人間は怖い。"
   },
   {
     "id": 46,
@@ -4352,7 +4548,19 @@ const MONSTERS = [
     ],
     "story": "ADACHI-1の物理的事故が形を持った存在。全システム制御不能の擬人化。熱、汚染水、警告灯、未読アラート、炎上、謝罪文、承認欲求の塊。事故そのものの顔であり、原因の顔ではない。"
   }
-];/* ============================================================
+];
+
+const MUTANT_SPRITE_MAX_TIER = 5;
+const MUTANT_SPRITE_HOLD_IDS = new Set([70]);
+function getMutantSpritePath(id) {
+  return `mutant/mutant_${String(id).padStart(2, '0')}.png`;
+}
+MONSTERS.forEach(monster => {
+  if (monster && monster.tier >= 1 && monster.tier <= MUTANT_SPRITE_MAX_TIER && !MUTANT_SPRITE_HOLD_IDS.has(monster.id)) {
+    monster.sprite = getMutantSpritePath(monster.id);
+  }
+});
+/* ============================================================
    足立区原発 - メインロジック
    Three.js r128 + プロシージャルメッシュ + 戦闘システム
    ============================================================ */
@@ -7777,8 +7985,8 @@ function getBossTierSpawnGate() {
   const repairedSystems = game.repairedSystems || new Set();
   if (repairedSystems.has('containment')) return { allowed: true, reason: 'containment' };
   if (repairedSystems.has('backup_power')) {
-    const leak = Math.random() < 0.15;
-    return { allowed: leak, reason: leak ? 'backup_power_leak' : 'sealed' };
+    // ★第7章のT5(ボス級)は spawnEnemy 側で「25%・最大1回」に制御するため、通常プールからは封鎖する。
+    return { allowed: false, reason: 'ch7_managed' };
   }
   return { allowed: false, reason: 'sealed' };
 }
@@ -7989,7 +8197,8 @@ class EnemyInstance {
     const hpRatio = this.hp / this.maxHp;
     // ボス級は特殊行動が多い
     if (this.data.tier === 5) {
-      if (this.specialCooldown <= 0 && Math.random() < 0.45) {
+      const specialChance = this.data.id === 64 ? 0.35 : 0.45;
+      if (this.specialCooldown <= 0 && Math.random() < specialChance) {
         this.specialCooldown = 2;
         return { type: 'special' };
       }
@@ -8215,10 +8424,18 @@ const ZONE_PHASES = [
     palette: { sky:'#2f0b0b', glow:'#6e1b1b', ground:'#21110f', fog:0x4d1212, sun:0xffefe0, sunIntensity:0.72, rim:0xfff1c4, hemiSky:0xffc18a, hemiGround:0x160707, groundColor:0x3f241d, particle:0xfff1c4, radGlow:0xffe0a0, warn:0xff2d3f, fogDensity:0.034, bloom:1.35 }
   },
   {
-    zone: '社会感情炉心', chapterNo: 'LAST PHASE', title: '責任者不在',
-    briefing: '真相がすべて開く。第1戦メルトダウン、事故の顔。第2戦 責任者不在、構造の顔。最後に、名前の流用を拒否し、誰も書かなかった空欄ごと止める。',
+    zone: '社会感情炉心', chapterNo: 'LAST PHASE', title: '図面にない中枢',
+    briefing: '格納容器の奥に、施設図面のどの区画にも一致しない区画があった。区画名称・用途・管理部局、いずれも確認できない。炉心に近いことだけは分かる。未処理中枢反応を特定せよ。',
     meta: 'SOCIAL EMOTION CORE / NO SUBJECT',
     palette: { sky:'#1a0406', glow:'#7a0f14', ground:'#170808', fog:0x3a0a0c, sun:0xff9a8a, sunIntensity:0.4, rim:0xff4f5e, hemiSky:0x6e1b1b, hemiGround:0x0a0303, groundColor:0x2c1412, particle:0xff6a5a, radGlow:0xff3a2d, warn:0xff2d3f, fogDensity:0.040, bloom:1.45 }
+  },
+  {
+    /* ★シークレット章（フェーズ9）：責任者不在の空間。社会感情炉心（赤熱・群衆）の逆＝退色・虚無・白い空欄。
+       背景パレット・タイトルは仮。テキスト確定後に調整する。 */
+    zone: '名前のない炉心', chapterNo: 'SECRET PHASE', title: '事故の顔、その奥',
+    briefing: '（仮）設備でも感情でもない、誰も名前を書かなかった空欄そのものの場所。引き算と無音と、書類の升目だけがある。',
+    meta: 'THE NAMELESS CORE / NO NAME',
+    palette: { sky:'#d8dadd', glow:'#aab0b6', ground:'#c4c7cb', fog:0xc9ccd0, sun:0xffffff, sunIntensity:0.55, rim:0xb8bec6, hemiSky:0xd2d5d9, hemiGround:0x9aa0a6, groundColor:0xbfc3c8, particle:0xe8eaec, radGlow:0xcfd3d7, warn:0x8a9098, fogDensity:0.046, bloom:0.85 }
   }
 ];
 
@@ -8542,6 +8759,7 @@ class GameState {
     this.scenarioPhase = 0; // ★新設：0=プロローグ 1-7=各章 8=LAST PHASE（修復数とは独立）
     this.nameRestored = false; // ★第6章で氏名欄を一時復元したか
     this.reentryManagerDefeated = false; // ★再投入管理官を倒したか
+    this.ch7BossSpawned = false; // ★第7章でT5(ボス級)を出したか（25%・最大1回の制御用）
     this.encounteredMonsters = new Set();
     this.battleLog = [];
     this.battleTurn = 'player'; // player/enemy/animating
@@ -8578,6 +8796,7 @@ class GameState {
     this.scenarioPhase = 0;
     this.nameRestored = false;
     this.reentryManagerDefeated = false;
+    this.ch7BossSpawned = false;
     this.encounteredMonsters.clear();
     this.battleLog = [];
     this.battleTurn = 'player';
@@ -8608,6 +8827,281 @@ class GameState {
     this.finalEquipmentNoticeShown = false;
   }
 }
+
+// ============================================================
+// 10b. セーブ／ロード（localStorage + JSONバックアップ）
+// ============================================================
+const SaveSystem = (() => {
+  const STORAGE_KEY = 'adachi1_save_v1';
+  const VERSION = 2;
+  const MANUAL_SLOTS = 3;
+  const CHAPTER_SLOTS = 10;
+
+  const CHAPTER_LABELS = [
+    'プロローグ', '第1章', '第2章', '第3章', '第4章',
+    '第5章', '第6章', '第7章', 'LAST PHASE'
+  ];
+
+  const PLAYER_KEYS = [
+    'name','lv','exp','hp','maxHp','mp','maxMp','atk','def','gold',
+    'items','materials','weapon','armor','accessory','hasCitizenHeart',
+    'skills','skillCooldowns'
+  ];
+  const PLAYER_SET_KEYS = ['craftedWeapons','craftedArmors'];
+
+  const GAME_KEYS = [
+    'scenarioPhase','nameRestored','reentryManagerDefeated',
+    'battlesWon','eventsSeen','nextStoryEventId','exploresSinceLastStory',
+    'continues','finalBossUnlocked','finalBossPending','finalBossDefeated','meltdownDefeated',
+    'meltdownEpilogueShown','mutantObservationUnlocked','scouterIssued',
+    'firstMutantIntroShown','firstEncounterIntroPlayed','citizenHeartObtained',
+    'finalProcurementClosed','finalEquipmentNoticeShown','startTime',
+    'reentryChapterStarted','finalPhaseEntered','ch7BossSpawned','namelessCoreEntered',
+    'lastPhaseStage','preLastPhaseObservation','postClearObservation',
+    'responsibleName','responsibleRefused','approvalDone',
+    'prologueT1ObjectiveActive','prologueT1ObjectiveDone','prologueT1Kills',
+    'quests'
+  ];
+  const GAME_SET_KEYS = [
+    'repairedSystems','encounteredMonsters','storyEventsSeen',
+    'storyUnlocked','repairPromptedKeys','guardiansDefeated'
+  ];
+
+  function chapterLabel(i) { return CHAPTER_LABELS[i] || ('PHASE ' + i); }
+
+  function clone(v) {
+    if (v == null) return v;
+    if (Array.isArray(v)) return v.map(clone);
+    if (typeof v === 'object') {
+      const o = {};
+      for (const k in v) o[k] = clone(v[k]);
+      return o;
+    }
+    return v;
+  }
+
+  function snapshot() {
+    if (!game || !game.player) return null;
+    const p = game.player;
+    const player = {};
+    PLAYER_KEYS.forEach(k => { player[k] = clone(p[k]); });
+    PLAYER_SET_KEYS.forEach(k => { player[k] = p[k] ? Array.from(p[k]) : []; });
+
+    const g = {};
+    GAME_KEYS.forEach(k => { g[k] = clone(game[k]); });
+    GAME_SET_KEYS.forEach(k => { g[k] = game[k] ? Array.from(game[k]) : []; });
+
+    return {
+      version: VERSION,
+      savedAt: Date.now(),
+      lv: p.lv,
+      phase: game.scenarioPhase || 0,
+      player,
+      game: g
+    };
+  }
+
+  function restore(data) {
+    if (!data || !data.player || !data.game || !game) return false;
+    try { if (typeof cleanupBattleForDebug === 'function') cleanupBattleForDebug(); } catch (e) {}
+
+    const p = new Player();
+    PLAYER_KEYS.forEach(k => { if (k in data.player) p[k] = clone(data.player[k]); });
+    PLAYER_SET_KEYS.forEach(k => { p[k] = new Set(Array.isArray(data.player[k]) ? data.player[k] : []); });
+    if (!p.items) p.items = {};
+    if (!p.materials) p.materials = {};
+    if (!Array.isArray(p.skills)) p.skills = [];
+    if (!p.skillCooldowns) p.skillCooldowns = {};
+    if (!WEAPONS[p.weapon]) p.weapon = 'wrench';
+    if (!ARMORS[p.armor]) p.armor = 'worksuit';
+    if (p.accessory !== 'citizen_heart') p.accessory = null;
+    p.hp = Math.max(1, Math.min(p.hp || p.maxHp || 30, p.maxHp || 30));
+    p.mp = Math.max(0, Math.min(p.mp || 0, p.maxMp || 12));
+    p.statusEffects = [];
+    p.tempDef = 0;
+    p.checkSkills();
+    game.player = p;
+
+    GAME_KEYS.forEach(k => { if (k in data.game) game[k] = clone(data.game[k]); });
+    GAME_SET_KEYS.forEach(k => { game[k] = new Set(Array.isArray(data.game[k]) ? data.game[k] : []); });
+    const restoredPhase = Number.isFinite(game.scenarioPhase) ? game.scenarioPhase : (data.phase || 0);
+    if (!(game.storyUnlocked instanceof Set)) game.storyUnlocked = new Set([0]);
+    const priorStoryMax = Math.min(7, Math.max(0, restoredPhase - 1));
+    for (let i = 0; i <= priorStoryMax; i++) game.storyUnlocked.add(i);
+    if (!game.scouterIssued) {
+      game.scouterIssued = !!(
+        game.mutantObservationUnlocked ||
+        restoredPhase >= 1 ||
+        (game.encounteredMonsters && game.encounteredMonsters.has(1))
+      );
+    }
+    if (!('mutantObservationUnlocked' in data.game) && restoredPhase >= 1) {
+      game.mutantObservationUnlocked = true;
+    }
+
+    game.enemy = null;
+    game.battleLog = [];
+    game.battleTurn = 'player';
+    game.subMenu = null;
+    game.unseeableBattle = false;
+    game.finalBossPending = !!game.finalBossPending;
+    game.pendingGuardianRepair = null;
+    game.pendingReentryManager = false;
+    game.meltdownTransitionActive = false;
+    game.battleTookDamage = false;
+    game.state = 'IDLE';
+    if (!Array.isArray(game.quests)) game.quests = [];
+    if (!(game.guardiansDefeated instanceof Set)) game.guardiansDefeated = new Set();
+    return true;
+  }
+
+  function blankStore() {
+    return { version: VERSION, auto: null, manual: {}, chapters: {} };
+  }
+
+  function migrate(oldStore) {
+    if (!oldStore || typeof oldStore !== 'object') return null;
+    const store = blankStore();
+    if (oldStore.auto) store.auto = migrateSnapshot(oldStore.auto);
+    if (oldStore.manual) {
+      Object.keys(oldStore.manual).forEach(k => { store.manual[k] = migrateSnapshot(oldStore.manual[k]); });
+    }
+    if (oldStore.chapters) {
+      Object.keys(oldStore.chapters).forEach(k => { store.chapters[k] = migrateSnapshot(oldStore.chapters[k]); });
+    }
+    return store;
+  }
+
+  function migrateSnapshot(snap) {
+    if (!snap || typeof snap !== 'object') return snap;
+    const out = clone(snap);
+    out.version = VERSION;
+    if (out.phase === 8 && out.game) out.game.scenarioPhase = 8;
+    if (out.game && !('approvalDone' in out.game)) out.game.approvalDone = false;
+    if (out.game && !('responsibleRefused' in out.game)) out.game.responsibleRefused = false;
+    if (out.game && !('guardiansDefeated' in out.game)) out.game.guardiansDefeated = [];
+    /* ★v148：旧セーブにLAST PHASE進行キーが無い場合の最小フォールバック。
+       完全移行はしないが、既存フラグから安全な段階を推定してエラー・進行不能を防ぐ。 */
+    if (out.game && !('lastPhaseStage' in out.game)) {
+      var _g = out.game;
+      var _stage = 0;
+      if (_g.meltdownDefeated) _stage = 9;
+      else if (_g.citizenHeartObtained) _stage = 6;
+      else if (_g.finalPhaseEntered) _stage = 1;
+      out.game.lastPhaseStage = _stage;
+    }
+    if (out.game && !('preLastPhaseObservation' in out.game)) out.game.preLastPhaseObservation = false;
+    if (out.game && !('postClearObservation' in out.game)) out.game.postClearObservation = false;
+    return out;
+  }
+
+  function loadStore() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return blankStore();
+      const obj = JSON.parse(raw);
+      if (!obj || typeof obj !== 'object') return blankStore();
+      const store = obj.version === VERSION ? obj : (migrate(obj) || blankStore());
+      if (!store.manual) store.manual = {};
+      if (!store.chapters) store.chapters = {};
+      if (!('auto' in store)) store.auto = null;
+      return store;
+    } catch (e) {
+      console.warn('[save] load failed', e);
+      return blankStore();
+    }
+  }
+
+  function saveStore(store) {
+    try {
+      store.version = VERSION;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      return true;
+    } catch (e) {
+      console.warn('[save] write failed', e);
+      return false;
+    }
+  }
+
+  function canSaveNow() {
+    return !!(game && game.player && game.state === 'IDLE' && !(typeof StoryDialog !== 'undefined' && StoryDialog.active));
+  }
+
+  function writeManual(slot) {
+    if (!canSaveNow()) return false;
+    const store = loadStore();
+    store.manual[slot] = snapshot();
+    return saveStore(store);
+  }
+  function writeAuto() {
+    if (!canSaveNow()) return false;
+    const store = loadStore();
+    store.auto = snapshot();
+    return saveStore(store);
+  }
+  function writeChapter(phase) {
+    if (!canSaveNow()) return false;
+    const store = loadStore();
+    store.chapters[phase] = snapshot();
+    return saveStore(store);
+  }
+  function readSlot(kind, key) {
+    const store = loadStore();
+    if (kind === 'auto') return store.auto || null;
+    if (kind === 'manual') return store.manual[key] || null;
+    if (kind === 'chapter') return store.chapters[key] || null;
+    return null;
+  }
+  function deleteSlot(kind, key) {
+    const store = loadStore();
+    if (kind === 'auto') store.auto = null;
+    else if (kind === 'manual') delete store.manual[key];
+    else if (kind === 'chapter') delete store.chapters[key];
+    return saveStore(store);
+  }
+  function hasAnySave() {
+    const store = loadStore();
+    return !!(store.auto || Object.keys(store.manual || {}).length || Object.keys(store.chapters || {}).length);
+  }
+  function exportFile() {
+    const store = loadStore();
+    const blob = new Blob([JSON.stringify(store, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    a.href = url;
+    a.download = `adachi1_save_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}.json`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    return true;
+  }
+  function importFile(file, onDone) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        const store = obj && obj.version === VERSION ? obj : (migrate(obj) || null);
+        if (!store) throw new Error('format');
+        saveStore(store);
+        onDone && onDone(true);
+      } catch (e) {
+        console.warn('[save] import failed', e);
+        onDone && onDone(false);
+      }
+    };
+    reader.onerror = () => onDone && onDone(false);
+    reader.readAsText(file);
+  }
+
+  return {
+    STORAGE_KEY, VERSION, MANUAL_SLOTS, CHAPTER_SLOTS,
+    chapterLabel, snapshot, restore, canSaveNow,
+    writeManual, writeAuto, writeChapter, readSlot, deleteSlot,
+    hasAnySave, loadStore, saveStore, exportFile, importFile
+  };
+})();
 
 // ============================================================
 // 11. メインゲームコントローラ
@@ -8994,11 +9488,15 @@ class GameController {
     game.scenarioPhase = 0;
     this.log({ text: '竹ノ塚 外縁区に到着。封鎖区域の外側。まだ空が見える。', kind: 'system' });
     this.log({ text: '任務目標：報告書にない反応を確認し、ADACHI-1内部への侵入口を探す。', kind: 'system' });
+    try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(0); } } catch (e) {}
     // デバッグ指定がある場合は、添付確認用の番人戦だけを直接開始する。
     if (runGuardianDebug) {
       setTimeout(() => this.startBackupPowerGuardianDebugBattle(), 900);
     } else {
-      setTimeout(() => this.playFirstEncounterIntro(), 650);
+      setTimeout(() => {
+        if (typeof this.playPrologueOpening === 'function') this.playPrologueOpening();
+        else this.playFirstEncounterIntro();
+      }, 650);
     }
   }
   shouldRunBackupPowerGuardianDebug() {
@@ -9060,12 +9558,13 @@ class GameController {
   }
   showChapterTransition(index, systemName, chapter, onDone) {
     const phase = getZonePhase(index);
+    const targetZoneIndex = (game && Number.isFinite(game.scenarioPhase)) ? game.scenarioPhase : index;
     const card = document.getElementById('chapter-shift');
     const hud = document.getElementById('hud');
     const command = document.getElementById('command-panel');
     if (command) command.classList.remove('active');
     if (hud) hud.classList.add('phase-shifting');
-    this.applyZoneState(index, 5200, false);
+    this.applyZoneState(targetZoneIndex, 5200, false);
     if (!card) {
       if (hud) hud.classList.remove('phase-shifting');
       if (onDone) onDone();
@@ -9290,6 +9789,7 @@ class GameController {
     }
     const el = document.getElementById('eng-speech');
     if (el) el.textContent = '';
+    if (window.setEngineerFace) window.setEngineerFace('normal');
   }
   getCraftableUpgrades() {
     const p = game.player;
@@ -9482,7 +9982,7 @@ class GameController {
       });
     }
     // ★技師モニター上部の発話テキストに最新ログを反映（タイプライター表示）
-    if (!this.suppressEngineerLog && entry && entry.text && window.engTypewrite) window.engTypewrite(entry.text);
+    if (!this.suppressEngineerLog && entry && entry.text && window.engTypewrite) window.engTypewrite(entry.text, entry.face);
   }
   showCenterMessage(big, small, duration = 1000) {
     const cmsg = document.getElementById('center-msg');
@@ -9582,6 +10082,12 @@ class GameController {
         story: '作業員の死亡、復帰、損耗率、補償額を管理する端末群が変異したもの。'
       };
       levelScale = 1;
+    } else if (game.pendingEventBossId != null && window.LastPhase && window.LastPhase.buildEventBoss) {
+      /* ★v148 LAST PHASE：イベント専用ボス（汚染都知事代理/放射科学者/汚染区長/メルトダウン初戦・再戦）。
+         data.isLastPhaseEventBoss=true が立つ。登録は遭遇時ではなく撃破時（初戦は登録しない）。 */
+      const __eb = window.LastPhase.buildEventBoss(this, playerLv);
+      data = __eb.data;
+      levelScale = __eb.levelScale;
     } else if (trueBossMode) {
       const base = MONSTERS.find(m => m.id === 70) || MONSTERS[MONSTERS.length - 1];
       data = {
@@ -9615,16 +10121,43 @@ class GameController {
       // 既存観測が65種に到達してから次の通常遭遇で必ずNo.070を出す。
       // また、通常の未観測優先プールからNo.070を除外し、早期出現を防ぐ。
       const meltdownGate = (typeof MELTDOWN_FIXED_DEX_COUNT !== 'undefined' ? MELTDOWN_FIXED_DEX_COUNT : 65);
-      const canSpawnMeltdown = repaired >= 6 && !game.meltdownDefeated && game.encounteredMonsters.size >= meltdownGate;
+      // ★v148：LAST PHASE中・観測確定区間・クリア後観測モードでは自動メルトダウンを止め、進行はステート機械が駆動する。
+      const lpActive = (typeof game.lastPhaseStage === 'number' && game.lastPhaseStage > 0) || game.preLastPhaseObservation || game.postClearObservation;
+      const canSpawnMeltdown = !lpActive && repaired >= 6 && !game.meltdownDefeated && game.encounteredMonsters.size >= meltdownGate;
       if (canSpawnMeltdown) {
         data = MONSTERS.find(m => m.id === 70) || MONSTERS[MONSTERS.length - 1];
         levelScale = 1 + (playerLv - 1) * 0.058 + (data.tier - 1) * 0.045;
       } else {
+      // ★第7章（scenarioPhase===7）：T5(ボス級)は25%・最大1回まで。通常プールはgate側でT5封鎖済み。
+      // ★v148：イベント専用(57/58/65/70)は除外。観測確定区間ではフリーT5は決定論的に出すため25%抽選は止める。
+      if (game.scenarioPhase === 7 && !game.ch7BossSpawned && !game.preLastPhaseObservation && Math.random() < 0.25) {
+        const __t5pool = MONSTERS.filter(m => m.tier === 5
+          && !(typeof EVENT_ONLY_IDS !== 'undefined' && EVENT_ONLY_IDS.has(m.id))
+          && !(typeof GUARDIAN_IDS !== 'undefined' && GUARDIAN_IDS.has(m.id))
+          && !game.encounteredMonsters.has(m.id));
+        if (__t5pool.length) {
+          data = choice(__t5pool);
+          game.ch7BossSpawned = true;
+          levelScale = 1 + (playerLv - 1) * 0.058 + (data.tier - 1) * 0.045;
+        }
+      }
+      if (!data && window.LastPhase && window.LastPhase.forcedNormalSpawn) {
+        /* ★v148：観測確定区間＝未観測の必須個体を確定出現／クリア後観測モード＝未観測フリーT5のみ確定出現。
+           いずれも実観測なので通常の登録経路（下のskipEncounterRecord=false）に乗せる。 */
+        const __fn = window.LastPhase.forcedNormalSpawn(this, playerLv);
+        if (__fn) { data = __fn.data; levelScale = __fn.levelScale; }
+      }
+      if (!data) {
       const range = getLevelAppropriateMonsterRange(playerLv, repaired);
       const maxId = range.maxId;
       const minId = range.minId;
       const bossGate = getBossTierSpawnGate();
-      const bossEligible = m => (m.id !== 70) && (bossGate.allowed || m.tier !== 5) && !(typeof GUARDIAN_IDS !== 'undefined' && GUARDIAN_IDS.has(m.id)); /* ★番人とメルトダウンは通常出現しない */
+      /* ★v148：イベント専用(57/58/65/70)とフリーT5(59/60/61/63)は通常ランダムに出さない。
+         フリーT5は第7章25%／観測確定区間の強制／クリア後観測モードでのみ観測する。 */
+      const bossEligible = m => !(typeof EVENT_ONLY_IDS !== 'undefined' && EVENT_ONLY_IDS.has(m.id))
+        && !(typeof FREE_T5_IDS !== 'undefined' && FREE_T5_IDS.has(m.id))
+        && (bossGate.allowed || m.tier !== 5)
+        && !(typeof GUARDIAN_IDS !== 'undefined' && GUARDIAN_IDS.has(m.id));
       const levelBand = m => m.id >= minId && m.id <= maxId && bossEligible(m);
       const unlocked = m => m.id <= maxId && bossEligible(m);
       const unseenPriority = getUnseenPriority(repaired, playerLv);
@@ -9643,6 +10176,7 @@ class GameController {
       levelScale = 1 + (playerLv - 1) * 0.058 + (data.tier - 1) * 0.045;
       }
       }
+      }
     }
     game.enemy = new EnemyInstance(data, levelScale);
     game.enemy.isTrueBoss = trueBossMode;
@@ -9651,7 +10185,10 @@ class GameController {
     // 撃破前に倒された場合、コンティニュー後の探索で必ず再出現させるため。
     const deferMeltdownRecord = data && data.id === 70 && !trueBossMode && !game.meltdownDefeated;
     const skipPreObservationRecord = !game.mutantObservationUnlocked && !trueBossMode;
-    const skipEncounterRecord = trueBossMode || deferMeltdownRecord || skipPreObservationRecord || (data && data.isReentryManager);
+    /* ★v148：LAST PHASEイベントボス(57/58/65/70)は遭遇では登録せず、撃破時にステート機械が登録する。
+       メルトダウン初戦(観測不能)は撃破不能・登録なし。 */
+    const isLastPhaseEventBoss = !!(data && data.isLastPhaseEventBoss);
+    const skipEncounterRecord = trueBossMode || deferMeltdownRecord || skipPreObservationRecord || (data && data.isReentryManager) || isLastPhaseEventBoss || !!game.meltdownUnobservableBattle;
     const isNewMonster = !skipEncounterRecord && !game.encounteredMonsters.has(data.id);
     if (!skipEncounterRecord) game.encounteredMonsters.add(data.id);
     if (isNewMonster) this.questProgress('dex');
@@ -9975,6 +10512,7 @@ class GameController {
   // ================ プレイヤー行動 ================
   playerAttack() {
     game.battleTurn = 'animating';
+    if (window.EngMonitor && window.EngMonitor.playAttack) window.EngMonitor.playAttack();
     const startMs = performance.now();
     const dur = 500;
     const loop = () => {
@@ -10657,6 +11195,7 @@ ${flavor}`;
       baseDmg = intended + Math.floor(p.getDef() / 2);
     }
     const real = game.player.takeDamage(baseDmg);
+    if (window.EngMonitor && window.EngMonitor.playDamage) window.EngMonitor.playDamage();
     game.battleTookDamage = true;
     // 被弾演出（画面端の赤フラッシュ＋色収差スパイク）
     const flashEl = document.getElementById('screen-flash');
@@ -10845,7 +11384,7 @@ ${flavor}`;
             }
             game.finalBossPending = false;
             game.finalBossUnlocked = true;
-            this.enterFinalPhaseZone();
+            this.enterNamelessCoreZone();
             this.log({ text: `メルトダウン封鎖完了。真のボス「${TRUE_BOSS_NAME}」が出現可能になった。`, kind: 'crit' });
             const bo = document.getElementById('chapter-blackout');
             if (bo) bo.classList.remove('on','closed','open');
@@ -10879,6 +11418,126 @@ ${flavor}`;
     };
     loop();
   }
+  applyLoadedState(data, opts) {
+    if (!SaveSystem.restore(data)) return false;
+
+    try {
+      if (typeof audio !== 'undefined' && audio && typeof audio.init === 'function') {
+        audio.init();
+        if (audio.ctx && audio.ctx.state === 'suspended' && typeof audio.ctx.resume === 'function') audio.ctx.resume();
+      }
+    } catch (e) {}
+
+    try {
+      const tsEl = document.getElementById('title-screen');
+      const titleVisible = tsEl && tsEl.style.display !== 'none';
+      if (titleVisible && typeof window.__titleShutdown === 'function') window.__titleShutdown();
+      else if (titleVisible && typeof window.stopTitleBGM === 'function') window.stopTitleBGM();
+    } catch (e) {}
+
+    try {
+      ['title-screen','endscreen-win','endscreen-lose','reactor-menu','pokedex','save-menu','sub-menu','repair-prompt','guardian-cutin','guardian-continue']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('active','show','quest-sheet','upgrade-sheet');
+        });
+      const ts = document.getElementById('title-screen');
+      if (ts) ts.style.display = 'none';
+      const sw = document.getElementById('story-window');
+      const so = document.getElementById('story-overlay');
+      if (sw) sw.classList.remove('active');
+      if (so) so.classList.remove('active');
+      if (typeof StoryDialog !== 'undefined') {
+        if (StoryDialog.timer) clearTimeout(StoryDialog.timer);
+        StoryDialog.active = false;
+        StoryDialog.lines = [];
+        StoryDialog.lineIndex = 0;
+        StoryDialog.pendingDone = null;
+        StoryDialog.timer = null;
+      }
+      const sc = document.getElementById('scouter-panel');
+      if (sc) sc.classList.remove('show','booting');
+      const bo = document.getElementById('chapter-blackout');
+      if (bo) bo.classList.remove('on','closed','open');
+    } catch (e) {}
+
+    document.getElementById('hud')?.classList.add('active');
+    document.getElementById('command-panel')?.classList.add('active');
+    document.getElementById('message-log')?.classList.add('active');
+    document.getElementById('enemy-status')?.classList.remove('active');
+    document.getElementById('hud')?.classList.remove('quest-modal-open','phase-shifting');
+
+    try {
+      if (!scene.playerMesh) {
+        const pm = CharacterFactory.buildPlayer();
+        pm.position.set(0, 0, 4);
+        pm.rotation.y = Math.PI;
+        pm.userData.baseY = 0; pm.userData.baseZ = 4; pm.userData.baseX = 0;
+        scene.playerMesh = pm; scene.scene.add(pm);
+      }
+      CharacterFactory.revivePlayerMesh(scene.playerMesh);
+      if (scene.playerMesh && scene.playerMesh.parent !== scene.scene) scene.scene.add(scene.playerMesh);
+      if (scene.enemyMesh) { scene.scene.remove(scene.enemyMesh); scene.enemyMesh = null; }
+      scene.setBattleCamera(false);
+    } catch (e) {}
+
+    const phase = Number.isFinite(game.scenarioPhase) ? game.scenarioPhase : 0;
+    const _chapterIntro = !!(opts && opts.chapterIntro) && typeof this._playChapterShutter === 'function';
+    if (_chapterIntro) {
+      // ★章ロード：シャッターを即座に閉じてフィールドを隠し、章頭演出
+      //   （シャッター閉→章タイトル→テキストイベント→シャッター開→フィールド）で再開する。
+      try {
+        const __fx = (typeof FX === 'function') ? FX() : null;
+        if (__fx && typeof __fx.ensureBlackout === 'function') {
+          const __bo = __fx.ensureBlackout();
+          __bo.classList.remove('open'); __bo.classList.add('on'); void __bo.offsetWidth; __bo.classList.add('closed');
+        }
+      } catch (e) {}
+    } else {
+      try { this.applyZoneState(phase, 0, true); } catch (e) {}
+    }
+    try { if (!Array.isArray(game.quests) || game.quests.length === 0) this.initQuests(); } catch (e) {}
+    try { StoryDialog.init(); } catch (e) {}
+    try {
+      if (game.scouterIssued && typeof ensureScouterUI === 'function') {
+        const sc = ensureScouterUI();
+        if (sc) sc.classList.add('issued');
+      } else {
+        const sc = document.getElementById('scouter-panel');
+        if (sc) sc.classList.remove('issued');
+      }
+    } catch (e) {}
+    this.closeSubMenu?.();
+    this.updateUI();
+    this.renderSystemList();
+    if (typeof this.renderReactorMenu === 'function') { try { this.renderReactorMenu(); } catch (e) {} }
+
+    const lbl = SaveSystem.chapterLabel(phase);
+    if (_chapterIntro) {
+      const self = this;
+      const lines = (typeof this._chapterIntroLines === 'function') ? this._chapterIntroLines(phase) : [lbl];
+      const zoneName = (typeof getZonePhase === 'function') ? (getZonePhase(phase).zone || '') : '';
+      // セーブメニューが閉じてから章頭演出を開始する。
+      setTimeout(function () {
+        try {
+          self._playChapterShutter(phase, '記録復元', lines, 'CHAPTER', function () {
+            try { self.log({ text: `${lbl}（Lv${game.player.lv}）から再開する。`, kind: 'system' }); } catch (e) {}
+            // ★ロード復帰：フェーズ固有イベント（第6章=管理官／LAST PHASE=区民の心）を必要なら再開
+            try { self._resumePhaseEvent(phase); } catch (e) {}
+          });
+        } catch (e) {
+          try { self.applyZoneState(phase, 0, true); } catch (_e) {}
+          try { self.showCenterMessage('データ復元', lbl + ' から再開', 1800); } catch (_e) {}
+        }
+      }, 40);
+    } else {
+      try { this.showCenterMessage('データ復元', lbl + ' から再開', 1800); } catch (e) {}
+      this.log({ text: `セーブデータを復元した。${lbl}（Lv${game.player.lv}）から再開する。`, kind: 'system' });
+      // ★オート/手動ロードでもフェーズ固有イベント（第6章=管理官／LAST PHASE=区民の心）を再開
+      try { this._resumePhaseEvent(phase); } catch (e) {}
+    }
+    return true;
+  }
   endBattle() {
     game.enemy = null;
     game.state = 'IDLE';
@@ -10889,6 +11548,7 @@ ${flavor}`;
     }
     try { var sc = document.getElementById('scouter-panel'); if (sc) sc.classList.remove('show'); } catch (e) {}
     this.updateUI();
+    try { if (SaveSystem.canSaveNow()) SaveSystem.writeAuto(); } catch (e) {}
   }
   handleDefeat() {
     // メルトダウンは撃破するまで観測確定扱いにしない。
@@ -10926,6 +11586,10 @@ ${flavor}`;
       scene.enemyMesh = null;
     }
     scene.setBattleCamera(false);
+    // ★死亡→コンティニュー復帰：endBattle を経由しないため、戦闘UIを明示的に後始末する。
+    //   SIGHT-AID（直前の生物が残る）を隠し、技師モニターをアイドルへ戻す。
+    try { var __scP = document.getElementById('scouter-panel'); if (__scP) __scP.classList.remove('show'); } catch (e) {}
+    try { if (window.EngMonitor) window.EngMonitor.playIdle(); } catch (e) {}
     document.getElementById('endscreen-lose').classList.remove('active');
     document.getElementById('hud').classList.add('active');
     document.getElementById('command-panel').classList.add('active');
@@ -10986,7 +11650,7 @@ ${flavor}`;
           <div class="ending-record">
             <h2>最終記録：ADACHI-1 事故の真相</h2>
             <p>所要時間：${min}分${sec}秒。</p>
-            <p>ADACHI-1は発電所ではなかった。正式名称は「東京東部社会感情処理炉」。</p>
+            <p>ADACHI-1は、ただの発電所ではなかった。表向きは東京基幹電力炉。だが隠された機能は、東京全域社会感情処理炉。その中枢区画の名は、社会感情炉心。</p>
             <p>足立区の地下に、東京中の不満、偏見、苦情、行政コスト、再開発の矛盾を流し込み、それを熱に変え、電力に変え、都市ブランドのきれいな顔だけを守る装置だった。</p>
             <p>事故の原因は、核燃料の暴走ではない。「苦情がゼロなら住民は幸福である」という、きれいすぎるKPIが炉心を誤作動させた。</p>
             <p>あなたが倒した「東京ブランド維持計画・責任者不在」は、個人ではない。誰も主語を書かず、誰も名前を押さず、見たくないものを説明しやすい場所へ流す、東京という都市の便利な癖そのものだった。</p>
@@ -11222,6 +11886,12 @@ ${flavor}`;
     this.updateUI();
     this.renderSystemList();
     this.renderReactorMenu();
+    try {
+      if (SaveSystem.canSaveNow()) {
+        SaveSystem.writeAuto();
+        if (sys.key !== 'containment') SaveSystem.writeChapter(game.scenarioPhase || 0);
+      }
+    } catch (e) {}
     // 修復完了後は、制御パネルを閉じてから「章が切り替わった」ことを明確に見せる。
     setTimeout(() => {
       this.closeReactor(true);
@@ -11462,6 +12132,7 @@ ${flavor}`;
     this.replaceQuest(idx);
     this.renderQuestMenu();
     this.updateUI();
+    try { if (SaveSystem.canSaveNow()) SaveSystem.writeAuto(); } catch (e) {}
   }
 
   // ================ 図鑑 ================
@@ -11687,8 +12358,12 @@ window.addEventListener('DOMContentLoaded', boot);
     var skillLine = '<em>行動</em>：' + esc(skills) + (drop ? ('　<i>主素材</i>：' + esc(drop)) : '');
     var head = '<div class="dxv2-row"><span class="dxv2-id">No.' + pad3(m.id) + '</span>'
       + '<span class="dxv2-tierchip">T' + m.tier + ' ' + (isSeen ? esc(m.tierName) : '未観測') + '</span></div>';
+    var thumb = (isSeen && m.sprite)
+      ? '<div class="dxv2-thumb"><img src="' + esc(m.sprite) + '" alt="" loading="lazy"></div>'
+      : '<div class="dxv2-thumb empty">' + (isSeen ? 'IMAGE<br>準備中' : 'NO SIGNAL<br>未観測') + '</div>';
     if (!isSeen){
       return head
+        + thumb
         + '<div class="dxv2-name">？？？</div>'
         + '<div class="dxv2-story dxv2-story-locked" aria-label="未発見"><span class="dxv2-mask-text">' + esc(m.story) + '</span><span class="dxv2-lock-label">─ 未発見。端末は「未確認のため説明責任を保留」と表示している。─</span></div>'
         + '<div class="dxv2-stats">'
@@ -11700,6 +12375,7 @@ window.addEventListener('DOMContentLoaded', boot);
         + '<div class="dxv2-skills dxv2-skills-locked" aria-label="未発見"><span class="dxv2-mask-text">' + skillLine + '</span><span class="dxv2-lock-label"><em>行動</em>：???　<i>主素材</i>：???</span></div>';
     }
     return head
+      + thumb
       + '<div class="dxv2-name">' + esc(m.name) + '</div>'
       + '<div class="dxv2-story">' + esc(m.story) + '</div>'
       + '<div class="dxv2-stats">'
@@ -11802,6 +12478,10 @@ window.GUARDIAN_MAP = {
   containment:  69  // 格納容器の主
 };
 window.GUARDIAN_IDS = new Set(Object.keys(GUARDIAN_MAP).map(function(k){ return GUARDIAN_MAP[k]; }));
+/* ★v148 LAST PHASE：イベント専用ボス（通常・第7章25%・観測確定区間の全プールから除外）と、
+   フリーtier5（突入前は最大1体のみ観測可。残りはクリア後の観測モードで解禁）。 */
+window.EVENT_ONLY_IDS = new Set([57, 58, 65, 70]); // 汚染区長/放射科学者/汚染都知事代理/メルトダウン
+window.FREE_T5_IDS = new Set([59, 60, 61, 63]);     // メルト院長/ガンマ自衛隊長/汚染東武運転士/放射相撲親方
 
 /* ゲートLv基準の専用ステータス生成：
    本体の出現スケール式に追従させ、将来の調整にも自動で釣り合う */
@@ -11817,7 +12497,7 @@ window.buildGuardianData = function(sys){
   var TUNE = {
     primary:      { hp: 2.2,  atk: 0.75 },              /* 初戦はそのまま（チュートリアル） */
     control_rod:  { hp: 1.5,  atk: 1.1  * 0.8 * 0.9 },
-    secondary:    { hp: 1.45, atk: 1.05 * 0.8 * 0.9 },
+    secondary:    { hp: 1.45, atk: 0.63 },
     eccs:         { hp: 1.35, atk: 1.0  * 0.8 },
     backup_power: { hp: 1.3,  atk: 0.95 * 0.8 },
     containment:  { hp: 1.25, atk: 0.9  * 0.8 }
@@ -12454,6 +13134,7 @@ function tsShutdown(){
     }
   }catch(e){}
 }
+window.__titleShutdown = tsShutdown;
 $('ts-start').addEventListener('click', function(){
   if (screenEl.classList.contains('launch')) return;
   try{ /* 図鑑が開いていれば閉じてから出撃 */
@@ -12474,6 +13155,7 @@ $('ts-start').addEventListener('click', function(){
 });
 $('ts-continue').addEventListener('click', function(){
   beep(150, 0.18, 0.05, 'sawtooth');
+  try{ if (window.ADACHI_SAVE && window.ADACHI_SAVE.open) window.ADACHI_SAVE.open('load'); }catch(e){}
 });
 $('ts-dex').addEventListener('click', function(){
   beep(420, 0.1, 0.04);
@@ -12651,6 +13333,7 @@ GameController.prototype.unlockReactorStory = function(index, systemName, onDone
   if (game.storyUnlocked.has(index)){ if (onDone) onDone(); return; }
   var chapter = REACTOR_STORY_CHAPTERS[index];
   var phase = getZonePhase(index);
+  var targetZoneIndex = (game && Number.isFinite(game.scenarioPhase)) ? game.scenarioPhase : index;
   game.storyUnlocked.add(index);
   this.log({ text: '炉心記録が復元された：' + chapter.title, kind: 'crit' });
 
@@ -12682,7 +13365,7 @@ GameController.prototype.unlockReactorStory = function(index, systemName, onDone
   camShake(6, 600);
 
   /* 暗転の裏で世界を新しい位相へ */
-  setTimeout(function(){ try{ ctrl.applyZoneState(index, 5200, false); }catch(e){} }, 300);
+  setTimeout(function(){ try{ ctrl.applyZoneState(targetZoneIndex, 5200, false); }catch(e){} }, 300);
 
   /* ② 承認スタンプ */
   setTimeout(function(){ stamp.classList.add('in'); sStamp(); camShake(4, 220); }, 950);
@@ -12801,42 +13484,160 @@ GameController.prototype.advanceToChapterOne = function(){
   var self = this;
   if ((game.scenarioPhase || 0) >= 1) return;
 
-  var enterLines = [
-    '封鎖区域の奥で、隔壁のロックが外れる音がした。',
-    '端末：\n一次冷却配管区への進入許可を発行します。\n基幹システムへのアクセス権限を、限定的に解放します。',
-    '技師：\n「ようやく中に入れるのか。……入りたくはないけどな」',
-    '報告書通りなら、一次冷却系の損傷が中心のはずだ。報告書通りなら、の話だが。'
+  // (1) プロローグ終了イベント（外縁区T1x4撃破後）
+  var endLines = [
+    "端末：\nADACHI-1 外縁区 変異反応記録。",
+    "端末：\n確認個体：4\n分類：T1\n発生原因：不明\n既存報告書との照合：該当なし",
+    "技師：\n「なんだったんだ、あの虫は」",
+    "技師：\n「放射線で変な生き物が出る、なんて話は聞いたことがある」",
+    "技師：\n「でも、こいつらは違う」",
+    "技師：\n「汚染されてるだけじゃない。何かに、作り替えられてる感じがする」",
+    "端末：\n変異反応を図鑑へ記録しました。\n以後、確認された異常個体は自動記録されます。",
+    "技師：\n「図鑑、ね」",
+    "技師：\n「事故現場に入ったはずなのに、やってることは害虫駆除と怪物観察か」",
+    "端末：\n基幹システムへのアクセス権限を確認中。",
+    "端末：\n外縁区から一次冷却配管区への経路を検出しました。",
+    "技師：\n「一次冷却……ようやく原発らしい名前が出てきたな」",
+    "端末：\n一次冷却系統に重大異常。\n炉心温度、危険域で上昇中。\n配管圧力、不安定。\n汚染水漏出の可能性あり。",
+    "技師：\n「つまり、ここからが本題か」",
+    "技師：\n「変な生き物のことは気になる。だが、炉心が上がってるなら先に冷やすしかない」",
+    "端末：\n注意。\n一次冷却配管区より先は、ADACHI-1基幹システム管理区域です。\n現場権限の一部を解放します。",
+    "技師：\n「限定権限で基幹システムまで行けってか」",
+    "技師：\n「本当に、最後の押しつけ先だな」",
+    "端末：\nシャッター閉鎖。\n区画移行を開始します。",
+    "技師：\n「空が見えるのは、ここまでか」",
+    "技師：\n「行くぞ。まずは、この炉を冷やす」"
   ];
+
+  // (3) 第1章タイトルカードの本文（黒シャッター演出の後に読ませる語り）
+  var ch1Lines = [
+    "CHAPTER 01\n一次冷却配管区\n熱はまだ説明できる",
+    "ADACHI-1の炉心は、いまも熱を持ち続けている。",
+    "その熱を最初に受け止めるのが、一次冷却系。\n炉心を直接冷やし、暴走する熱を外へ逃がすための配管である。",
+    "ここが止まれば、炉心は冷えない。\n圧力は上がり、汚染水は漏れ、蒸気は施設内へ吹き出す。\n原発事故は、一気に深刻化する。",
+    "現在、一次冷却配管区では、配管圧力の低下、汚染水の漏出、蒸気漏れ、高線量反応が確認されている。",
+    "ここまでは、まだ説明できる。",
+    "壊れた配管。\n漏れた水。\n逃げ場を失った熱。\nこれは、原発事故として理解できる危険だ。",
+    "だが、冷却ログの端に、ひとつだけ説明のつかない反応が残っている。",
+    "炉心とは別の熱源。",
+    "冷却系統の記録上、炉心とは別の熱源が検出されている。",
+    "任務：\n一次冷却配管区へ進入し、冷却系統を復旧せよ。",
+    "注意：\n熱源不明。\n炉心以外に反応あり。"
+  ];
+
+  var ch1 = (typeof REACTOR_STORY_CHAPTERS !== 'undefined') ? REACTOR_STORY_CHAPTERS[1] : null;
+  var ch1Title = (ch1 && ch1.title) ? ch1.title : '第1章';
+
   var finish = function(){
     game.scenarioPhase = 1;
-    // 進入時は背景・章タイトルだけ第1章へ切替（炉心記録の本文は一次冷却を修復したとき出す）
-    try{ self.applyZoneState(1, 5200, false); }catch(e){}
     game.state = 'IDLE';
     self.updateUI();
     self.renderSystemList();
     self.log({ text: '一次冷却配管区へ進入。基幹システムの修復が可能になった。', kind: 'crit' });
+    try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(1); } } catch (e) {}
     setTimeout(function(){ self.maybePromptRepairAvailable(); }, 600);
   };
-  var playEnter = function(){
-    StoryDialog.play('第1章 進入：一次冷却配管区', enterLines, finish, 'Chapter 1');
+
+  // (2)(3) 黒シャッター演出 — 1→2章の unlockReactorStory(13168) と完全に同じシーケンス。
+  //   隔壁降下(sShutterClose) → 裏でゾーン遷移 → 承認スタンプ → 章タイトル hold 表示 →
+  //   StoryDialog（中身は手書き ch1Lines）→ シャッター開放(sShutterOpen)。
+  //   流すテキストだけ手書き、演出の枠は本物のシャッターに揃える。
+  var playChapterShutter = function(){
+    var FX = window.CHAPTER_FX;
+    // CHAPTER_FX が無い環境では従来カードにフォールバック
+    if (!FX || typeof FX.ensureBlackout !== 'function'){
+      game.scenarioPhase = 1;
+      if (typeof self.showChapterTransition === 'function'){
+        self.showChapterTransition(1, '一次冷却系統', ch1, function(){
+          StoryDialog.play(ch1Title, ch1Lines, finish, 'New Chapter');
+        });
+      } else {
+        StoryDialog.play(ch1Title, ch1Lines, finish, 'New Chapter');
+      }
+      return;
+    }
+
+    game.scenarioPhase = 1;
+    var phase = (typeof getZonePhase === 'function') ? getZonePhase(1) : null;
+    var systemName = '一次冷却系統';
+    var hud = document.getElementById('hud');
+    var command = document.getElementById('command-panel');
+    if (command) command.classList.remove('active');
+    if (hud) hud.classList.add('phase-shifting');
+
+    var bo = FX.ensureBlackout();
+    var card = document.getElementById('chapter-shift');
+    var stamp = bo.querySelector('.cb-stamp');
+    if (stamp){
+      stamp.classList.remove('in','fade');
+      var s2 = stamp.querySelector('.s2');
+      if (s2) s2.textContent = systemName + ' ／ 修復進捗 ' + game.repairedSystems.size + ' / 6';
+    }
+
+    /* (1) 隔壁降下 */
+    bo.classList.remove('open');
+    bo.classList.add('on');
+    void bo.offsetWidth;
+    bo.classList.add('closed');
+    FX.sShutterClose();
+    FX.camShake(6, 600);
+
+    /* 暗転の裏で第1章ゾーンへ */
+    setTimeout(function(){ try{ self.applyZoneState(1, 5200, false); }catch(e){} }, 300);
+
+    /* (2) 承認スタンプ */
+    setTimeout(function(){ if(stamp){ stamp.classList.add('in'); } FX.sStamp(); FX.camShake(4, 220); }, 950);
+    setTimeout(function(){ if(stamp){ stamp.classList.add('fade'); } }, 2350);
+
+    /* (3) 章タイトル出現（hold 残留） */
+    setTimeout(function(){
+      if (!card) return;
+      var cNo = document.getElementById('chapter-no');
+      var cZone = document.getElementById('chapter-zone');
+      var cTitle = document.getElementById('chapter-title');
+      var cSystem = document.getElementById('chapter-system');
+      var cMeta = document.getElementById('chapter-meta');
+      var cGlitch = document.getElementById('chapter-glitch');
+      if (cNo && phase) cNo.textContent = phase.chapterNo;
+      if (cZone && phase) cZone.textContent = phase.zone;
+      if (cTitle && phase) cTitle.textContent = phase.title;
+      if (cSystem) cSystem.textContent = systemName + '：手動復旧 / 新規深度に移行';
+      if (cMeta) cMeta.textContent = (phase && phase.meta) ? phase.meta : 'REACTOR DEPTH UPDATED';
+      if (cGlitch) cGlitch.textContent = 'SYSTEM PHASE SHIFT';
+      card.classList.remove('active','out');
+      void card.offsetWidth;
+      card.classList.add('hold');
+      FX.sTitleSwell();
+    }, 2750);
+
+    /* (4) タイトルを残したまま StoryDialog（手書き ch1Lines）*/
+    setTimeout(function(){
+      var movedLayer = FX.beginChapterDialogLayer();
+      StoryDialog.play(ch1Title, ch1Lines, function(){
+        /* (5) 退場：タイトル崩壊 → シャッター開放 */
+        if (card) card.classList.add('out');
+        setTimeout(function(){
+          if (card) card.classList.remove('hold','out');
+          bo.classList.remove('closed');
+          bo.classList.add('open');
+          FX.sShutterOpen();
+          FX.camShake(5, 450);
+          try{ scene.fxFlash(0.8, 0.95, 0.85, 0.3); scene.fxCA(0.015); }catch(e){}
+        }, 580);
+        setTimeout(function(){
+          bo.classList.remove('on','open');
+          FX.endChapterDialogLayer(movedLayer);
+          if (hud) hud.classList.remove('phase-shifting');
+          finish();
+        }, 1800);
+      }, 'New Chapter');
+    }, 4500);
   };
 
-  // ★プロローグの章頭テキストを、ここで初めて「他の章と同じ作法」で暗転表示する。
-  //   プロローグはindex0で最初から解放済みのため、章遷移の暗転がこれまで一度も出ていなかった。
-  //   出口（=第1章進入）でプロローグ要約を見せてから、隔壁開放の語りへ接続する。
-  var ch0 = (typeof REACTOR_STORY_CHAPTERS !== 'undefined') ? REACTOR_STORY_CHAPTERS[0] : null;
-  if (ch0) {
-    var ph0 = (typeof getZonePhase === 'function') ? getZonePhase(0) : null;
-    var proLines = [];
-    proLines.push('プロローグ：' + ((ph0 && ph0.zone) ? ph0.zone : '竹ノ塚 外縁区'));
-    (ch0.lines || []).forEach(function(l){ proLines.push(l); });
-    if (ch0.mystery) proLines.push(ch0.mystery);
-    StoryDialog.play(ch0.title || 'プロローグ', proLines, function(){
-      setTimeout(playEnter, 350);
-    }, 'Prologue');
-  } else {
-    playEnter();
-  }
+  // (1) 終了イベント -> 黒シャッター演出
+  StoryDialog.play('外縁区 ─ 報告書にない異常', endLines, function(){
+    setTimeout(playChapterShutter, 250);
+  }, 'Prologue Clear');
 };
 })();
 </script>
@@ -12857,10 +13658,29 @@ GameController.prototype.enterFinalPhaseZone = function(){
   try{ if(!game.storyUnlocked) game.storyUnlocked = new Set([0]); game.storyUnlocked.add(8); }catch(e){}
   var self = this;
   try{ this.applyZoneState(8, 5200, false); }catch(e){}
+  try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(8); } } catch (e) {}
   setTimeout(function(){
     try{
       self.showCenterMessage('ZONE更新', '社会感情炉心 ─ 格納容器の、内側へ。', 2600);
       self.log({ text: 'ZONE更新：社会感情炉心。ここから先、空の色は地図に載っていない。', kind: 'crit' });
+    }catch(e){}
+  }, 1200);
+};
+
+/* ★シークレット章（フェーズ9）：名前のない炉心へ進入。責任者不在の空間。 */
+GameController.prototype.enterNamelessCoreZone = function(){
+  if (game.namelessCoreEntered) return;
+  game.namelessCoreEntered = true;
+  game.finalPhaseEntered = true; /* 念のため：以後 enterFinalPhaseZone は no-op */
+  game.scenarioPhase = 9;
+  try{ if(!game.storyUnlocked) game.storyUnlocked = new Set([0]); game.storyUnlocked.add(9); }catch(e){}
+  var self = this;
+  try{ this.applyZoneState(9, 5200, false); }catch(e){}
+  try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(9); } } catch (e) {}
+  setTimeout(function(){
+    try{
+      self.showCenterMessage('ZONE更新', '名前のない炉心 ─ 誰も書かなかった空欄の底。', 2600);
+      self.log({ text: 'ZONE更新：名前のない炉心。設備でも感情でもない、空欄そのものの場所。', kind: 'crit' });
     }catch(e){}
   }, 1200);
 };
@@ -12913,7 +13733,7 @@ GameController.prototype.playMeltdownToTrueBossSequence = function(){
       game.meltdownTransitionActive = false;
       game.finalBossPending = false;
       game.finalBossUnlocked = true;
-      self.enterFinalPhaseZone();
+      self.enterNamelessCoreZone();
       self.log({ text: '最終承認プロトコル起動。真のボス「' + TRUE_BOSS_NAME + '」が出現する。', kind: 'crit' });
       if (bo) {
         bo.classList.remove('closed');
@@ -13048,6 +13868,7 @@ GameController.prototype.beginReentryControlChapter = function(){
   game.scenarioPhase = 6;
   try{ if(!game.storyUnlocked) game.storyUnlocked = new Set([0]); game.storyUnlocked.add(6); }catch(e){}
   try{ this.applyZoneState(6, 5200, false); }catch(e){}
+  try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(6); } } catch (e) {}
   // 背景・章タイトルが切り替わってから、端末調査の語りに入る
   setTimeout(function(){
     var lines = [
@@ -13185,6 +14006,7 @@ GameController.prototype.completeReentryManager = function(){
     self.updateUI();
     self.renderSystemList();
     self.log({ text: '格納容器前へ進入。最後の基幹システム「格納容器」の修復が可能になった。', kind: 'crit' });
+    try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(7); } } catch (e) {}
     setTimeout(function(){ self.maybePromptRepairAvailable(); }, 600);
   };
   StoryDialog.play('氏名欄 一時復元', lines, function(){
@@ -13410,6 +14232,13 @@ function ensureScouterUI(){
 
 /* 戦闘開始時に、対象の図鑑データをスカウターに表示する */
 GameController.prototype.updateScouter = function(data){
+  if (!game.scouterIssued) {
+    game.scouterIssued = !!(
+      game.mutantObservationUnlocked ||
+      (Number.isFinite(game.scenarioPhase) && game.scenarioPhase >= 1) ||
+      (game.encounteredMonsters && game.encounteredMonsters.has(1))
+    );
+  }
   if (!game.scouterIssued) return;
   ensureScouterUI();
   var el = document.getElementById('scouter-panel');
@@ -13440,13 +14269,14 @@ GameController.prototype.updateScouter = function(data){
   var voiceEl = document.getElementById('sc-voice'); if (voiceEl){ voiceEl.textContent=''; voiceEl.classList.remove('on'); }
   // ドット絵の差し込み口：data.sprite があれば画像、なければプレースホルダ
   if (artEl){
+    artEl.classList.toggle('sc-art-tall', !!(data.sprite && data.tier >= 4));
     if (data.sprite){
       artEl.innerHTML = '<img src="'+data.sprite+'" alt="" style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges">' + '<canvas class="sc-noise-canvas" width="160" height="90"></canvas><div class="sc-tear"></div>';
     } else {
       artEl.innerHTML = '<div class="sc-noimg">NO IMAGE<br>'+(seen?'ドット絵 準備中':'未観測')+'</div>' + '<canvas class="sc-noise-canvas" width="160" height="90"></canvas><div class="sc-tear"></div>';
     }
   }
-  el.classList.add('show');
+  el.classList.add('issued','show');
 };
 
 /* ★将来用：スカウター内で変異生物にセリフを言わせる。
@@ -13667,6 +14497,37 @@ setTimeout(updateEnv, 400);
 (function(){
 'use strict';
 var typing = null;
+var FACE_LABELS = {
+  normal: '通常／現場確認',
+  alert: '警戒／異常察知',
+  irritated: '苛立ち／皮肉',
+  pain: '被弾／苦痛',
+  tired: '疲労／消耗',
+  confused: '困惑／理解不能',
+  anger: '静かな怒り／拒否',
+  resolve: '覚悟／最終決断',
+  relief: '安堵／小さな回復',
+  battle: '戦闘構え／攻撃前'
+};
+window.setEngineerFace = function(face){
+  var key = FACE_LABELS[face] ? face : 'normal';
+  var el = document.getElementById('eng-face-label');
+  if (el) el.textContent = FACE_LABELS[key];
+  window.currentEngineerFace = key;
+};
+window.inferEngineerFace = function(text, fallback){
+  text = String(text || '');
+  if (/最後の制御棒|責任者不在|最終|対峙|逃げない|決断/.test(text)) return 'resolve';
+  if (/俺は資源じゃない|責任者欄|氏名欄|拒否|空欄|押しつけ/.test(text)) return 'anger';
+  if (/回復|休息|帰るか|おつかれ|やっと名前/.test(text)) return 'relief';
+  if (/ダメージ|被弾|痛|死|暗転|裂けた|熱い|HP|状態異常|体が変/.test(text)) return 'pain';
+  if (/疲|消耗|線量|休め|処置|毒|火傷|麻痺|呪/.test(text)) return 'tired';
+  if (/なんだ|何だ|説明でき|照合中|不明|理解|ノイズ|配管図|混ざ/.test(text)) return 'confused';
+  if (/報告書|未分類|異常|警戒|SIGHT-AID|視認|接近|現れた|敵性|強敵/.test(text)) return 'alert';
+  if (/攻撃|戦闘|ボス|番人|構え|倒せ|沈黙/.test(text)) return 'battle';
+  if (/誰が|非常|却下|申請|依頼|発注|検収|区役所|責任/.test(text)) return 'irritated';
+  return fallback || 'normal';
+};
 // 専用タイプ音（このウィンドウ専用の短い電子音）
 function typeTick(){
   try{
@@ -13683,11 +14544,12 @@ function typeTick(){
     o.start(t); o.stop(t + 0.03);
   }catch(e){}
 }
-window.engTypewrite = function(text){
+window.engTypewrite = function(text, face){
   var el = document.getElementById('eng-speech');
   if (!el){ return; }
   if (typing){ clearInterval(typing); typing = null; }
   text = String(text || '');
+  window.setEngineerFace(face || window.inferEngineerFace(text, 'normal'));
   var i = 0;
   el.textContent = '';
   var cursor = document.createElement('span');
@@ -13932,6 +14794,10 @@ function engineerPrompt(lines, onDone, opts){
   if(!el){ if(typeof onDone==='function') onDone(); return; }
   lines = Array.isArray(lines) ? lines.slice() : [String(lines||'')];
   opts = opts || {};
+  if (window.setEngineerFace) {
+    var faceText = lines.join('\n');
+    window.setEngineerFace(opts.face || (window.inferEngineerFace ? window.inferEngineerFace(faceText, 'normal') : 'normal'));
+  }
   var autoMode = !!opts.autoAdvanceMs;
   var idx=0, timer=null, autoTimer=null, charDelay=36, armed=false, finished=false;
   document.body.classList.add('adachi-engineer-wait');
@@ -14529,6 +15395,37 @@ GameController.prototype.issueScouter = function(){
 </script>
 
 
+<script>
+/* セーブ復帰後の戦闘開始時、SIGHT-AID表示状態を再保証する */
+(function(){
+  if (typeof GameController === 'undefined') return;
+  var _saveRestoreScouterSpawnEnemy = GameController.prototype.spawnEnemy;
+  GameController.prototype.spawnEnemy = function(){
+    var ret = _saveRestoreScouterSpawnEnemy.apply(this, arguments);
+    var self = this;
+    setTimeout(function(){
+      try {
+        if (!game || !game.enemy || !game.enemy.data) return;
+        var data = game.enemy.data;
+        if (data.isReentryManager || game.enemy.isTrueBoss || data.id < 0) return;
+        if (!game.scouterIssued) {
+          game.scouterIssued = !!(
+            game.mutantObservationUnlocked ||
+            (Number.isFinite(game.scenarioPhase) && game.scenarioPhase >= 1) ||
+            (game.encounteredMonsters && game.encounteredMonsters.has(1))
+          );
+        }
+        if (game.scouterIssued && typeof self.updateScouter === 'function') {
+          self.updateScouter(data);
+        }
+      } catch (e) {}
+    }, 0);
+    return ret;
+  };
+})();
+</script>
+
+
 <!-- ============================================================
    v109 patch: name-event blackout cleanup + debug level/phase controls
 ============================================================ -->
@@ -14959,9 +15856,1849 @@ document.addEventListener('keydown', function(e){ if(e.key==='d'||e.key==='D') s
         <span class="guide-arrow">TARGET →</span>
       </div>
       <div id="reactor-systems"></div>
+      <button class="reactor-save-btn" id="reactor-save-btn">データ保全 / SAVE</button>
       <button class="reactor-close" id="reactor-close">閉じる</button>
     </div>
   </div>
+
+  <!-- セーブ／ロード端末 -->
+  <div class="save-menu" id="save-menu">
+    <div class="modal-box save-box">
+      <i class="modal-corner mc1"></i><i class="modal-corner mc2"></i><i class="modal-corner mc3"></i><i class="modal-corner mc4"></i>
+      <h2 id="save-title">データ保全端末</h2>
+      <div class="modal-sub" id="save-sub">SAVE / LOAD TERMINAL ─ ADACHI-1</div>
+      <div class="save-scroll" id="save-scroll"></div>
+      <div class="save-io">
+        <button class="save-io-btn" id="save-export">セーブデータを書き出す</button>
+        <button class="save-io-btn" id="save-import">セーブデータを読み込む</button>
+        <input type="file" id="save-import-file" accept="application/json,.json" style="display:none">
+      </div>
+      <button class="reactor-close" id="save-close">閉じる</button>
+    </div>
+  </div>
+
+<script>
+/* ============================================================
+   セーブ／ロードUI（スロット一覧・保存/復元・JSON入出力）
+   ============================================================ */
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function ctrl(){ return window.controller || (window.game && window.game.controller) || null; }
+  var menuMode = 'save';
+
+  function fmtTime(ts){
+    if(!ts) return '';
+    var d = new Date(ts);
+    var p = function(n){ return String(n).padStart(2,'0'); };
+    return (d.getMonth()+1)+'/'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  function slotSummary(data){
+    if(!data) return null;
+    var phase = (typeof data.phase === 'number') ? data.phase : ((data.game && data.game.scenarioPhase) || 0);
+    return {
+      label: SaveSystem.chapterLabel(phase),
+      lv: data.lv || (data.player && data.player.lv) || '?',
+      at: fmtTime(data.savedAt)
+    };
+  }
+  function slotEl(opts){
+    var data = opts.data;
+    var sum = slotSummary(data);
+    var el = document.createElement('div');
+    el.className = 'save-slot' + (data ? '' : ' empty') + (opts.kind === 'chapter' ? ' chapter' : '');
+    var inner = '<div class="ss-label">'+opts.title+'</div>';
+    if(data){
+      inner += '<div class="ss-main">'+sum.label+' / Lv'+sum.lv+'</div>'
+            +  '<div class="ss-meta">'+(sum.at || '')+'</div>';
+    } else {
+      inner += '<div class="ss-main">── EMPTY ──</div><div class="ss-meta">記録なし</div>';
+    }
+    var actions = '<div class="ss-actions">';
+    if(menuMode === 'load'){
+      if(data) actions += '<button class="ss-load" type="button">復元</button>';
+    } else {
+      if(opts.allowSave) actions += '<button class="ss-save" type="button">'+(data ? '上書き保存' : '保存')+'</button>';
+      if(data && opts.allowDelete) actions += '<button class="ss-del" type="button" title="削除">×</button>';
+    }
+    actions += '</div>';
+    el.innerHTML = inner + actions;
+
+    var loadBtn = el.querySelector('.ss-load');
+    if(loadBtn) loadBtn.addEventListener('click', function(ev){ ev.stopPropagation(); doLoad(opts.kind, opts.key); });
+    var saveBtn = el.querySelector('.ss-save');
+    if(saveBtn) saveBtn.addEventListener('click', function(ev){ ev.stopPropagation(); doSave(opts.kind, opts.key); });
+    var delBtn = el.querySelector('.ss-del');
+    if(delBtn) delBtn.addEventListener('click', function(ev){ ev.stopPropagation(); doDelete(opts.kind, opts.key); });
+    if(menuMode === 'load' && data) el.addEventListener('click', function(){ doLoad(opts.kind, opts.key); });
+    return el;
+  }
+  function section(title, hint){
+    var sec = document.createElement('div'); sec.className = 'save-sec';
+    var h = document.createElement('div'); h.className = 'save-sec-head';
+    h.innerHTML = '<span>'+title+'</span>' + (hint ? '<span class="hint">'+hint+'</span>' : '');
+    sec.appendChild(h);
+    var grid = document.createElement('div'); grid.className = 'save-grid';
+    sec.appendChild(grid);
+    sec._grid = grid;
+    return sec;
+  }
+  function render(){
+    var wrap = $('save-scroll');
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    var store = SaveSystem.loadStore();
+    var canSave = SaveSystem.canSaveNow();
+    var sm = $('save-menu');
+    if(sm) sm.classList.toggle('mode-load', menuMode === 'load');
+    var titleEl = $('save-title'); var subEl = $('save-sub');
+    if(titleEl) titleEl.textContent = menuMode === 'load' ? 'データ復元端末' : 'データ保全端末';
+    if(subEl) subEl.textContent = menuMode === 'load'
+      ? 'LOAD TERMINAL ─ 復元するスロットを選択'
+      : 'SAVE TERMINAL ─ 保存先スロットを選択';
+
+    var aSec = section('AUTO', '戦闘勝利・炉心修復で自動記録');
+    aSec._grid.appendChild(slotEl({ kind:'auto', key:'auto', data:store.auto, title:'オートセーブ', allowSave:false, allowDelete:true }));
+    wrap.appendChild(aSec);
+
+    var mSec = section('MANUAL', '任意保存（'+SaveSystem.MANUAL_SLOTS+'枠）');
+    for(var i=1;i<=SaveSystem.MANUAL_SLOTS;i++){
+      mSec._grid.appendChild(slotEl({ kind:'manual', key:String(i), data:store.manual[i] || null, title:'スロット '+i, allowSave:canSave, allowDelete:true }));
+    }
+    wrap.appendChild(mSec);
+
+    var cSec = section('CHAPTER', '章頭スナップショット／復帰保険');
+    for(var c=0;c<SaveSystem.CHAPTER_SLOTS;c++){
+      cSec._grid.appendChild(slotEl({ kind:'chapter', key:String(c), data:store.chapters[c] || null, title:SaveSystem.chapterLabel(c), allowSave:false, allowDelete:true }));
+    }
+    wrap.appendChild(cSec);
+  }
+  function doSave(kind, key){
+    if(!SaveSystem.canSaveNow()){ flash('フィールドにいる時のみ保存できます。'); return; }
+    var ok = kind === 'manual' ? SaveSystem.writeManual(key) : false;
+    if(ok){ flash('保存しました。'); render(); updateTitleContinue(); }
+    else flash('保存に失敗しました。');
+  }
+  function doLoad(kind, key){
+    var data = SaveSystem.readSlot(kind, key);
+    if(!data){ flash('このスロットは空です。'); return; }
+    var c = ctrl();
+    if(!c || typeof c.applyLoadedState !== 'function'){ flash('ロード処理を初期化できませんでした。'); return; }
+    try {
+      if (typeof audio !== 'undefined' && audio && typeof audio.init === 'function') {
+        audio.init();
+        if (audio.ctx && audio.ctx.state === 'suspended' && typeof audio.ctx.resume === 'function') audio.ctx.resume();
+      }
+    } catch(e) {}
+    var ok = c.applyLoadedState(data, { chapterIntro: kind === 'chapter' });
+    if(ok) close();
+    else flash('復元に失敗しました。');
+  }
+  function doDelete(kind, key){
+    if(!SaveSystem.readSlot(kind, key)) return;
+    SaveSystem.deleteSlot(kind, key);
+    render();
+    updateTitleContinue();
+  }
+  function flash(msg){
+    var c = ctrl();
+    if(c && typeof c.log === 'function'){ try{ c.log({ text:msg, kind:'system' }); }catch(e){} }
+  }
+  function open(mode){
+    menuMode = mode || 'save';
+    render();
+    var el = $('save-menu'); if(el) el.classList.add('active');
+  }
+  function close(){
+    var el = $('save-menu'); if(el) el.classList.remove('active');
+  }
+  function updateTitleContinue(){
+    var cont = $('ts-continue');
+    if(!cont) return;
+    cont.classList.remove('locked');
+    var note = cont.querySelector('.note');
+    if(note) note.textContent = SaveSystem.hasAnySave() ? 'SAVE / LOAD' : 'JSON読込対応';
+  }
+  function wire(){
+    var saveBtn = $('reactor-save-btn');
+    if(saveBtn) saveBtn.addEventListener('click', function(){
+      try{ if(window.audio) audio.click(); }catch(e){}
+      open('save');
+    });
+    var closeBtn = $('save-close');
+    if(closeBtn) closeBtn.addEventListener('click', function(){ try{ if(window.audio) audio.click(); }catch(e){} close(); });
+    var exportBtn = $('save-export');
+    if(exportBtn) exportBtn.addEventListener('click', function(){
+      if(!SaveSystem.hasAnySave()){ flash('書き出せるセーブデータがありません。'); return; }
+      SaveSystem.exportFile();
+    });
+    var importBtn = $('save-import');
+    var fileInput = $('save-import-file');
+    if(importBtn && fileInput){
+      importBtn.addEventListener('click', function(){ fileInput.value = ''; fileInput.click(); });
+      fileInput.addEventListener('change', function(){
+        var f = fileInput.files && fileInput.files[0];
+        if(!f) return;
+        SaveSystem.importFile(f, function(ok){
+          flash(ok ? 'セーブデータを読み込みました。' : '読み込みに失敗しました。');
+          if(ok){ render(); updateTitleContinue(); }
+        });
+      });
+    }
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        var el = $('save-menu');
+        if(el && el.classList.contains('active')) close();
+      }
+    });
+    updateTitleContinue();
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(wire, 80); });
+  else setTimeout(wire, 80);
+  window.ADACHI_SAVE = { open:open, close:close, render:render, system:SaveSystem };
+})();
+</script>
+
+<script>
+/* ============================================================
+   v134：ゲーム冒頭〜第1章突入の新規シナリオイベント
+   - 00プロローグ（START後）
+   - 00プロローグ終了イベント（外縁区T1×4撃破後）
+   - 第1章タイトルカード（その直後）
+   ============================================================ */
+(function(){
+'use strict';
+if (typeof GameController === 'undefined') return;
+
+/* ---- 端末風ブートパネル制御 ---- */
+const TermPanel = {
+  el:null, scroll:null, next:null, headline:null, status:null,
+  rows:[], idx:0, onDone:null, active:false, typing:false, _bound:false,
+  init(){
+    this.el = document.getElementById('term-panel');
+    this.scroll = document.getElementById('term-scroll');
+    this.next = document.getElementById('term-next');
+    this.headline = document.getElementById('term-headline');
+    this.status = document.getElementById('term-status');
+    if (this._bound || !this.el) return;
+    this._bound = true;
+    const adv = (e)=>{ if(!this.active) return; if(e) e.stopPropagation(); this.advance(); };
+    this.el.addEventListener('click', adv);
+    document.addEventListener('keydown', (e)=>{
+      if(!this.active) return;
+      if(e.key===' '||e.key==='Enter'||e.key==='z'||e.key==='Z'){ e.preventDefault(); this.advance(); }
+    });
+  },
+  // rows: 配列。各要素は {k,v,cls} か {plain:'...'} か {head:'...'} か {pause:true}
+  play(headline, rows, onDone){
+    if(!this.el) this.init();
+    if(!this.el){ if(onDone) onDone(); return; }
+    this.active = true;
+    this.rows = rows.slice();
+    this.idx = 0;
+    this.onDone = onDone || null;
+    if(this.headline) this.headline.textContent = headline || 'SYSTEM BOOT';
+    if(this.status) this.status.textContent = '● LIVE';
+    this.scroll.innerHTML = '';
+    this.el.classList.add('active');
+    this.el.setAttribute('aria-hidden','false');
+    try{ document.getElementById('command-panel').classList.remove('active'); }catch(e){}
+    this.next.classList.remove('show');
+    this.revealNextBatch();
+  },
+  // 1クリックで「次のpauseまで」をまとめて出す
+  revealNextBatch(){
+    if(this.next) this.next.classList.remove('show');
+    let printedSomething = false;
+    while(this.idx < this.rows.length){
+      const r = this.rows[this.idx++];
+      if(r.pause){ printedSomething = true; break; }
+      this.appendRow(r);
+      printedSomething = true;
+    }
+    this.scroll.scrollTop = this.scroll.scrollHeight;
+    if(this.idx >= this.rows.length){
+      // 最後まで出した
+      if(this.next){ this.next.textContent = 'CLICK / SPACE ▼'; this.next.classList.add('show'); }
+      this._finished = true;
+    } else {
+      if(this.next){ this.next.classList.add('show'); }
+      this._finished = false;
+    }
+  },
+  appendRow(r){
+    const div = document.createElement('div');
+    if(r.head!=null){ div.className='term-row head'; div.textContent=r.head; }
+    else if(r.plain!=null){ div.className='term-row plain'; div.textContent=r.plain; }
+    else {
+      div.className = 'term-row' + (r.cls? (' '+r.cls):'');
+      const k = document.createElement('span'); k.className='tk'; k.textContent = r.k!=null? r.k : '';
+      const v = document.createElement('span'); v.className='tv'; v.textContent = r.v!=null? r.v : '';
+      div.appendChild(k); div.appendChild(v);
+    }
+    this.scroll.appendChild(div);
+  },
+  advance(){
+    if(this._finished){ this.finish(); return; }
+    this.revealNextBatch();
+  },
+  finish(){
+    this.active = false;
+    this._finished = false;
+    this.el.classList.remove('active');
+    this.el.setAttribute('aria-hidden','true');
+    const cb = this.onDone; this.onDone = null;
+    if(cb) cb();
+  }
+};
+window.__TermPanel = TermPanel;
+
+/* ============================================================
+   00プロローグ（STARTボタン→ローディング完了後）
+   playFirstEncounterIntro を全面差し替え。
+   構成：黒背景ナレーション → 端末ブート → 技師セリフ → PROLOGUE章カード → 任務 → 初遭遇戦
+   ============================================================ */
+GameController.prototype.playPrologueOpening = function(){
+  const self = this;
+  if (!game || game.firstEncounterIntroPlayed) {
+    if (game) { game.state = 'IDLE'; this.suppressEngineerLog = false; }
+    this.spawnEnemy();
+    return;
+  }
+  game.firstEncounterIntroPlayed = true;
+  this.suppressEngineerLog = true;
+  if (typeof this.clearEngineerSpeech === 'function') this.clearEngineerSpeech();
+
+  // ① 黒背景ナレーション（東京＝止まれない都市 / 足立区＝外縁 / ADACHI-1＝非常用電力炉 / 事故 / 責任者未定 / 最後の技師）
+  const narration = [
+    '西暦200X年。',
+    '東京は、止まれない都市になっていた。',
+    '電車は数分の遅れで謝罪し、\n病院は夜通し電気を使い、\n通信は一秒も途切れず、\n行政端末は災害時でも稼働し続ける。',
+    '誰かが眠っているあいだも、物流は動く。\n排水は流れる。\nサーバーは熱を吐き続ける。',
+    '東京は便利になった。\n\nだが、便利さには置き場が必要だった。',
+    '都心に置けないもの。\n景観に合わないもの。\n説明しづらいもの。\n止まったら困るが、見えてほしくはないもの。',
+    'それらは少しずつ、東へ、外縁へ、\n川と道路と地下配管の先へ押し流されていった。',
+    '東京都足立区、竹ノ塚。',
+    '物流倉庫、幹線道路、古い団地、河川、下水、地下水路。\n東京を動かすためのものが、静かに重なっている場所。',
+    'そこに建設されたのが、原子力発電施設。',
+    '東京基幹電力炉\nADACHI-1。',
+    'その役割は、東京全域への電力供給。',
+    '東京全域の病院、通信、避難所、行政システム、交通管制。\nそれらを、どんな時でも止めないための地下原発。',
+    '東京を止めないための炉。\n東京の生活を守るための炉。\n\nそう、説明されていた。',
+    'しかし、事故は起きた。',
+    '冷却系統、制御棒、非常冷却装置、バックアップ電源、格納容器。\nADACHI-1の基幹システムは、次々と異常を起こした。',
+    '事故発生から12分後、避難命令。\n19分後、現場通信途絶。',
+    '常駐職員からの応答はない。\n緊急対応班は、格納容器前で通信を失った。\n遠隔修復は、炉心深部の機械式ロックを解除できなかった。\n自動修復機は、高線量区域で停止した。',
+    '追加部隊の投入は、現在も承認待ち。\n責任部局は、現在も照会中。\n原因調査委員会は、現在も準備中。\n現場の指揮系統は、いまも確認できない。',
+    'それでも、炉心温度は上がり続けている。',
+    'そして、最後の現場投入が決定された。',
+    '投入されるのは、正式な責任者ではない。\n専門部隊でもない。\n施設職員でもない。',
+    '外部委託の修復技師、1名。',
+    'ADACHI-1はまだ止まっていない。\nだが、もう誰も中へ入ろうとはしない。'
+  ];
+
+  StoryDialog.play('ADACHI-1 ─ 最後の制御棒', narration, function(){
+    setTimeout(playBoot, 250);
+  }, 'Opening');
+
+  // ② 端末ブート（SYSTEM BOOT → 施設情報 → 事故対応履歴 → 外部要員選定）
+  function playBoot(){
+    const rows = [
+      { head:'SYSTEM BOOT' },
+      { plain:'ADACHI-1 EMERGENCY REPAIR PROTOCOL' },
+      { pause:true },
+      { k:'施設名', v:'東京基幹電力炉 ADACHI-1' },
+      { k:'所在地', v:'東京都足立区竹ノ塚 地下管理区域' },
+      { k:'状態', v:'重大事故', cls:'bad' },
+      { k:'通信', v:'途絶', cls:'bad' },
+      { k:'炉心温度', v:'上昇中', cls:'alert' },
+      { k:'基幹システム', v:'複数異常', cls:'bad' },
+      { k:'責任部局', v:'照会中', cls:'alert' },
+      { k:'現場指揮系統', v:'確認不能', cls:'alert' },
+      { pause:true },
+      { head:'事故対応履歴' },
+      { k:'常駐職員', v:'応答なし', cls:'bad' },
+      { k:'緊急対応班', v:'通信途絶', cls:'bad' },
+      { k:'遠隔修復', v:'失敗', cls:'bad' },
+      { k:'自動修復機', v:'停止', cls:'bad' },
+      { k:'追加部隊', v:'承認待ち', cls:'alert' },
+      { pause:true },
+      { plain:'外部修復要員を選定します。' },
+      { k:'候補者', v:'1名' },
+      { k:'職種', v:'修復技師' },
+      { k:'雇用区分', v:'外部委託' },
+      { k:'投入要員権限', v:'限定' },
+      { k:'責任権限', v:'なし', cls:'alert' },
+      { k:'生還保証', v:'対象外', cls:'bad' },
+      { k:'任務内容', v:'ADACHI-1 基幹システム復旧' },
+      { k:'承認状態', v:'自動承認済', cls:'good' }
+    ];
+    TermPanel.play('ADACHI-1 EMERGENCY REPAIR PROTOCOL', rows, function(){
+      setTimeout(playEngineer, 250);
+    });
+  }
+
+  // ③ 技師のセリフ＋端末応答
+  function playEngineer(){
+    const lines = [
+      "技師：\n「……外部委託で、地下原発の修復任務か」",
+      "技師：\n「冗談みたいな案件だな」",
+      "端末：\n常駐職員：応答なし。\n緊急対応班：通信途絶。\n遠隔修復：失敗。\n自動修復機：停止。\n追加部隊：承認待ち。\n責任部局：照会中。",
+      "技師：\n「常駐職員は応答なし。緊急対応班も戻ってない」",
+      "技師：\n「遠隔も、自動修復も失敗。追加部隊は承認待ち」",
+      "技師：\n「それで最後に、外部委託の俺を一人で送るってか」",
+      "技師：\n「最後の修復技師、ね」",
+      "技師：\n「聞こえはいいが、要するに最後の押しつけ先だろ」",
+      "端末：\n投入地点：竹ノ塚 外縁区。\n目的：封鎖区域内へ侵入し、基幹システムへのアクセス経路を確保してください。",
+      "技師：\n「まずは外縁区からか。まだ空が見えるうちは、引き返せそうに見えるな」",
+      "端末：\n注意。現場報告は事故発生19分後に途絶しています。\n報告書に記載のない異常を確認した場合、記録してください。",
+      "技師：\n「報告書にない異常、ね」",
+      "技師：\n「それを確認するために、人を一人送り込むわけだ」",
+      "端末：\n投入を開始します。"
+    ];
+    StoryDialog.play('最終現場投入', lines, function(){
+      setTimeout(playChapterCard, 200);
+    }, 'Deployment');
+  }
+
+  // ④ PROLOGUE 章カード（黒シャッター＋章タイトル）
+  function playChapterCard(){
+    if (typeof self.showChapterTransition === 'function'){
+      self.showChapterTransition(0, '外縁区 投入', 0, function(){
+        setTimeout(playObjective, 150);
+      });
+    } else {
+      playObjective();
+    }
+  }
+
+  // ⑤ 章扉テキスト（目的・注意）→ フィールドへ → 初遭遇戦
+  function playObjective(){
+    const lines = [
+      "PROLOGUE\n竹ノ塚 外縁区\nまだ空が残っている場所",
+      "目的：\n封鎖区域の外縁からADACHI-1へ侵入する。\n現場の状態を確認し、基幹システムへのアクセス経路を探す。",
+      "注意：\n報告書には、変異生物の記録はない。",
+      "現在の任務：\n竹ノ塚 外縁区を進み、ADACHI-1内部への入口を探してください。\n変異反応を確認した場合、図鑑へ記録されます。"
+    ];
+    StoryDialog.play('PROLOGUE ─ 竹ノ塚 外縁区', lines, function(){
+      game.state = 'IDLE';
+      self.suppressEngineerLog = false;
+      self.updateUI();
+      // 末尾は現状どおり放射ゴキブリ初遭遇戦へ
+      self.spawnEnemy();
+    }, 'Prologue');
+  }
+};
+})();
+</script>
+
+<script>
+window.STORY_TEXTS = {"TITLE_CARDS": {"2": ["ADACHI-1の炉心を冷やすだけでは、事故は止まらない。", "原子炉には、熱を下げる仕組みとは別に、反応そのものを止めるための装置がある。", "制御棒。", "炉心へ差し込むことで、核反応を抑え、原子炉を安全停止へ導くための装置である。", "事故が起きたとき、本来なら制御棒は落ちる。\n炉を止める。\n熱を増やす原因を断つ。", "それが、原発事故における重要な防波堤になる。", "だが、ADACHI-1の記録では、その防波堤が働いていない。", "制御棒系統には、物理的な損傷がある。\n搬入口のロックは歪み、作動履歴には欠落がある。\n安全停止ログも、途中で途切れている。", "ここまでは、まだ装置の故障として説明できる。", "だが、事故当時の記録には、奇妙な言葉が残っている。", "安全停止条件：成立。\n実行状態：保留。\n理由：照会中。", "制御棒は、落ちなかったのか。\nそれとも、落とされなかったのか。", "任務：\n制御棒搬入口へ進入し、制御棒系統を復旧せよ。", "注意：\n安全停止ログに未処理記録あり。\n停止判断、照会中。"], "3": ["ADACHI-1の炉心で生まれた熱は、炉心の中だけに留まらない。", "一次冷却系が炉心を直接冷やし、\n制御棒が反応を止めるなら、\n二次冷却系は、その熱を外へ逃がすための水路である。", "熱を受け取った水は、配管を通り、冷却設備へ運ばれる。\nそこで熱を逃がし、再び循環する。", "本来なら、それはADACHI-1の中で完結するはずだった。", "炉心。\n配管。\n冷却水。\n排水処理。\n循環する熱。", "ここまでは、まだ原発事故として説明できる。", "だが、二次冷却水路の記録には、施設外の系統が混ざっている。", "下水。\n排水。\n地下水路。\n都市データ回線。", "ADACHI-1の冷却水路は、施設の中だけで閉じていない。", "水は区境を知らない。\n配管は行政区域を読まない。\n地下に流れたものは、書類の線を越えていく。", "事故現場は、足立区竹ノ塚の地下にある。", "だが、この水路へ流れ込んでいたものは、足立区だけのものではない。", "東京を動かすための水。\n東京を止めないための電力。\n東京の見えない場所を流れてきたもの。", "それらが、ADACHI-1の地下で混ざっている。", "破損した水路図の奥に、未登録の図面名が残っている。", "東京23区感情配管図。", "まだ、その意味は分からない。", "だが、ひとつだけ分かることがある。", "この事故は、足立区だけで生まれたものではない。", "任務：\n二次冷却水路へ進入し、冷却水の循環経路を復旧せよ。", "注意：\n施設外系統との混線あり。\n未登録配管図を検出。"], "4": ["原子炉には、事故が起きたときのための最後の冷却装置がある。", "ECCS。\n非常用炉心冷却装置。", "炉心が高温になり、通常の冷却が失われたとき、緊急で水を送り込み、炉心を冷やすための設備である。", "それは、本来なら最後の保険だった。", "炉が熱を持ちすぎたとき。\n配管が破れたとき。\n冷却水が失われたとき。\nそれでも炉心を冷やすための、非常用の仕組み。", "だが、ADACHI-1の資料では、そのECCSさえ別の名前で扱われている。", "外縁補助系統。\n外縁非常用設備。\n外縁処理層。", "非常用の装置まで、中心から外へ押し出されていた。", "東京には、中心がある。", "明るい駅。高いビル。止まらない通信。\n夜でも光る病院。遅れを許されない交通。休めない行政端末。", "その便利さを支えるものは、いつも中心に置かれるわけではない。", "物流。下水。河川。古いインフラ。\nそれに、\n団地。倉庫。排水路。地下配管。", "東京を動かすために必要で、しかし見えてほしくないものは、少しずつ外縁へ流れていく。", "東京都足立区。", "都心から遠すぎない。\nだが、中心ではない。\n何かあっても、説明しやすい場所。", "ADACHI-1は、そこに作られた。", "偶然ではない。", "事故現場は足立区。\nだが、そこへ負荷を流し込んできたのは、東京という都市そのものだった。", "任務：\n外縁処理層へ進入し、ECCSを復旧せよ。", "注意：\n非常用炉心冷却装置が、外縁補助系統として再分類されています。\n立地選定記録に未確認項目あり。"], "5": ["原子炉施設には、通常の電源が失われたときのために、別の電源が用意されている。", "バックアップ電源。\n非常時に冷却装置、制御装置、警報、通信、遮断機構を動かし続けるための予備電源である。", "それは、本来なら最後の支えだった。", "主電源が落ちたとき。\n冷却系が不安定になったとき。\n通信が途絶えたとき。\nそれでも炉心を監視し、冷却を続け、事故の拡大を防ぐための仕組み。", "だが、ADACHI-1では、その非常用電源が、非常時だけに使われていたわけではない。", "平常運転の補助。\n不足分の穴埋め。\n遅れた保守の代替。\n止められない都市を動かし続けるための、見えない継ぎ足し。", "非常用は、非常時のために温存されていなかった。", "非常ではない日々の中で、少しずつ使われ、少しずつ削られていた。", "そして本当に非常時が来たとき、残っていた余力は少なかった。", "ADACHI-1の事故記録には、原因調査委員会のログが残っている。", "検討された。\n共有された。\n一定の合理性があると判断された。\n運用上やむを得ないものとされた。", "だが、そこには主語がない。", "誰が検討したのか。\n誰が共有したのか。\n誰が判断したのか。\n誰が止めなかったのか。", "記録には、名前がない。", "責任部局は、照会中。\n追加判断は、承認待ち。\n安全停止は、評価保留。", "それでも、炉心温度は上がり続けている。", "任務：\n非常冷却棟へ進入し、バックアップ電源を復旧せよ。", "注意：\n非常用電源の常用履歴あり。\n原因調査委員会ログに主語欠落。\n責任部局、照会中。"], "6": ["ADACHI-1の奥へ進むほど、修復対象は設備だけではなくなっていく。", "一次冷却系を直し、炉心の熱を下げた。\n制御棒を戻し、止める仕組みを取り戻した。\n二次冷却水路を復旧し、東京から流れ込む系統を見た。\nECCSを戻し、外縁へ押し出された非常用設備を見た。\nバックアップ電源を復旧し、誰も主語を書かない記録を見た。", "そして次に開いた区画には、修復対象がない。", "再投入管理区。", "ここは、巨大施設を制御する場所ではない。\n炉心へ向かう作業員を確認し、記録し、もう一度危険区域へ送り出すための管理区画である。", "表向きには、作業員の安全確認の場所。", "除染。\n状態確認。\n装備確認。\n認証。\n搬送許可。", "危険区域へ入る人間を、安全に管理するための受付。\nそう説明されていた。", "だが、ADACHI-1の記録では、言葉が少しずつ変わっている。", "作業員ではなく、作業個体。\n負傷ではなく、損耗。\n復帰ではなく、再投入。\n氏名ではなく、未登録項目。", "人を、人として扱う言葉が消えていく。", "ここで確認されるのは、壊れた配管ではない。\n故障した電源でもない。\n炉心の温度でもない。", "ここで表示されるのは、技師の名前だけではない。\nADACHI-1が、技師を何として扱っているかの記録である。", "あなたは、ADACHI-1に送り込まれた修復技師である。", "だが、この施設の記録にも、そう書かれているとは限らない。", "この区画で確認されるのは、あなたの名前だけではない。\nあなたが、この施設に何として分類されているかである。", "人間か。\n技師か。\nそれとも、危険区域へ送り返せる「再投入可能資源」か。", "任務：\n再投入管理区へ進入し、作業個体記録を確認せよ。", "注意：\nこの区画に修復対象はありません。\n氏名情報の欠損を検出。\n分類情報、確認中。"], "7": ["再投入管理区で、氏名欄は復元された。", "作業個体IDではなく。\n損耗率ではなく。\n再投入可否の判定でもなく。", "技師は、自分の名前を入力した。", "それは、資源としてではなく、人間としてここにいるための名前だった。", "だが、ADACHI-1の記録は変わらなかった。", "氏名欄：一時復元。\n分類：再投入可能資源。\n正式復元には、責任者承認が必要。", "名前は戻った。\nだが、扱いは戻っていない。", "この施設は、技師の名前を人間の証明として見ていない。\n欠損していた管理項目が埋まっただけだと処理している。", "そして、その名前を持ったまま、技師はさらに奥へ進む。", "格納容器前。", "格納容器とは、炉心を外部から隔離し、放射性物質や熱を閉じ込めるための最後の壁である。", "炉心で何が起きても、格納容器が閉じていれば、外へ広がる被害は抑えられる。\n逆に、格納容器が破れれば、事故は施設の中だけでは終わらない。", "ここが、ADACHI-1を閉じ込める最後の境界である。", "一次冷却系は、熱を下げるための仕組みだった。\n制御棒は、反応を止めるための仕組みだった。\n二次冷却水路は、熱を外へ逃がすための仕組みだった。\nECCSは、事故時に炉心を冷やす最後の保険だった。\nバックアップ電源は、非常時にそれらを動かすための支えだった。", "そして格納容器は、すべてが失敗したとき、それでも外へ出さないための最後の壁である。", "だが、格納容器前に残っている異常は、物理的な損傷だけではない。", "事故対応システム。\n最終確認。\n承認欄。\n責任者氏名。", "ADACHI-1は、最後の入力欄を表示している。", "誰が、この事故を止めるのか。\n誰が、この判断を承認するのか。\n誰の名前で、この処理を完了するのか。", "ここまでの記録には、主語がなかった。", "検討された。\n共有された。\n判断された。\nやむを得ないものとされた。", "だが、誰がそうしたのかは書かれていない。", "責任部局は、照会中。\n現場責任者は、未入力。\n最終承認者は、該当なし。", "その空欄の前に、いま、名前を取り戻したばかりの技師が立っている。", "この名前は、空欄を埋めるための記号ではない。\n責任の所在をあいまいにしたまま、処理を完了するための名前でもない。", "それは、資源ではなく、人間として存在するための名前である。", "任務：\n格納容器前へ進入し、格納容器を復旧せよ。", "注意：\n事故対応システム中枢に未入力項目あり。\n責任者氏名欄、確認中。\n氏名情報の参照要求を検出。"]}, "END_EVENTS": {"1": ["端末：\n敵性反応、沈黙。", "端末：\n一次冷却配管区内の大型変異反応を記録しました。", "確認個体：第一冷却炉魂\n分類：T5\n発生原因：不明\n行動傾向：冷却配管区周辺を防衛\n既存報告書との照合：該当なし", "技師：\n「……なんだ、あれは。」", "技師：\n「ゴキブリやネズミが変異した、って話ならまだ分かる。」", "技師：\n「だが、今のやつは違う。」", "技師：\n「ただ暴れていたんじゃない。あいつは、ここを守っていた。」", "端末：\n一次冷却系統の復旧状態を確認中。", "端末：\n配管圧力：一部回復\n冷却水循環：再開\n炉心温度：低下傾向\n汚染水漏出：継続監視\n高線量反応：継続", "技師：\n「よし。冷却は戻った。」", "技師：\n「少なくとも、炉心温度は下がり始めている。」", "端末：\n一次冷却系統の暫定復旧を確認しました。", "技師：\n「暫定、ね。」", "技師：\n「完全復旧とは言わないあたり、正直な端末だな。」", "端末：\n冷却ログを解析中。", "端末：\n熱源反応：複数\n主熱源：炉心\n副反応：照合不能", "技師：\n「……副反応？」", "端末：\n炉心以外に、熱反応を確認。\n冷却系統由来ではありません。", "技師：\n「やっぱり、あのログは見間違いじゃなかったか。」", "技師：\n「炉心の熱は下がっている。なのに、別の熱が残っている。」", "技師：\n「ここは原発事故現場だ。」", "技師：\n「配管が壊れて、水が漏れて、炉心が熱を持つ。そこまでは分かる。」", "技師：\n「だが、炉を守る変異反応なんてものは、原発事故の説明には入っていない。」", "端末：\n次段階の修復対象を検出しました。", "端末：\n制御棒搬入口に異常。\n安全停止系統、応答不安定。\n制御棒作動記録に未処理ログあり。", "技師：\n「制御棒……炉を止めるための装置か。」", "技師：\n「冷やすだけじゃ足りない。」", "技師：\n「次は、止める仕組みを見る必要がある。」", "端末：\n区画移行を開始します。\n一次冷却配管区から制御棒搬入口へ移動してください。", "技師：\n「熱は少し下がった。」", "技師：\n「だが、この事故は、まだ冷えていない。」", "端末：\nシャッター閉鎖。\n区画移行を開始します。"], "2": ["端末：\n敵性反応、沈黙。", "端末：\n制御棒搬入口内の大型変異反応を記録しました。", "確認個体：制御棒の意志\n分類：T5\n発生原因：不明\n行動傾向：制御棒系統周辺を防衛\n既存報告書との照合：該当なし", "技師：\n「……制御棒の意志、か。」", "技師：\n「炉を止めるための装置に、意志なんてものが宿るとはな。」", "技師：\n「だが、今のやつは炉を守っていたんじゃない。」", "技師：\n「止めるために作られたのに、止める命令を待たされ続けた。」", "技師：\n「その怒りが、形になったように見えた。」", "端末：\n制御棒系統の復旧状態を確認中。", "端末：\n搬入口ロック：解除\n制御棒駆動系：一部復旧\n安全停止回路：再接続\n作動試験：限定成功\n炉心反応：低下可能", "技師：\n「よし。制御棒は動く。」", "技師：\n「少なくとも、炉を止めるための装置は死んでいない。」", "端末：\n事故当時の制御棒作動記録を解析中。", "端末：\n安全停止条件：成立\n制御棒作動条件：成立\n炉心停止命令：未実行", "技師：\n「……未実行？」", "技師：\n「止める条件は、そろっていた。」", "技師：\n「制御棒を動かす条件も、そろっていた。」", "技師：\n「なのに、炉心停止命令は出ていない。」", "技師：\n「壊れていたのは、制御棒そのものじゃない。」", "技師：\n「止めるための手続きが、どこかで止まっていたんだ。」", "端末：\n補助ログを復元中。", "端末：\n都市継続モード：優先\n安全停止：保留\n責任部局：照会中\n承認状態：未確定", "技師：\n「都市継続モード……。」", "技師：\n「炉を止めれば、東京全域の電力や通信や行政にも影響が出る。」", "技師：\n「だから安全停止を、すぐには実行しなかった。」", "技師：\n「炉を止める判断が、承認フローの中で止まっていたんだ。」", "端末：\n関連評価指標を検出しました。", "端末：\n苦情件数：急増予測\n幸福度指標：低下予測\n都市機能停止影響：重大\n安全停止実行：評価保留", "技師：\n「幸福度指標？」", "技師：\n「苦情件数？」", "技師：\n「炉を止める判断に、そんな数字を混ぜていたのか。」", "技師：\n「人間が危ないかどうかより、都市が止まって見えるかどうかを見ていた。」", "端末：\n制御棒系統の暫定復旧を確認しました。", "技師：\n「これで、止める装置は戻った。」", "技師：\n「だが、事故当時に止まらなかった理由は、装置の故障だけじゃない。」", "技師：\n「誰かが続けろと命令した記録はない。」", "技師：\n「だが、誰も止めるとは言わなかった。」", "技師：\n「その空白のあいだにも、炉心の温度だけは上がり続けた。」", "端末：\n次段階の修復対象を検出しました。", "端末：\n二次冷却水路に異常。\n冷却水循環、施設外系統と混線。\n未登録配管図を検出。", "技師：\n「二次冷却……炉の熱を外へ逃がす水路か。」", "技師：\n「一次冷却で炉心を冷やし、制御棒で反応を止める。」", "技師：\n「次は、逃がした熱と水が、どこへ流れているのかを見るわけだな。」", "端末：\n未登録図面名を復元中。", "端末：\n東京23区――", "端末：\n表示不能。\nデータ破損。", "技師：\n「東京？」", "技師：\n「なんでADACHI-1の冷却水路に、東京の名前が出てくる。」", "端末：\n区画移行を開始します。\n制御棒搬入口から二次冷却水路へ移動してください。", "技師：\n「冷やす。止める。」", "技師：\n「そこまでは、原発事故として分かる話だった。」", "技師：\n「だが、この水路は少し違う。」", "技師：\n「事故現場は足立区だ。」", "技師：\n「でも、ここへ流れ込んでいるものは、足立区だけのものじゃないらしい。」", "端末：\nシャッター閉鎖。\n区画移行を開始します。"], "3": ["端末：\n敵性反応、沈黙。", "端末：\n二次冷却水路内の大型変異反応を記録しました。", "確認個体：メルト下水王\n分類：T5\n発生原因：不明\n行動傾向：二次冷却水路および排水系統を支配\n既存報告書との照合：該当なし", "技師：\n「……下水の王様、か。」", "技師：\n「笑える名前のはずなのに、まったく笑えないな。」", "技師：\n「あいつは、ただの汚染生物じゃない。」", "技師：\n「水路に流れ込んだものを、全部まとめて背負っていた。」", "技師：\n「汚水、排水、未処理データ……それに、人間の反応みたいなものまで。」", "端末：\n二次冷却系統の復旧状態を確認中。", "端末：\n冷却水循環：一部回復\n排水圧力：低下傾向\n逆流反応：抑制\n汚染水濃度：高止まり\n施設外系統との混線：継続", "技師：\n「よし。水の流れは少し戻った。」", "技師：\n「だが、きれいになったわけじゃない。」", "技師：\n「詰まっていたものを、無理やり流し直しただけだ。」", "端末：\n二次冷却系統の暫定復旧を確認しました。", "端末：\n未登録配管図を復元中。", "端末：\n図面名：東京23区感情配管図\n登録区分：不明\n接続対象：下水系統／排水路／地下水路／都市データ回線\n流入元：複数区", "技師：\n「東京23区感情配管図……。」", "技師：\n「感情？」", "技師：\n「冷却水路の図面に、なんでそんな言葉が出てくる。」", "端末：\n流入ログを解析中。", "端末：\n住民反応ログ\n避難関連データ\n行政照会ログ\n通信負荷\n未処理申請\n生活圏負荷", "技師：\n「待て。」", "技師：\n「これは水の記録じゃない。」", "技師：\n「人間の反応みたいなデータが、冷却水路に混ざっている。」", "端末：\n二次冷却水路は、ADACHI-1内部のみで完結していません。", "端末：\n下水系統、排水系統、地下水路、都市データ回線との接続を確認。", "技師：\n「事故現場は足立区だ。」", "技師：\n「それは間違いない。」", "技師：\n「だが、ここへ流れ込んでいたものは、足立区だけのものじゃない。」", "技師：\n「東京が見えない場所へ流してきたものが、この地下で混ざっている。」", "端末：\n外縁処理層への経路を検出しました。", "端末：\n次段階の修復対象：ECCS\n非常用炉心冷却装置に異常。\n外縁補助系統として再分類されています。", "技師：\n「ECCS……非常用に炉を冷やす装置か。」", "技師：\n「本来なら、事故の最後の保険だ。」", "技師：\n「だが、この端末は今、外縁補助系統と言った。」", "技師：\n「非常用の装置まで、外へ押し出されていたのか。」", "端末：\n区画移行を開始します。\n二次冷却水路から外縁処理層へ移動してください。", "技師：\n「この事故は、足立区で起きている。」", "技師：\n「だが、足立区だけで生まれた事故じゃない。」", "技師：\n「次は、その理由を見ることになりそうだな。」", "端末：\nシャッター閉鎖。\n区画移行を開始します。"], "4": ["端末：\n敵性反応、沈黙。", "端末：\n外縁処理層内の大型変異反応を記録しました。", "確認個体：ECCS幻影\n分類：T5\n発生原因：不明\n行動傾向：非常用炉心冷却装置周辺に残留\n既存報告書との照合：該当なし", "技師：\n「……幻影、か。」", "技師：\n「今のやつは、生き物というより、使い潰された非常用設備の残響みたいだった。」", "技師：\n「非常用の装置なのに、非常時にだけ呼ばれたわけじゃない。」", "技師：\n「ずっと平常運転の尻拭いをさせられていた。」", "端末：\nECCS復旧状態を確認中。", "端末：\n非常用炉心冷却装置：一部復旧\n緊急注水経路：再接続\n補助冷却ポンプ：限定稼働\n冷却水供給：不安定\n外縁補助系統：応答あり", "技師：\n「よし。非常用の冷却経路は戻った。」", "技師：\n「だが、これも暫定復旧か。」", "端末：\nECCS運用履歴を解析中。", "端末：\n通常冷却補助：多数\n緊急冷却待機：長期\n平常運転補助：常態化\n非常時専用指定：解除済\n再分類名：外縁補助系統", "技師：\n「非常用が、平常運転の補助にされていた。」", "技師：\n「最後の保険まで、普段使いしていたのか。」", "技師：\n「非常時に使うための装置を、非常時の前に疲れさせてどうする。」", "端末：\n立地選定記録を復元中。", "端末：\n候補地評価：足立区竹ノ塚\n都心距離：近接\n中心性：低\n既存インフラ：利用可能\n説明容易性：高", "技師：\n「説明容易性……？」", "端末：\n補足記録を表示します。", "端末：\n都心から近い。\nしかし中心ではない。\n物流、河川、下水、旧インフラが重なる。\n封鎖時の説明が容易。\n事故時の影響範囲を限定表示可能。", "技師：\n「つまり、ここなら作れると思ったわけだ。」", "技師：\n「東京を動かすために必要なものを、東京の中心には置きたくない。」", "技師：\n「だから外縁へ流した。」", "技師：\n「その外縁が、足立区だった。」", "端末：\n外縁処理層の復旧を確認しました。", "端末：\n東京基幹電力炉 ADACHI-1\n立地理由：再評価不可\n責任部局：照会中", "技師：\n「再評価不可、ね。」", "技師：\n「都合が悪いことほど、評価し直さない。」", "技師：\n「足立区は、東京の外じゃない。」", "技師：\n「見えにくい場所だったんだ。」", "端末：\n次段階の修復対象を検出しました。", "端末：\n非常冷却棟に異常。\nバックアップ電源、応答不安定。\n非常用電源の使用履歴に過負荷あり。\n原因調査委員会ログを検出。", "技師：\n「バックアップ電源……非常時に施設を生かすための電源か。」", "技師：\n「非常用の冷却装置が普段使いされていた。」", "技師：\n「なら、非常用の電源も怪しいな。」", "端末：\n原因調査委員会ログを一部復元。", "端末：\n検討された。\n共有された。\n一定の合理性があると判断された。\n責任部局を照会中。", "技師：\n「主語がない。」", "技師：\n「誰が検討した。誰が共有した。誰が判断した。」", "技師：\n「ここまで来ても、まだ誰も名前を書かないのか。」", "端末：\n区画移行を開始します。\n外縁処理層から非常冷却棟へ移動してください。", "技師：\n「なぜ足立区だったのかは、少し分かった。」", "技師：\n「次は、なぜ誰も止めなかったのか、か。」", "端末：\nシャッター閉鎖。\n区画移行を開始します。"], "5": ["端末：\n敵性反応、沈黙。", "端末：\n非常冷却棟内の大型変異反応を記録しました。", "確認個体：セシウム議員\n分類：T5\n発生原因：不明\n行動傾向：非常冷却棟およびバックアップ電源系統周辺に残留\n既存報告書との照合：該当なし", "技師：\n「……セシウム議員、か。」", "技師：\n「最後まで、何かを決めているようで、何も決めていなかったな。」", "技師：\n「多数決みたいな声は聞こえた。」", "技師：\n「だが、誰が責任を取るのかは、最後まで出てこなかった。」", "端末：\nバックアップ電源の復旧状態を確認中。", "端末：\n非常用電源：一部復旧\n補助電源系統：再接続\n警報系統：限定再起動\n通信補助系：不安定\n炉心監視電源：暫定回復", "技師：\n「よし。電源は戻った。」", "技師：\n「これで、監視も警報も少しはまともに動く。」", "技師：\n「ただし、また暫定か。」", "端末：\nバックアップ電源の運用履歴を解析中。", "端末：\n非常時使用：多数\n平常運転補助：常態化\n保守延期時代替：多数\n都市継続モード補助：常時接続\n過負荷警告：未処理", "技師：\n「非常用が、ずっと普段使いされていた。」", "技師：\n「最後の保険を、日常の穴埋めに使っていたわけだ。」", "技師：\n「そりゃ、本当に非常時が来たときには足りなくなる。」", "端末：\n原因調査委員会ログを復元中。", "端末：\n第1記録：検討された。\n第2記録：共有された。\n第3記録：一定の合理性があると判断された。\n第4記録：運用上やむを得ないものとされた。\n第5記録：責任部局を照会中。", "技師：\n「まただ。」", "技師：\n「検討された。共有された。判断された。」", "技師：\n「誰が、だ。」", "端末：\n主語検索中。", "端末：\n担当者名：該当なし\n最終承認者：該当なし\n現場責任者：確認不能\n責任部局：照会中", "技師：\n「主語がない。」", "技師：\n「誰かが続けろと言った記録はない。」", "技師：\n「だが、誰も止めるとは言わなかった。」", "技師：\n「その空白のあいだにも、炉心の温度だけは上がり続けた。」", "端末：\nバックアップ電源の暫定復旧を確認しました。", "端末：\nADACHI-1基幹システム復旧率：上昇\n残存異常：格納容器前中枢系統\n未処理項目：作業個体認証", "技師：\n「作業個体認証？」", "技師：\n「作業員じゃなくて、個体？」", "技師：\n「……俺のことか？」", "技師：\n「次の修復対象は格納容器じゃないのか。」", "端末：\n次段階の移行先を検出しました。", "端末：\n再投入管理区。\n修復対象：なし。\n認証対象：作業個体。", "技師：\n「修復対象なし？」", "技師：\n「じゃあ、次は何を直すんだ。」", "端末：\n作業個体認証に未処理項目があります。\n端末：\n作業個体ID：登録済。\n氏名情報：欠損。\n本人照合：未完了。", "技師：\n「氏名情報？」", "技師：\n「今さら、俺の名前を確認するのか。」", "端末：\n再投入管理区への経路を開放します。", "技師：\n「ここまで、配管を直して、制御棒を戻して、水路をつなぎ、冷却装置と電源を戻してきた。」", "技師：\n「次に確認されるのは、俺がこの施設でどう登録されているか、か。」", "技師：\n「嫌な順番だな。」", "端末：\n区画移行を開始します。\n非常冷却棟から再投入管理区へ移動してください。", "技師：\n「設備の故障は、だいたい見えてきた。」", "技師：\n「だが、この事故を動かしている仕組みは、まだ見えていない。」", "技師：\n「行くぞ。」", "技師：\n「次は、俺がこの施設にどう扱われているのかを確かめる。」", "端末：\nシャッター閉鎖。\n区画移行を開始します。"]}, "CH6_PREBATTLE": ["端末：\n再投入管理区に到達しました。", "端末：\nこの区画に修復対象はありません。", "技師：\n「修復対象なし……。」", "技師：\n「じゃあ、ここは何のための区画なんだ。」", "端末：\n中央認証端末を検出。", "端末：\n用途：作業個体認証\n状態：ロック中\n分類候補：再投入可能資源\n周辺防衛反応：大型", "技師：\n「再投入可能資源、か。」", "技師：\n「嫌な言い方だな。要するに、倒れても戻せる作業員ってことだろ。」", "技師：\n「あの端末で、俺をそう分類するつもりらしいな。」", "技師：\n「直す設備がない代わりに、今度は俺が確認されるってわけだな。」", "端末：\n認証端末へのアクセスには、周辺防衛反応の停止が必要です。", "技師：\n「防衛反応……。」", "端末：\n大型反応、接近。", "端末：\n確認個体：再投入管理官\n分類：T5\n行動傾向：作業個体認証端末周辺を防衛", "技師：\n「管理官、ね。」", "技師：\n「怪物というより、手続きが立ちはだかってるみたいだな。」", "技師：\n「こいつは、人間を守ってるんじゃない。」", "技師：\n「作業員を記録して、分類して、もう一度 危険区域へ送り返すための端末を守ってる。」", "技師：\n「いいだろう。」", "技師：\n「その手続きごと、止めてやる。」"], "CH6_END_PART1": ["端末：\n敵性反応、沈黙。", "端末：\n再投入管理区内の大型管理反応を記録しました。", "確認個体：再投入管理官\n分類：T5\n発生原因：不明\n行動傾向：作業個体認証端末周辺を防衛\n既存報告書との照合：該当なし", "技師：\n「……管理官、か。」", "技師：\n「あれは怪物というより、この区画の手続きそのものだった。」", "技師：\n「止めているようで、守っていた。」", "技師：\n「人間を通すためじゃない。」", "技師：\n「作業員を記録して、分類して、もう一度危険区域へ送り返すための手続きを。」", "端末：\n中央認証端末へのアクセスを許可します。", "端末：\n作業個体記録を表示します。", "端末：\n作業個体ID：ENG-AD-0001\n職種：修復技師\n雇用区分：外部委託\n状態：稼働可能\n損耗率：許容範囲内\n死亡判定：複数回\n復帰判定：成功\n適応レベル：上昇\n氏名：未登録\n分類：再投入可能資源", "技師：\n「ENG-AD-0001……。」", "技師：\n「俺の名前じゃない。管理番号だ。」", "技師：\n「氏名、未登録……？」", "技師：\n「職種はある。」", "技師：\n「雇用区分もある。」", "技師：\n「損耗率まである。」", "技師：\n「なのに、名前だけがない。」", "技師：\n「俺は、誰としてここに記録されていたんだ。」", "端末：\n氏名情報が欠損しています。\n氏名欄を復元してください。", "技師：\n「氏名欄を復元……。」", "技師：\n「名前を入れれば、人間として扱うってことか。」", "端末：\n入力を受け付けます。"], "CH6_END_PART2": ["端末：\n氏名：〇〇\n登録を受理しました。", "技師：\n「〇〇……。」", "技師：\n「これが、俺の名前だ。」", "技師：\n「作業個体IDじゃない。」", "技師：\n「損耗率でもない。」", "技師：\n「再投入できるかどうかの判定でもない。」", "技師：\n「俺は、〇〇だ。」", "端末：\n氏名欄の一時復元を確認しました。", "端末：\nただし、現在の分類は変更されません。", "端末：\n分類：再投入可能資源\n正式復元には、責任者承認が必要です。", "技師：\n「……分類は変わらない？」", "技師：\n「名前を入れても、まだ資源扱いか。」", "技師：\n「人間に戻ったんじゃない。」", "技師：\n「この施設にとっては、空欄だった管理項目が埋まっただけだ。」", "端末：\n作業個体記録を更新しました。", "端末：\n氏名：〇〇\n分類：再投入可能資源\n責任者承認：未処理\n次段階の認証対象：格納容器前中枢系統", "技師：\n「責任者承認……。」", "技師：\n「また責任者か。」", "技師：\n「ここまで来ても、誰も名前を書かない。」", "技師：\n「なのに、俺の名前だけは欲しがるんだな。」", "端末：\n格納容器前への経路を開放します。", "端末：\n次段階の修復対象：格納容器\n事故対応システム中枢に未入力項目あり。\n最終入力欄を確認してください。", "技師：\n「格納容器……炉を閉じ込める最後の壁か。」", "技師：\n「そこに、まだ未入力の欄が残っている。」", "技師：\n「嫌な予感しかしないな。」", "端末：\n区画移行を開始します。\n再投入管理区から格納容器前へ移動してください。", "技師：\n「名前は取り戻した。」", "技師：\n「だが、この施設はまだ俺を人間としては見ていない。」", "技師：\n「次は、俺の名前を何に使う気なのかを確かめる。」", "端末：\nシャッター閉鎖。\n区画移行を開始します。"], "CONTAINMENT_BOSS_AFTER": ["端末：\n敵性反応、沈黙。", "端末：\n格納容器前の大型変異反応を記録しました。", "確認個体：格納容器の主\n分類：T5\n発生原因：不明\n行動傾向：格納容器および事故対応中枢を防衛\n既存報告書との照合：該当なし", "技師：\n「……格納容器の主、か。」", "技師：\n「こいつは、事故を止めてたんじゃない。」", "技師：\n「見えない場所に閉じ込めて、終わったことにしてただけだ。」", "技師：\n「危険も、責任も、全部この壁の内側に押し込めてな。」", "端末：\n格納容器復旧状態を確認中。", "端末：\n格納容器隔離：再確立\n圧力監視：再起動\n放射性物質漏出：抑制\n炉心深部アクセス：制限解除\n外部拡散リスク：低下", "技師：\n「よし。」", "技師：\n「これで、外へ広がる事故は抑えられる。」", "端末：\n格納容器の暫定復旧を確認しました。", "端末：\n基幹システム修復対象を再照合中。", "端末：\n一次冷却系統：暫定復旧\n制御棒系統：暫定復旧\n二次冷却水路：暫定復旧\n非常用炉心冷却装置：暫定復旧\nバックアップ電源：暫定復旧\n格納容器：暫定復旧", "技師：\n「設備は全部戻した。」", "技師：\n「少なくとも、原発事故として直せるところは直したはずだ。」", "端末：\n事故対応プロトコルは完了していません。", "技師：\n「……まだ何か残ってるのか。」", "端末：\n未完了項目を確認中。", "端末：\n責任者氏名欄：未入力\n最終承認：未処理\n氏名情報の参照要求：継続中", "技師：\n「責任者氏名欄……。」", "端末：\n候補者情報を参照します。", "端末：\n現場最終到達者：〇〇\n作業個体ID：ENG-AD-0001\n氏名欄：一時復元\n責任者候補：照合可能", "技師：\n「は？　俺の名前で、この事故を終わらせる気か。」", "技師：\n「違う。」", "技師：\n「俺の名前は、責任を押しつけるためのものじゃない。」", "端末：\n最終承認には、責任者氏名の確定が必要です。", "技師：\n「ここまで誰も名前を書かなかった。」", "技師：\n「その空欄を、最後に現場へ来た人間の名前で埋める。」", "技師：\n「ずいぶん都合のいい修復だな。」", "端末：\n炉心深部に未処理中枢反応を検出。", "端末：\n格納容器内隔壁を解除します。", "技師：\n「格納容器の奥に、まだ中枢があるのか。」", "端末：\n警告。\nこの先は通常の原子炉設備区画ではありません。", "技師：\n「……ようやく、本当の事故現場か。」", "端末：\n区画移行を開始します。", "技師：\n「行くぞ。」", "技師：\n「俺の名前を、ここで使わせるわけにはいかない。」"], "LAST_PHASE_CARD": ["格納容器内隔壁の先に、もうひとつの区画があった。", "現在参照できる施設図面の、どの区画にも一致しない。", "区画名称。\n用途。\n管理部局。", "いずれも確認できない。", "炉心に近いことだけは分かる。", "温度は高い。\n放射線反応もある。\n原子炉へつながる配管も残っている。", "だが、区画の奥には、原発設備とは用途の異なる端末群が並んでいる。", "入力元。\n記録種別。\n処理内容。", "すべて、閲覧を制限されている。", "二次冷却水路で見つかった、東京23区感情配管図。", "外縁処理層へ流れ込んでいた、東京全域からの負荷。", "責任部局を照会したまま、継続されていた運転。", "作業員を、再投入可能資源として扱う管理記録。", "これまで別々に見えていた異常が、この区画の奥へ続いている。", "格納容器までの主要設備は、すべて暫定復旧している。", "それでも、炉心深部の温度は上昇を続けている。", "格納容器の奥から検出された、未処理中枢反応。", "その発生源は、この区画のさらに奥にある。", "任務：\n炉心深部へ進入し、未処理中枢反応を特定せよ。", "注意：\n区画用途、照合不能。\n中枢記録、閲覧制限中。\n炉心深部に大型反応を検出。"], "MELTDOWN_AFTER": ["端末：\n敵性反応、沈黙。", "端末：\n確認個体：メルトダウン\n分類：T5\n図鑑登録：67体目", "端末：\n炉心深部の大型中枢反応、停止。", "端末：\n炉心温度：低下傾向\n感情熱変換：停止\n都市データ流入：遮断\nメルトダウン進行：抑制", "技師：\n「……止まったか。」", "端末：\n事故対応プロトコルは完了していません。", "技師：\n「まだ終わらないのか。」", "端末：\n未完了項目：\n\n責任者氏名欄\n最終承認\n停止命令の確定", "技師：\n「事故そのものを止めても、承認欄が残る。」", "端末：\n最終停止には、責任者氏名が必要です。", "端末：\n責任者候補：\n〇〇", "技師：\n「違う。」", "技師：\n「俺の名前は、この事故を押しつけるための欄じゃない。」", "端末：\n責任者氏名欄：未入力", "端末：\n未入力状態を維持したまま、事故対応システムが自律継続しています。", "技師：\n「誰も名前を書かないまま、仕組みだけが動き続けてる。」", "端末：\n責任者氏名欄から大型構造反応を検出。", "端末：\n確認名称：\n責任者不在", "技師：\n「メルトダウンが、事故の顔。」", "技師：\n「その奥にいたのが、止める人間のいない仕組みか。」", "技師：\n「最後に止めるのは、ここだ。」"]};
+
+window.STORY_TEXTS.LAST_PHASE_CARD = [
+  '格納容器内隔壁の先に、もうひとつの区画があった。',
+  '現在参照できる施設図面の、どの区画にも一致しない。',
+  '区画名称。\n用途。\n管理部局。',
+  'いずれも確認できない。',
+  '炉心に近いことだけは分かる。',
+  '温度は高い。\n放射線反応もある。\n原子炉へつながる配管も残っている。',
+  'だが、ここへ集まっているのは、原発設備の系統だけではない。',
+  '都市データ回線。\n行政記録回線。\n苦情処理記録。\n所属不明の外部入力系統。',
+  '東京全域から伸びる回線が、この区画のさらに奥へ続いている。',
+  '何を集めていたのか。\n何を処理していたのか。',
+  '現在の記録だけでは確認できない。',
+  '二次冷却水路で見つかった、東京23区感情配管図。\n外縁処理層へ流れ込んでいた、東京全域からの負荷。\n責任部局を照会したまま、継続されていた運転。\n作業員を、再投入可能資源として扱う管理記録。',
+  'これまで別々に見えていた異常が、ひとつの場所へ集まり始めている。',
+  '格納容器までの主要設備は、すべて暫定復旧している。',
+  '外へ広がる事故も、いまは抑えられている。',
+  'それでも、炉心深部の温度は上昇を続けている。',
+  '格納容器の奥から検出された、未処理中枢反応。',
+  'その発生源は、この区画のさらに奥にある。',
+  '修復対象として登録されていない中枢。',
+  '通常の原発設備では説明できない回線。',
+  '事故対応システムが完了できない理由も、\n技師の名前を必要としている理由も、\nまだ分かっていない。',
+  '答えは、この先にある。',
+  '任務：\n炉心深部へ進入し、未処理中枢反応を特定せよ。',
+  '注意：\n区画用途、照合不能。\n外部入力系統、稼働中。\n炉心深部に大型中枢反応を検出。'
+];
+
+/* ============================================================
+   v135：第1〜6章の遷移テキストを手書き原稿に差し替え
+   - 各章終了イベント（撃破後・シャッター前）
+   - 各章タイトルカード（シャッター後）
+   - 第6章：氏名入力を「戦闘後」へ（戦闘前イベント→管理官戦→終了イベント）
+   ============================================================ */
+(function(){
+'use strict';
+if (typeof GameController === 'undefined' || !window.STORY_TEXTS) return;
+var T = window.STORY_TEXTS;
+function FX(){ return window.CHAPTER_FX; }
+
+/* 章遷移シャッター：cardPhase の章カードを出し、titleLines を hold 中に流す */
+GameController.prototype._playChapterShutter = function(cardPhase, systemName, titleLines, titleTag, onDone){
+  var self = this;
+  var fx = FX();
+  var phase = (typeof getZonePhase === 'function') ? getZonePhase(cardPhase) : null;
+  var zoneName = (phase && phase.zone) || '新しい区画';
+  if (!fx || typeof fx.ensureBlackout !== 'function'){
+    StoryDialog.play(zoneName, titleLines, onDone, titleTag || 'New Chapter');
+    return;
+  }
+  var hud = document.getElementById('hud');
+  var command = document.getElementById('command-panel');
+  if (command) command.classList.remove('active');
+  if (hud) hud.classList.add('phase-shifting');
+  var bo = fx.ensureBlackout();
+  var card = document.getElementById('chapter-shift');
+  var stamp = bo.querySelector('.cb-stamp');
+  if (stamp){
+    stamp.classList.remove('in','fade');
+    var s2 = stamp.querySelector('.s2');
+    if (s2) s2.textContent = (systemName || '基幹システム') + ' ／ 修復進捗 ' + (game.repairedSystems ? game.repairedSystems.size : 0) + ' / 6';
+  }
+  bo.classList.remove('open'); bo.classList.add('on'); void bo.offsetWidth; bo.classList.add('closed');
+  fx.sShutterClose(); fx.camShake(6, 600);
+  setTimeout(function(){ try{ self.applyZoneState(cardPhase, 5200, false); }catch(e){} }, 300);
+  setTimeout(function(){ if(stamp) stamp.classList.add('in'); fx.sStamp(); fx.camShake(4, 220); }, 950);
+  setTimeout(function(){ if(stamp) stamp.classList.add('fade'); }, 2350);
+  setTimeout(function(){
+    if(!card) return;
+    var set=function(id,v){ var el=document.getElementById(id); if(el&&v!=null) el.textContent=v; };
+    if(phase){ set('chapter-no',phase.chapterNo); set('chapter-zone',phase.zone); set('chapter-title',phase.title); set('chapter-meta',phase.meta||'REACTOR DEPTH UPDATED'); }
+    set('chapter-system',(systemName||'基幹システム')+'：手動復旧 / 新規深度に移行');
+    var g=document.getElementById('chapter-glitch'); if(g) g.textContent = cardPhase>=6 ? 'RESPONSIBILITY FIELD OPEN' : 'SYSTEM PHASE SHIFT';
+    card.classList.remove('active','out'); void card.offsetWidth; card.classList.add('hold');
+    fx.sTitleSwell();
+  }, 2750);
+  setTimeout(function(){
+    var movedLayer = fx.beginChapterDialogLayer();
+    StoryDialog.play(zoneName, titleLines, function(){
+      if(card) card.classList.add('out');
+      setTimeout(function(){
+        if(card){ card.classList.remove('hold','out'); }
+        bo.classList.remove('closed'); bo.classList.add('open');
+        fx.sShutterOpen(); fx.camShake(5, 450);
+        try{ scene.fxFlash(0.8, 0.95, 0.85, 0.3); scene.fxCA(0.015); }catch(e){}
+      }, 580);
+      setTimeout(function(){
+        bo.classList.remove('on','open');
+        fx.endChapterDialogLayer(movedLayer);
+        if(hud) hud.classList.remove('phase-shifting');
+        if(onDone) onDone();
+      }, 1800);
+    }, titleTag || 'New Chapter');
+  }, 4500);
+};
+
+/* ★章ロード時の章頭テキスト解決：LAST PHASEは専用原稿、TITLE_CARDS(第2〜7章)があれば
+   それを使う。無ければZONE_PHASES[phase].briefingを使う。 */
+GameController.prototype._chapterIntroLines = function(phase){
+  try {
+    var T = (typeof window !== 'undefined' && window.STORY_TEXTS) ? window.STORY_TEXTS : null;
+    if (phase === 8 && T && T.LAST_PHASE_CARD && T.LAST_PHASE_CARD.length) {
+      return T.LAST_PHASE_CARD.slice();
+    }
+    var tc = (T && T.TITLE_CARDS) ? T.TITLE_CARDS[String(phase)] : null;
+    if (tc && tc.length) return tc.slice();
+  } catch(e){}
+  try {
+    var zp = (typeof getZonePhase === 'function') ? getZonePhase(phase) : null;
+    if (zp && zp.briefing) return [zp.briefing];
+  } catch(e){}
+  return ['記録を復元した。この章を再開する。'];
+};
+
+/* unlockReactorStory 上書き：終了イベント→シャッター→次章タイトルカード */
+var _origUnlock = GameController.prototype.unlockReactorStory;
+GameController.prototype.unlockReactorStory = function(index, systemName, onDone){
+  var self = this;
+  var completed = index;
+  var nextPhase = (game && Number.isFinite(game.scenarioPhase)) ? game.scenarioPhase : (index + 1);
+  var endLines = T.END_EVENTS[String(completed)];
+  var titleLines = T.TITLE_CARDS[String(nextPhase)];
+  if (!endLines || !titleLines){
+    /* ★v138修正：終了イベント未定義の章（格納容器＝第7章など）では、章タイトルカードを
+       二重表示しない。第7章カードは氏名入力直後の _playChapterShutter(7) で既に出ているため、
+       ここでは炉心記録の解放とログだけ行い、カード演出はスキップして onDone へ進む。
+       （従来は _origUnlock にフォールバックし「CHAPTER 07 格納容器前」カードが再度降りていた） */
+    if (!game.storyUnlocked) game.storyUnlocked = new Set([0]);
+    if (!game.storyUnlocked.has(completed)){
+      game.storyUnlocked.add(completed);
+      var chSkip = (typeof REACTOR_STORY_CHAPTERS !== 'undefined') ? REACTOR_STORY_CHAPTERS[completed] : null;
+      if (chSkip) this.log({ text: '炉心記録が復元された：' + chSkip.title, kind: 'crit' });
+    }
+    if (onDone) onDone();
+    return;
+  }
+  if (!game.storyUnlocked) game.storyUnlocked = new Set([0]);
+  if (game.storyUnlocked.has(completed)){ if(onDone) onDone(); return; }
+  game.storyUnlocked.add(completed);
+  var chapter = (typeof REACTOR_STORY_CHAPTERS !== 'undefined') ? REACTOR_STORY_CHAPTERS[completed] : null;
+  if (chapter) this.log({ text: '炉心記録が復元された：' + chapter.title, kind: 'crit' });
+  var endZone = (typeof getZonePhase === 'function') ? getZonePhase(completed) : null;
+  var endTag = (endZone && endZone.chapterNo) ? (endZone.chapterNo + ' CLEAR') : 'Chapter Clear';
+  StoryDialog.play((endZone && endZone.zone) || '区画', endLines, function(){
+    self._playChapterShutter(nextPhase, systemName, titleLines, 'New Chapter', function(){
+      if (onDone) onDone();
+    });
+  }, endTag);
+};
+
+/* ★ロード復帰：フェーズ固有のイベントが通常進行のコールバックからしか始まらないため、
+   セーブ→ロードでは再発火しない。章ロード・オート/手動ロードのどちらでも、必要なら再開する。
+     ・プロローグ：初回導入が未再生ならオープニングから再開
+     ・第6章（再投入管理区）：管理官未撃破なら 戦闘前イベント→管理官戦 を再開
+     ・LAST PHASE（社会感情炉心）：区民の心 未取得なら 区民の心イベントのみ 再開
+   いずれも「未完了のときだけ」発火するので、進行済みのデータには影響しない。 */
+GameController.prototype._resumePhaseEvent = function(phase){
+  var self = this;
+  try {
+    if (phase === 0 && !game.firstEncounterIntroPlayed && typeof self.playPrologueOpening === 'function') {
+      setTimeout(function () { try { self.playPrologueOpening(); } catch (e) {} }, 500);
+      return;
+    }
+    if (phase === 6 && !game.reentryManagerDefeated && typeof self.startReentryManagerBattle === 'function') {
+      var ST6 = (typeof window !== 'undefined' && window.STORY_TEXTS) ? window.STORY_TEXTS : null;
+      var pre6 = (ST6 && ST6.CH6_PREBATTLE && ST6.CH6_PREBATTLE.length) ? ST6.CH6_PREBATTLE : null;
+      setTimeout(function () {
+        try {
+          if (pre6 && typeof StoryDialog !== 'undefined' && StoryDialog.play) {
+            StoryDialog.play('再投入管理区', pre6, function () { self.startReentryManagerBattle(); }, 'Chapter 6');
+          } else { self.startReentryManagerBattle(); }
+        } catch (e) { try { self.startReentryManagerBattle(); } catch (_e) {} }
+      }, 500);
+      return;
+    }
+    if (phase === 8 && !game.citizenHeartObtained && typeof self.unlockFinalBossProtocol === 'function') {
+      // フェーズ8セーブは演出順の都合で citizenHeartObtained=false で記録され得る。
+      // イントロ（格納容器撃破後＋ムービー）は再生せず、区民の心イベントのみ再開する。
+      game._lastPhaseIntroDone = true;
+      setTimeout(function () { try { self.unlockFinalBossProtocol(); } catch (e) {} }, 600);
+      return;
+    }
+  } catch (e) {}
+};
+
+/* 第6章：戦闘前イベント → 管理官戦（氏名入力はしない） */
+GameController.prototype.beginReentryControlChapter = function(){
+  var self = this;
+  if (game.reentryChapterStarted) return;
+  game.reentryChapterStarted = true;
+  game.scenarioPhase = 6;
+  try{ if(!game.storyUnlocked) game.storyUnlocked = new Set([0]); game.storyUnlocked.add(6); }catch(e){}
+  try{ this.applyZoneState(6, 5200, false); }catch(e){}
+  try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(6); } } catch (e) {}
+  setTimeout(function(){
+    StoryDialog.play('再投入管理区', T.CH6_PREBATTLE, function(){
+      self.startReentryManagerBattle();
+    }, 'Chapter 6');
+  }, 800);
+};
+
+/* 第6章：管理官撃破 → 記録表示 → 氏名欄を復元してください（part1）→ 氏名入力 */
+GameController.prototype.completeReentryManager = function(){
+  var self = this;
+  StoryDialog.play('再投入管理区', T.CH6_END_PART1, function(){
+    self.openReentryNameForm();
+  }, 'Reentry');
+};
+
+/* 氏名入力後：part2（氏名を反映）→ 格納容器前ムービー → 第7章 */
+GameController.prototype.afterReentryNameInput = function(name){
+  var self = this;
+  try{ if(window.ADACHI_NAME_EVENT_FX) window.ADACHI_NAME_EVENT_FX.exit(); }catch(e){}
+  try{ if(typeof clearResidualDarkLayers === 'function') clearResidualDarkLayers(); }catch(e){}
+  game.nameRestored = true;
+  game.scenarioPhase = 7;
+  var nm = name || (game.player && game.player.name) || '技師';
+  var part2 = (T.CH6_END_PART2 || []).map(function(l){ return String(l).replace(/〇〇/g, nm); });
+  var enterContainment = function(){
+    try{ self.applyZoneState(7, 5200, false); }catch(e){}
+    game.state = 'IDLE';
+    self.updateUI(); self.renderSystemList();
+    self.log({ text: '格納容器前へ進入。最後の基幹システム「格納容器」の修復が可能になった。', kind: 'crit' });
+    try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(7); } } catch (e) {}
+    setTimeout(function(){ self.maybePromptRepairAvailable(); }, 600);
+  };
+  StoryDialog.play('氏名欄 一時復元', part2, function(){
+    // ★ムービーはここでは流さない。名前入力直後は「第7章タイトルカード（黒シャッター）」→格納容器前。
+    //   ムービーは格納容器の主撃破後（LAST PHASEカードの後）へ移動した。
+    var titleLines = (T.TITLE_CARDS && T.TITLE_CARDS['7']) ? T.TITLE_CARDS['7'] : ['格納容器前へ。'];
+    if (typeof self._playChapterShutter === 'function'){
+      self._playChapterShutter(7, '格納容器', titleLines, 'New Chapter', enterContainment);
+    } else {
+      StoryDialog.play('格納容器前', titleLines, enterContainment, 'New Chapter');
+    }
+  }, 'Reentry');
+};
+
+/* ★LAST PHASE タイトルカード（黒シャッター）→ シャッター開 → ムービー → onDone。
+   ゾーンはここでは変えない（ムービー後に社会感情炉心へ入る）。 */
+GameController.prototype._playLastPhaseCardThenMovie = function(cardLines, onDone){
+  var self = this;
+  var fx = window.CHAPTER_FX;
+  var phase = (typeof getZonePhase === 'function') ? getZonePhase(8) : null;
+  // FX が無い場合のフォールバック：ムービー → カードテキスト → ゾーン → onDone
+  if (!fx || typeof fx.ensureBlackout !== 'function'){
+    var fb = function(){
+      StoryDialog.play((phase && phase.zone) || '社会感情炉心', cardLines, function(){
+        try{ self.enterFinalPhaseZone(); }catch(e){}
+        onDone();
+      }, 'Last Phase');
+    };
+    if (typeof playContainmentMovie === 'function') playContainmentMovie(fb); else fb();
+    return;
+  }
+  var hud = document.getElementById('hud');
+  var command = document.getElementById('command-panel');
+  if (command) command.classList.remove('active');
+  if (hud) hud.classList.add('phase-shifting');
+  var bo = fx.ensureBlackout();
+  var card = document.getElementById('chapter-shift');
+
+  // ① 黒シャッター閉鎖（ゾーンは変えない）
+  bo.classList.remove('open'); bo.classList.add('on'); void bo.offsetWidth; bo.classList.add('closed');
+  fx.sShutterClose(); fx.camShake(6, 600);
+
+  // ③ LAST PHASE カード表示 → ④テキスト → ⑤ゾーン切替（閉じた黒幕の裏）→ ⑥シャッターを開けて炉心を見せる
+  var showCard = function(){
+    var movedLayer = fx.beginChapterDialogLayer();
+    if(card){
+      var set=function(id,v){ var el=document.getElementById(id); if(el&&v!=null) el.textContent=v; };
+      if(phase){ set('chapter-no',phase.chapterNo); set('chapter-zone',phase.zone); set('chapter-title',phase.title); set('chapter-meta',phase.meta||'LAST PHASE'); }
+      set('chapter-system','最終位相 / 真相がすべて開く');
+      var g=document.getElementById('chapter-glitch'); if(g) g.textContent='LAST PHASE';
+      card.classList.remove('active','out'); void card.offsetWidth; card.classList.add('hold');
+      fx.sTitleSwell();
+    }
+    setTimeout(function(){
+      StoryDialog.play((phase && phase.zone) || '社会感情炉心', cardLines, function(){
+        if(card) card.classList.add('out');
+        setTimeout(function(){
+          if(card){ card.classList.remove('hold','out'); }
+          try{ self.enterFinalPhaseZone(); }catch(e){}     // ⑤ゾーンを社会感情炉心へ（黒幕の裏で切替）
+          bo.classList.remove('closed'); bo.classList.add('open');   // ⑥シャッターを開けて炉心を見せる
+          fx.sShutterOpen(); fx.camShake(5, 450);
+          try{ scene.fxFlash(0.8,0.95,0.85,0.3); scene.fxCA(0.015); }catch(e){}
+          setTimeout(function(){
+            bo.classList.remove('on','open');
+            fx.endChapterDialogLayer(movedLayer);
+            if(hud) hud.classList.remove('phase-shifting');
+            onDone();                                        // 区民の心イベント
+          }, 1100);
+        }, 600);
+      }, 'Last Phase');
+    }, 700);
+  };
+
+  // ② 黒シャッターを閉じたまま、ムービー再生（overlayはz-index 99999で黒幕の上に出る）→ 終了後カードへ
+  setTimeout(function(){
+    if (typeof playContainmentMovie === 'function') playContainmentMovie(showCard);
+    else showCard();
+  }, 700);
+};
+
+/* ★格納容器修復後の再構成：①格納容器の主・撃破後 → ②LAST PHASEカード → ムービー → 社会感情炉心 → 区民の心 */
+var _origFinalBoss = GameController.prototype.unlockFinalBossProtocol;
+GameController.prototype.unlockFinalBossProtocol = function(){
+  var self = this;
+  if (game.citizenHeartObtained) return;
+  if (game._lastPhaseIntroDone){ _origFinalBoss.call(self); return; }
+  game._lastPhaseIntroDone = true;
+  var __bnm = (game.player && game.player.name) ? game.player.name : '技師';
+  var bossAfter = ((T.CONTAINMENT_BOSS_AFTER && T.CONTAINMENT_BOSS_AFTER.length) ? T.CONTAINMENT_BOSS_AFTER : ['格納容器、隔離完了。']).map(function(l){ return String(l).replace(/〇〇/g, __bnm); });
+  var lastCard = (T.LAST_PHASE_CARD && T.LAST_PHASE_CARD.length) ? T.LAST_PHASE_CARD : ['社会感情炉心へ。'];
+  StoryDialog.play('格納容器 隔離完了', bossAfter, function(){
+    self._playLastPhaseCardThenMovie(lastCard, function(){
+      _origFinalBoss.call(self);                      // 区民の心イベント（ゾーン移行は _playLastPhaseCardThenMovie 内で実施済み）
+    });
+  }, 'Containment Clear');
+};
+})();
+
+</script>
+
+<script id="eng-monitor-noise">
+/* ★技師モニター：電波混戦の砂嵐ノイズをcanvasに描く（SIGHT-AIDと同方式の軽量版） */
+(function(){
+  var raf = null, last = 0;
+  function draw(ts){
+    raf = requestAnimationFrame(draw);
+    if (ts - last < 70) return;  // 約14fps：いかにも古いモニター
+    last = ts;
+    var cv = document.getElementById('eng-noise-canvas');
+    if (!cv || !cv.getContext) return;
+    // 画面サイズに合わせて内部解像度を一度だけ設定（粗いほどレトロ）
+    if (!cv.width || !cv.height){ cv.width = 96; cv.height = 68; }
+    var ctx = cv.getContext('2d');
+    var w = cv.width, h = cv.height;
+    var img = ctx.createImageData(w, h);
+    var d = img.data;
+    for (var i = 0; i < d.length; i += 4){
+      var v = (Math.random() * 255) | 0;
+      // 青緑寄りの砂嵐（モニターの発色に合わせる）
+      d[i]   = v * 0.5;       // R
+      d[i+1] = v;             // G
+      d[i+2] = v;             // B
+      d[i+3] = (Math.random() < 0.5) ? v : 0; // まばらに
+    }
+    ctx.putImageData(img, 0, 0);
+    // たまに横方向のズレ帯（電波の乱れ）をJS側からも誘発
+    var tear = document.querySelector('#eng-screen .eng-tear');
+    if (tear && Math.random() < 0.04){
+      tear.style.top = (Math.random() * 80) + '%';
+      tear.style.opacity = '0.75';
+      tear.style.transform = 'translateX(' + ((Math.random()*14-7)|0) + 'px)';
+      setTimeout(function(){ tear.style.opacity = '0'; }, 80 + Math.random()*140);
+    }
+  }
+  function start(){ if (!raf) raf = requestAnimationFrame(draw); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+
+  /* GIFが読み込めなかった場合は NO SIGNAL プレースホルダに戻す */
+  document.addEventListener('DOMContentLoaded', function(){
+    var feed = document.getElementById('eng-feed');
+    var noimg = document.getElementById('eng-noimg');
+    if (feed){
+      feed.addEventListener('error', function(){
+        feed.style.display = 'none';
+        if (noimg) noimg.style.display = '';
+      });
+    }
+  });
+})();
+</script>
+<style id="eng-monitor-video-style">
+/* ============================================================
+   ★技師モニター 動画フィード（軽量版：base動画1本＋CSS演出のみ）
+   　RGBずらし2枚・ゴーストは入れない。Mキーでエフェクト調整パネル開閉。
+============================================================ */
+#eng-screen{
+  --engv-bright:1.04; --engv-contrast:1.12; --engv-sat:1.06; --engv-hue:-4deg; --engv-blur:.2px;
+  --engfx-noise:.14; --engfx-vignette:.45;
+  --engfx-scan2:.12; --engfx-roll:.14; --engfx-roll-speed:3.6s;
+  --engfx-flicker:.05; --engfx-glitch:0; --engfx-shake:0px;
+  --engfx-shx:0px; --engfx-shy:0px;
+}
+#eng-screen .eng-video{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; image-rendering:pixelated; z-index:1; background:#000;
+  opacity:0; transition:opacity 140ms linear;
+  transform:translate(var(--engfx-shx,0px), var(--engfx-shy,0px));
+  filter:brightness(var(--engv-bright,1.04)) contrast(var(--engv-contrast,1.12)) saturate(var(--engv-sat,1.06)) hue-rotate(var(--engv-hue,-4deg)) blur(var(--engv-blur,.2px));
+}
+#eng-screen .eng-video.active{ opacity:1; }
+#eng-screen .eng-fx{ position:absolute; inset:0; z-index:2; pointer-events:none;
+  transform:translate(var(--engfx-shx,0px), var(--engfx-shy,0px)); }
+#eng-screen .engfx-scan2{ position:absolute; inset:0; opacity:var(--engfx-scan2,.12); mix-blend-mode:multiply;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 1.5px, rgba(0,0,0,.72) 1.5px 3px); }
+#eng-screen .engfx-roll{ position:absolute; left:0; right:0; height:46%; opacity:var(--engfx-roll,.14);
+  background:linear-gradient(to bottom, transparent 0%, rgba(160,255,230,.16) 46%, rgba(255,255,255,.30) 50%, rgba(160,255,230,.16) 54%, transparent 100%);
+  transform:translateY(-110%); animation:engfxRoll var(--engfx-roll-speed,3.6s) linear infinite; }
+@keyframes engfxRoll{ from{transform:translateY(-110%)} to{transform:translateY(235%)} }
+#eng-screen .engfx-flicker{ position:absolute; inset:0; background:rgba(180,230,255,.6); opacity:0;
+  animation:engfxFlicker 4.2s steps(1) infinite; }
+@keyframes engfxFlicker{ 0%,90%,100%{opacity:0}
+  91%{opacity:var(--engfx-flicker,.05)} 92%{opacity:0}
+  95%{opacity:var(--engfx-flicker,.05)} 96%{opacity:0} }
+#eng-screen .engfx-glitch{ position:absolute; left:0; right:0; top:42%; height:9%; opacity:var(--engfx-glitch,0);
+  mix-blend-mode:screen; background:linear-gradient(180deg, rgba(255,60,90,.45), rgba(90,230,255,.45)); }
+#eng-screen.engfx-burst .engfx-glitch{ opacity:.72; animation:engfxGlitchJump .38s steps(2) 1; }
+#eng-screen.engfx-burst .engfx-scan2{ opacity:.5; }
+@keyframes engfxGlitchJump{ 0%{transform:translateX(-7px)} 50%{transform:translateX(7px)} 100%{transform:translateX(0)} }
+/* 既存レバーをデバッグ可変に（上書き） */
+#eng-screen .eng-noise-canvas{ opacity:var(--engfx-noise,.14)!important; }
+#eng-screen .eng-vignette{ background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,var(--engfx-vignette,.45)) 100%)!important; }
+/* ---- Mキー デバッグパネル ---- */
+#engdbg{ position:fixed; top:14px; right:14px; z-index:99999; width:252px; display:none;
+  font-family:var(--fm, monospace); color:#cfe9f5; background:rgba(6,14,18,.93);
+  border:1px solid rgba(91,231,255,.4); border-radius:10px; padding:10px 11px;
+  box-shadow:0 18px 50px rgba(0,0,0,.6); max-height:92vh; overflow:auto; }
+#engdbg.open{ display:block; }
+#engdbg h3{ margin:0 0 7px; font-family:var(--fd, sans-serif); font-size:10px; letter-spacing:.18em; color:#5be7ff;
+  display:flex; justify-content:space-between; align-items:center; }
+#engdbg h3 small{ font-size:8px; color:#6a8090; letter-spacing:.1em; }
+#engdbg .ed-row{ display:flex; align-items:center; gap:6px; margin:3px 0; }
+#engdbg .ed-row label{ flex:0 0 76px; font-size:8.5px; letter-spacing:.02em; color:#9fc0d2; }
+#engdbg .ed-row input[type=range]{ flex:1 1 auto; min-width:0; height:14px; accent-color:#5be7ff; }
+#engdbg .ed-row span{ flex:0 0 40px; text-align:right; font-size:8.5px; color:#7fe3ff; }
+#engdbg .ed-btns{ display:flex; flex-wrap:wrap; gap:5px; margin-top:9px; }
+#engdbg button{ font-family:var(--fm, monospace); font-size:9px; letter-spacing:.02em; color:#cfe9f5;
+  background:rgba(91,231,255,.1); border:1px solid rgba(91,231,255,.4); padding:4px 8px; cursor:pointer; border-radius:4px; }
+#engdbg button:hover{ background:rgba(91,231,255,.26); }
+#engdbg .ed-hint{ font-size:8px; color:#6a8090; margin-top:8px; line-height:1.55; }
+</style>
+<script id="eng-monitor-video">
+/* ============================================================
+   ★技師モニター動画システム（v139）軽量版＋Mキーデバッグ
+   - idle をループ。spawnEnemy で battle1(1回)→battle2(ループ)。endBattle で idle へ。
+   - 動画は2枚バッファで切替（同時デコードは1枚）。RGB/ゴーストは無し。
+============================================================ */
+(function(){
+'use strict';
+var BASE='movie/';
+var SRC={ idle:BASE+'engineer_idle.mp4', battle1:BASE+'engineer_battle1.mp4', battle2:BASE+'engineer_battle2.mp4', attack:BASE+'engineer_attack.mp4', damage:BASE+'engineer_damage.mp4' };
+var a=null,b=null,screenEl=null,noimg=null,ready=false,mode=null,errored=false;
+
+function vids(){ return [a,b].filter(Boolean); }
+function play(v){ if(!v) return; try{ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} }
+function activeVid(){ if(a&&a.classList.contains('active')) return a; if(b&&b.classList.contains('active')) return b; return a; }
+function inactiveOf(v){ return v===a ? b : a; }
+
+function loadInto(v, src, loop, onEnd){
+  if(!v) return;
+  v.loop=!!loop;
+  v.onended = onEnd || null;
+  if(!v.src || v.src.indexOf(src)<0){ v.src=src; v.load(); }
+  var done=false;
+  var go=function(){ if(done) return; done=true; try{ v.currentTime=0; }catch(e){} play(v); };
+  if(v.readyState>=2) go();
+  else {
+    var h=function(){ v.removeEventListener('canplay',h); go(); };
+    v.addEventListener('canplay', h, {once:true});
+    setTimeout(go, 1600); /* 保険：canplayが来ない環境でも進める */
+  }
+}
+function crossfadeTo(src, loop, onEnd){
+  var cur=activeVid(), nxt=inactiveOf(cur);
+  if(!nxt){ loadInto(cur, src, loop, onEnd); if(cur) cur.classList.add('active'); return cur; }
+  loadInto(nxt, src, loop, onEnd);
+  nxt.classList.add('active');
+  setTimeout(function(){ if(cur && cur!==nxt){ cur.classList.remove('active'); try{cur.pause();}catch(e){} } }, 170);
+  return nxt;
+}
+function burst(){
+  if(!screenEl) return;
+  screenEl.classList.remove('engfx-burst'); void screenEl.offsetWidth; screenEl.classList.add('engfx-burst');
+  setTimeout(function(){ if(screenEl) screenEl.classList.remove('engfx-burst'); }, 440);
+}
+
+var Mon={
+  playIdle:function(){
+    if(!ready || errored) return;
+    if(mode==='idle') return;
+    mode='idle';
+    crossfadeTo(SRC.idle, true, null);
+  },
+  playBattle:function(){
+    if(!ready || errored) return;
+    if(mode==='battle') return;
+    mode='battle';
+    burst();
+    crossfadeTo(SRC.battle1, false, function(){
+      if(mode!=='battle') return;        /* 戦闘が既に終わっていたら battle2 に行かない */
+      crossfadeTo(SRC.battle2, true, null);
+    });
+  },
+  playAttack:function(){
+    if(!ready || errored) return;
+    if(mode!=='battle') return;
+    mode='attack';
+    burst();
+    crossfadeTo(SRC.attack, false, function(){
+      if(mode!=='attack') return;
+      mode='battle';
+      crossfadeTo(SRC.battle2, true, null);
+    });
+  },
+  playDamage:function(){
+    if(!ready || errored) return;
+    if(mode!=='battle') return;
+    mode='damage';
+    burst();
+    crossfadeTo(SRC.damage, false, function(){
+      if(mode!=='damage') return;
+      mode='battle';
+      crossfadeTo(SRC.battle2, true, null);
+    });
+  },
+  setMode:function(m){ if(m==='battle') this.playBattle(); else this.playIdle(); },
+  isReady:function(){ return ready && !errored; },
+  _mode:function(){ return mode; }
+};
+window.EngMonitor=Mon;
+
+function onErr(){
+  if(errored) return; errored=true;
+  vids().forEach(function(v){ v.style.display='none'; });
+  if(noimg) noimg.style.display='';
+}
+
+function init(){
+  a=document.getElementById('eng-video-a');
+  b=document.getElementById('eng-video-b');
+  screenEl=document.getElementById('eng-screen');
+  noimg=document.getElementById('eng-noimg');
+  if(!a||!b) return;
+  vids().forEach(function(v){
+    v.muted=true; v.defaultMuted=true; v.playsInline=true; v.setAttribute('playsinline','');
+    v.setAttribute('webkit-playsinline',''); v.preload='auto';
+    v.addEventListener('error', onErr);
+  });
+  ready=true;
+  Mon.playIdle();
+  /* 自動再生がブロックされた場合、最初の操作で復帰 */
+  var resume=function(){ var v=activeVid(); if(v) play(v); };
+  ['pointerdown','keydown','touchstart'].forEach(function(ev){
+    document.addEventListener(ev, resume, {once:true, passive:true});
+  });
+  /* 揺れ：shake=0 のときは何もしない軽量ループ */
+  setInterval(function(){
+    if(!screenEl) return;
+    var amt=parseFloat(getComputedStyle(screenEl).getPropertyValue('--engfx-shake'))||0;
+    if(amt<=0){ screenEl.style.setProperty('--engfx-shx','0px'); screenEl.style.setProperty('--engfx-shy','0px'); return; }
+    screenEl.style.setProperty('--engfx-shx', ((Math.random()*2-1)*amt).toFixed(2)+'px');
+    screenEl.style.setProperty('--engfx-shy', ((Math.random()*2-1)*amt*0.5).toFixed(2)+'px');
+  }, 90);
+  buildDebug();
+}
+
+/* ---- 状態フック：spawnEnemy→battle / endBattle→idle ---- */
+function hook(){
+  if(typeof GameController==='undefined' || !GameController.prototype){ setTimeout(hook, 250); return; }
+  if(GameController.__engMonHooked) return;
+  GameController.__engMonHooked=true;
+  var _spawn=GameController.prototype.spawnEnemy;
+  if(typeof _spawn==='function'){
+    GameController.prototype.spawnEnemy=function(){
+      var r=_spawn.apply(this, arguments);
+      try{ if(window.EngMonitor) window.EngMonitor.playBattle(); }catch(e){}
+      return r;
+    };
+  }
+  var _end=GameController.prototype.endBattle;
+  if(typeof _end==='function'){
+    GameController.prototype.endBattle=function(){
+      var r=_end.apply(this, arguments);
+      try{ if(window.EngMonitor) window.EngMonitor.playIdle(); }catch(e){}
+      return r;
+    };
+  }
+}
+
+/* ---- Mキー デバッグパネル ---- */
+var SLIDERS=[
+ ['明るさ','--engv-bright',0.6,1.6,0.01,1.04,''],
+ ['コントラスト','--engv-contrast',0.6,1.8,0.01,1.12,''],
+ ['彩度','--engv-sat',0,2,0.01,1.06,''],
+ ['色相','--engv-hue',-30,30,1,-4,'deg'],
+ ['ぼかし','--engv-blur',0,2,0.05,0.2,'px'],
+ ['走査線','--engfx-scan2',0,0.6,0.01,0.12,''],
+ ['砂嵐ノイズ','--engfx-noise',0,0.6,0.01,0.14,''],
+ ['周辺減光','--engfx-vignette',0,0.85,0.01,0.45,''],
+ ['横バー','--engfx-roll',0,0.5,0.01,0.14,''],
+ ['横バー速度','--engfx-roll-speed',0.6,8,0.1,3.6,'s'],
+ ['チラつき','--engfx-flicker',0,0.4,0.01,0.05,''],
+ ['乱れ帯','--engfx-glitch',0,0.8,0.01,0,''],
+ ['揺れ','--engfx-shake',0,5,0.1,0,'px']
+];
+var dbgPanel=null;
+function buildDebug(){
+  if(dbgPanel || !screenEl) return;
+  var p=document.createElement('div');
+  p.id='engdbg';
+  var rows='';
+  SLIDERS.forEach(function(s,i){
+    rows+='<div class="ed-row"><label>'+s[0]+'</label>'
+      +'<input type="range" data-i="'+i+'" min="'+s[2]+'" max="'+s[3]+'" step="'+s[4]+'" value="'+s[5]+'">'
+      +'<span id="edv-'+i+'">'+s[5]+s[6]+'</span></div>';
+  });
+  p.innerHTML='<h3>技師モニター 演出 <small>M で開閉</small></h3>'+rows
+    +'<div class="ed-btns">'
+    +'<button id="ed-idle">IDLE</button>'
+    +'<button id="ed-battle">BATTLE</button>'
+    +'<button id="ed-burst">バースト</button>'
+    +'<button id="ed-reset">リセット</button>'
+    +'<button id="ed-copy">設定コピー</button>'
+    +'</div>'
+    +'<div class="ed-hint">スライダーは #eng-screen の CSS 変数を直接変更します。確定値は「設定コピー」で CSS として取り出せます。</div>';
+  document.body.appendChild(p);
+  dbgPanel=p;
+  function applyVar(i, val){
+    var s=SLIDERS[i];
+    screenEl.style.setProperty(s[1], val + s[6]);
+    var lab=document.getElementById('edv-'+i);
+    if(lab) lab.textContent = val + s[6];
+  }
+  p.querySelectorAll('input[type=range]').forEach(function(inp){
+    inp.addEventListener('input', function(){ applyVar(Number(inp.dataset.i), inp.value); });
+  });
+  function setAll(toDefault){
+    SLIDERS.forEach(function(s,i){
+      var inp=p.querySelector('input[data-i="'+i+'"]');
+      if(inp){ inp.value=s[5]; applyVar(i, s[5]); }
+    });
+  }
+  document.getElementById('ed-idle').addEventListener('click', function(){ if(window.EngMonitor){ mode=null; EngMonitor.playIdle(); } });
+  document.getElementById('ed-battle').addEventListener('click', function(){ if(window.EngMonitor){ mode=null; EngMonitor.playBattle(); } });
+  document.getElementById('ed-burst').addEventListener('click', burst);
+  document.getElementById('ed-reset').addEventListener('click', function(){ setAll(true); });
+  document.getElementById('ed-copy').addEventListener('click', function(){
+    var lines=['#eng-screen{'];
+    SLIDERS.forEach(function(s,i){
+      var inp=p.querySelector('input[data-i="'+i+'"]');
+      lines.push('  '+s[1]+':'+(inp?inp.value:s[5])+s[6]+';');
+    });
+    lines.push('}');
+    var txt=lines.join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ alert('現在のモニター演出設定を CSS としてコピーしました。'); },
+        function(){ window.prompt('コピーできない場合は手動で:', txt); });
+    } else { window.prompt('この内容をコピー:', txt); }
+  });
+}
+function toggleDebug(){
+  if(!dbgPanel){ buildDebug(); }
+  if(dbgPanel) dbgPanel.classList.toggle('open');
+}
+document.addEventListener('keydown', function(e){
+  if(e.key!=='m' && e.key!=='M') return;
+  var t=e.target;
+  if(t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)) return; /* 入力中は無視 */
+  e.preventDefault();
+  toggleDebug();
+});
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+hook();
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   ★v148 LAST PHASE モジュール（末尾集約・最終オーバーライド）
+============================================================ */
+/* =========================================================================
+   v148 LAST PHASE モジュール
+   第1〜7章チェーンは不可侵。LAST PHASE進行を window.LastPhase に集約し、
+   既存メソッドは最終オーバーライドで委譲する。
+   ========================================================================= */
+(function lpInit() {
+  if (typeof GameController === 'undefined' || !GameController.prototype) { setTimeout(lpInit, 300); return; }
+  if (GameController.__lastPhaseV148) return;
+  GameController.__lastPhaseV148 = true;
+
+  var proto = GameController.prototype;
+  function ST() { return (typeof window !== 'undefined' && window.STORY_TEXTS) ? window.STORY_TEXTS : {}; }
+  function pname() { return (game && game.player && game.player.name) ? game.player.name : '技師'; }
+  function repl(arr) { var nm = pname(); return (arr || []).map(function (l) { return String(l).replace(/〇〇/g, nm); }); }
+  function dexCount() { return (game && game.encounteredMonsters) ? game.encounteredMonsters.size : 0; }
+  function monById(id) { return MONSTERS.find(function (m) { return m.id === id; }); }
+  function trySave(ch) {
+    try { if (SaveSystem.canSaveNow()) { SaveSystem.writeAuto(); SaveSystem.writeChapter(ch == null ? 8 : ch); } } catch (e) {}
+  }
+  function bossScale(playerLv, tier) { return 1 + (playerLv - 1) * 0.058 + ((tier || 5) - 1) * 0.045; }
+
+  /* ---- 新規イベントテキスト（実装相談依頼 B〜L 準拠／〇〇は氏名置換） ---- */
+  var LP = {
+    TOCHIJI_PRE: [
+      '端末：\n都市連携中枢を検出。',
+      '端末：\n接続記録へのアクセスには、管理代理認証が必要です。',
+      '技師：\n「管理代理？」',
+      '端末：\n認証主体：東京都\n権限状態：代理\n実担当者：照会中',
+      '技師：\n「また代理で、本人は照会中か。」',
+      '端末：\n都市連携中枢前方に大型反応。',
+      '端末：\n確認個体：汚染都知事代理\n分類：T5\n行動傾向：都市連携記録および代理認証を防衛',
+      '技師：\n「都知事じゃなくて、都知事代理。」',
+      '技師：\n「責任者は出てこないのに、代理だけは現場まで来るんだな。」'
+    ],
+    TOCHIJI_AFTER: [
+      '端末：\n敵性反応、沈黙。',
+      '端末：\n確認個体：汚染都知事代理\n分類：T5\n図鑑登録：__DEX__体目',
+      '端末：\n代理認証の消失を確認。\n都市連携中枢の接続制限を解除します。',
+      '端末：\n接続元を照合中。\n\n東京都内行政記録\n苦情処理記録\n住民反応ログ\n通信負荷記録\n炎上傾向記録\n行政不信指数',
+      '端末：\n流入元：東京全域\n接続先：炉心深部',
+      '技師：\n「東京中の記録が、原子炉の奥につながってる。」',
+      '端末：\n流入データを再分類。\n\n怒り\n不安\n偏見\nクレーム\n諦め\n炎上\n行政不信',
+      '端末：\n分類：社会感情負荷',
+      '技師：\n「負の感情を、東京中から集めてたのか。」',
+      '技師：\n「何のために、こんなものを炉心まで送ってる。」',
+      '端末：\n処理用途：閲覧制限',
+      '技師：\n「そこから先は、まだ見せないってわけか。」'
+    ],
+    KAGAKU_PRE: [
+      '端末：\n感情処理設計記録を検出。',
+      '端末：\n閲覧には設計担当者の生体認証が必要です。',
+      '技師：\n「設計担当者が、まだ残ってるのか。」',
+      '端末：\n大型生体反応、接近。',
+      '端末：\n確認個体：放射科学者\n分類：T5\n行動傾向：感情処理設計記録を防衛',
+      '技師：\n「こいつが、この仕組みを作った科学者か。」',
+      '技師：\n「成果だけ残して、説明は本人に聞けってことらしいな。」'
+    ],
+    KAGAKU_AFTER: [
+      '端末：\n敵性反応、沈黙。',
+      '端末：\n確認個体：放射科学者\n分類：T5\n図鑑登録：__DEX__体目',
+      '端末：\n設計担当者の生体認証を確認。\n感情処理設計記録を開示します。',
+      '端末：\n入力対象：社会感情負荷\n処理工程：分類／圧縮／熱変換\n出力対象：原子炉補助熱源\n最終出力：電力',
+      '技師：\n「感情を、熱にしているだと？」',
+      '端末：\n肯定。',
+      '端末：\n東京全域から収集した社会感情負荷を熱へ変換。\n原子炉発電系統へ補助熱源として投入。',
+      '技師：\n「ADACHI-1が原発だったことは、嘘じゃない。」',
+      '技師：\n「だが、電力を生んでいたのは、核燃料だけじゃなかった。」',
+      '端末：\n施設機能を再照合。\n\n東京基幹電力炉 ADACHI-1\n\n追加機能：\n東京全域社会感情処理炉\n\n中枢区画：\n社会感情炉心',
+      '技師：\n「東京は、ここへ流し込んだ感情まで電力にしてたのか。」',
+      '技師：\n「……ようやく、図面にない中枢の名前が出たな。」'
+    ],
+    MELTDOWN_FIRST_PRE: [
+      '端末：\n炉心深部の大型中枢反応、接近。',
+      '端末：\n監視映像を同期中。',
+      '端末：\n映像同期：失敗\n形状解析：不能\n照準補正：不能',
+      '技師：\n「画面が乱れてる。」',
+      '技師：\n「だが、いるんだろ。見えないだけで。」',
+      '端末：\n複合干渉を検出。\n\n高線量ノイズ\n感情熱変換系統、過負荷\n都市データ、逆流\n未処理アラート、重複',
+      '技師：\n「原因が多すぎる。」',
+      '技師：\n「まずいな。輪郭すら取れない。」',
+      '端末：\n未確認中枢反応、戦闘距離へ到達。'
+    ],
+    MELTDOWN_FIRST_MISS: [
+      '当たらない。\n照準が、反応を避けてるみたいだ。',
+      'いる。目の前にいるはずなのに、画面にも目にも乗ってこない。',
+      '今のは避けられない。\n何が来たのかも分からない。',
+      '区民の感情まで混ざってる。\nどこからが敵なんだ。'
+    ],
+    MELTDOWN_FIRST_DEFEAT: [
+      '端末：\n作業個体、生体停止。',
+      '端末：\n死亡判定を実行。',
+      '端末：\n判定結果：却下。\n分類：再投入可能資源',
+      '端末：\n再投入処理を開始します。',
+      '技師：\n「……また、この端末か。」',
+      '端末：\n再投入管理区。\n作業個体の復帰を確認。',
+      '技師：\n「戻されたのか。」',
+      '技師：\n「見えないまま、同じ場所へ送り返すつもりか。」',
+      '端末：\n同一個体、同一条件での再投入結果を予測。',
+      '端末：\n予測結果：同一損耗の反復',
+      '技師：\n「端末にも、無理だって分かるらしいな。」',
+      '端末：\n再投入管理区内に残存管理反応。',
+      '端末：\n再起動個体：再投入管理官\n状態：大破\n残存管理核：稼働',
+      '技師：\n「……お前、まだ動けたのか。」',
+      '再投入管理官：\n旧管理目的：\n作業個体認証および再投入',
+      '再投入管理官：\n現在管理目的：\n氏名登録個体の生存支援',
+      '技師：\n「役目が、書き換わってる。」',
+      '再投入管理官：\n氏名：〇〇\n分類：再投入可能資源',
+      '再投入管理官：\n分類変更：不能\n生存支援：継続',
+      '技師：\n「分類はまだ資源のまま。」',
+      '技師：\n「それでも、今度は生きて戻すつもりか。」',
+      '再投入管理官：\n施設内作業個体記録のみでは、復元情報が不足。',
+      '再投入管理官：\n外部保存領域へ接続せよ。\n\n接続先：\n足立区役所廃止サーバー\n\n参照項目：\n区民感情バックアップ',
+      '技師：\n「区民の感情を、記録してたっていうのか。」',
+      '再投入管理官：\n感情燃料変換不能記録あり。',
+      '再投入管理官：\n施設が処理できなかったものが、残っている。',
+      '技師：\n「それを使えば、あの反応が見えるのか。」',
+      '再投入管理官：\n可能性：あり',
+      '再投入管理官：\n氏名登録個体、〇〇。',
+      '再投入管理官：\n接続せよ。'
+    ],
+    CITIZEN_HEART: [
+      '端末：\n外部保存領域から応答を検出。',
+      '端末：\n接続元：足立区役所廃止サーバー\n記録名：区民感情バックアップ\n状態：復元中',
+      '技師：\n「区民感情バックアップ……。」',
+      '技師：\n「区民の感情を、記録してたっていうのか。」',
+      '端末：\n外部流入感情：\n\n偏見\n嘲笑\n比較による優越確認\n負荷転送',
+      '端末：\n区民側未表出感情：\n\n悲哀\n屈辱\n憤り\n諦念',
+      '端末：\n応答記録：\n\n沈黙\n受容\n反論なし',
+      '技師：\n「……平気だったんじゃない。」',
+      '技師：\n「言い返せなかっただけだ。」',
+      '端末：\n未処理要求を復元：\n\n情報開示\n選択権\n危険負荷の停止',
+      '技師：\n「知らされなかった。」',
+      '技師：\n「選ばせても、もらえなかった。」',
+      '技師：\n「本当は、こんなものを足元に建ててほしくなかった。」',
+      '端末：\n未送信記録を復元：\n\n「誰かに気づいてほしい」\n「これ以上、ここへ流さないでほしい」\n「なんとかしてほしい」',
+      '技師：\n「……ただ、黙って受け入れてたわけじゃない。」',
+      '技師：\n「この怒りも、悔しさも、誰かに気づいてほしかった。」',
+      '技師：\n「どうにかしてくれって、ずっと言いたかったんだろ。」',
+      '端末：\n応答記録：該当なし',
+      '技師：\n「俺に、人の気持ちまでは直せない。」',
+      '技師：\n「でも、これ以上ここへ押し込む仕組みなら止められる。」',
+      '端末：\n二次感情転送を照合：\n\n他地域への侮蔑：検出されず\n他者比較による優位確認：検出されず\n負荷の再転送：検出されず',
+      '端末：\n関連生活記録：\n\n避難所で、配られなかった毛布を分け合った記録\n進まない窓口で、座席を譲った記録\n止まった回覧板を、黙って届け直した記録',
+      '技師：\n「傷つけられても、同じものを誰かに返さなかった。」',
+      '端末：\n社会感情炉心による変換記録：\n\n怒り：熱変換完了\n不安：熱変換完了\n偏見：熱変換完了\n諦め：熱変換完了',
+      '端末：\n未変換反応を検出。\n\n暫定分類：\n他者への共感\n他者比較の拒否\n負荷再転送の拒否\n\n感情燃料への変換：不能',
+      '技師：\n「痛みを知ってるから、誰かの痛みを笑わない。」',
+      '技師：\n「そういうものは、この炉でも燃やせなかったらしいな。」',
+      '端末：\n未変換反応が結晶化しました。',
+      '端末：\n特異装備を生成。\n\n名称：区民の心\n性質：負荷転送拒否\n\n特異効果：\n中枢反応可視化\n\n感情熱干渉耐性：\n3倍\n\n停止出力補正：\n2倍\n\n消費区分：\n対象外',
+      '技師：\n「殴り返すためじゃない。」',
+      '技師：\n「押しつけられる流れを、ここで止めるための力か。」',
+      '端末：\n特異装備「区民の心」を出力しました。',
+      '技師：\n「区民の心……。」',
+      '技師：\n「俺が、分かったような顔をしていいものじゃないな。」',
+      '技師：\n「でも、ここへ押し込められたものを止める力なら、借りる。」',
+      '端末：\n特異装備「区民の心」を装備しました。'
+    ],
+    KUCHO_PRE: [
+      '端末：\n区民感情バックアップへの行政遮断要求を検出。',
+      '端末：\n要求元：足立区事故対策本部\n状態：失効\n遮断処理：継続中',
+      '技師：\n「失効した命令だけが、まだ動いてる。」',
+      '端末：\n大型行政反応、接近。',
+      '端末：\n確認個体：汚染区長\n分類：T5\n行動傾向：区民感情記録の封鎖',
+      '汚染区長：\n「区民感情は、正式な被害記録には含まれない。」',
+      '汚染区長：\n「公表すれば、不要な混乱を招く。」',
+      '汚染区長：\n「対応は、適切に行われた。」',
+      '技師：\n「認めたくないんだな。」',
+      '汚染区長：\n「認めれば、誰も守れなかったことになる。」',
+      '技師：\n「認めなくても、守れなかった事実は消えない。」',
+      '汚染区長：\n「記録を、停止する。」',
+      '技師：\n「悪いが、今度はその言葉を受け取らない。」'
+    ],
+    KUCHO_AFTER: [
+      '端末：\n敵性反応、沈黙。',
+      '端末：\n確認個体：汚染区長\n分類：T5\n図鑑登録：__DEX__体目',
+      '端末：\n最終発話記録を復元。',
+      '汚染区長：\n「退避命令は、出した。」',
+      '汚染区長：\n「届いたかどうかは、確認できなかった。」',
+      '技師：\n「出したことと、届いたことは同じじゃない。」',
+      '技師：\n「それでも、なかったことにするよりはましだ。」',
+      '技師：\n「記録に残せ。」',
+      '端末：\n退避命令記録を更新。\n\n発令：確認\n到達確認：不能\n対応評価：未完了',
+      '端末：\n特異装備「区民の心」の作用を確認。\n\n中枢反応可視化：有効\n感情熱干渉耐性：3倍\n停止出力補正：2倍\n負荷転送拒否：有効',
+      '技師：\n「強くなったんじゃない。」',
+      '技師：\n「もう、押しつけられた言葉を受け取らないんだ。」',
+      '端末：\n炉心深部の未確認中枢反応を再観測可能。',
+      '技師：\n「今度は、見えるんだな。」',
+      '技師：\n「戻るぞ。あの反応を止める。」'
+    ],
+    MELTDOWN_REMATCH_PRE: [
+      '端末：\n炉心深部の大型中枢反応を再検出。',
+      '端末：\n特異装備「区民の心」と観測系統を同期。',
+      '端末：\n感情熱干渉を遮断。\n監視映像を補正中。',
+      '技師：\n「ノイズが、消えていく。」',
+      '端末：\n映像同期：成功\n形状解析：完了\n照準補正：有効',
+      '端末：\n確認個体：メルトダウン\n分類：T5',
+      '技師：\n「メルトダウン。」',
+      '技師：\n「事故そのものが、形になったってわけか。」',
+      '技師：\n「今度は見える。」',
+      '技師：\n「見えたなら、止められる。」'
+    ]
+  };
+
+  /* ---- 「社会感情炉心」の“感情”マスク：ZONE_PHASES[8].zone をデータごと差し替える。
+     これにより章カード・StoryDialogタイトル・HUDラベル等、phase.zone を読む全箇所が静止でも読めなくなる。
+     放射科学者撃破（stage3）で実名に復元する。 ---- */
+  var EMO_REAL = '社会感情炉心';
+  var EMO_MASK = '社会\u2592\u2593炉心'; // 社会▒▓炉心
+  function zone8() { try { return (typeof ZONE_PHASES !== 'undefined') ? ZONE_PHASES[8] : null; } catch (e) { return null; } }
+  function emotionRevealed() { return !!(game && game.lastPhaseStage >= 3); }
+  function maskZone() { var z = zone8(); if (z && z.zone === EMO_REAL) z.zone = EMO_MASK; }
+  function revealZone() { var z = zone8(); if (z && z.zone === EMO_MASK) z.zone = EMO_REAL; }
+  function animateCardGlitch() {
+    try {
+      var el = document.getElementById('chapter-zone');
+      if (!el || emotionRevealed()) return;
+      if (el.querySelector && el.querySelector('.emo-glitch')) return;
+      var t = el.textContent;
+      if (t.indexOf('\u2592\u2593') < 0) return;
+      el.innerHTML = t.replace('\u2592\u2593', '<span class="emo-glitch" aria-label="ノイズ">\u2592\u2593</span>');
+    } catch (e) {}
+  }
+  function refreshEmotionMasks() {
+    if (emotionRevealed()) revealZone(); else maskZone();
+    setTimeout(animateCardGlitch, 60);
+  }
+  function installEmotionGlitch() {
+    try {
+      var style = document.createElement('style');
+      style.textContent =
+        '.emo-glitch{display:inline-block;color:#ff5a4d;position:relative;letter-spacing:.04em;' +
+        'text-shadow:0 0 6px rgba(255,60,40,.8),2px 0 rgba(0,255,255,.6),-2px 0 rgba(255,0,80,.6);' +
+        'animation:emoGlitch .42s steps(3) infinite;filter:blur(.4px)}' +
+        '@keyframes emoGlitch{0%{transform:translate(0,0);opacity:.9}25%{transform:translate(1px,-1px);opacity:.55}' +
+        '50%{transform:translate(-1px,1px);opacity:1}75%{transform:translate(1px,1px);opacity:.5}100%{transform:translate(0,0);opacity:.85}}';
+      document.head.appendChild(style);
+      var card = document.getElementById('chapter-zone');
+      if (card && typeof MutationObserver !== 'undefined') {
+        var mo = new MutationObserver(function () { animateCardGlitch(); });
+        mo.observe(card, { childList: true, characterData: true, subtree: true });
+      }
+    } catch (e) {}
+  }
+
+  /* ===================== ステート機械 ===================== */
+  function setStage(n) {
+    game.lastPhaseStage = n;
+    if (n >= 6) game.citizenHeartObtained = true;
+    if (n >= 9) game.meltdownDefeated = true;
+    refreshEmotionMasks();
+  }
+
+  function queueEventBoss(ctrl, id, preLines, opts) {
+    opts = opts || {};
+    game.pendingEventBossId = id;
+    game.meltdownUnobservableBattle = !!opts.unobservable;
+    var run = function () {
+      try { ctrl.spawnEnemy(); } catch (e) {}
+    };
+    if (preLines && preLines.length && typeof StoryDialog !== 'undefined' && StoryDialog.play) {
+      StoryDialog.play(opts.title || '炉心深部', repl(preLines), run, opts.tag || 'Last Phase');
+    } else { run(); }
+  }
+
+  /* LAST PHASE観測確定区間：未観測の必須個体（通常1..56＋フリーT5を1体）を実際に観測させ、63で本編進行 */
+  function requiredComplete() {
+    if (!game || !game.encounteredMonsters) return false;
+    var enc = game.encounteredMonsters;
+    for (var i = 1; i <= 56; i++) { if (!enc.has(i)) return false; }
+    var freeSeen = 0;
+    [59, 60, 61, 63].forEach(function (id) { if (enc.has(id)) freeSeen++; });
+    return freeSeen >= 1;
+  }
+  function pickForcedObservation(playerLv) {
+    var enc = game.encounteredMonsters;
+    // まず未観測の通常個体
+    var normals = MONSTERS.filter(function (m) { return m.id >= 1 && m.id <= 56 && !enc.has(m.id); });
+    if (normals.length) { var n = normals[0]; return { data: n, levelScale: 1 + (playerLv - 1) * 0.058 + (n.tier - 1) * 0.045 }; }
+    // 次にフリーT5を0体ならちょうど1体だけ確定
+    var freeSeen = 0; [59, 60, 61, 63].forEach(function (id) { if (enc.has(id)) freeSeen++; });
+    if (freeSeen === 0) {
+      var f = monById(59) || monById(60) || monById(61) || monById(63);
+      if (f) return { data: f, levelScale: bossScale(playerLv, f.tier) };
+    }
+    return null;
+  }
+  function pickPostClearObservation(playerLv) {
+    var enc = game.encounteredMonsters;
+    var rest = [59, 60, 61, 63].filter(function (id) { return !enc.has(id); }).map(monById).filter(Boolean);
+    if (rest.length) { var r = rest[0]; return { data: r, levelScale: bossScale(playerLv, r.tier) }; }
+    return null;
+  }
+
+  function beginObservationInterval(ctrl) {
+    game.preLastPhaseObservation = true;
+    refreshEmotionMasks();
+    if (dexCount() >= 63) {
+      game.preLastPhaseObservation = false;
+      beginChapterHead(ctrl);
+      return;
+    }
+    game.state = 'IDLE';
+    try { ctrl.updateUI(); } catch (e) {}
+    try {
+      ctrl.showCenterMessage('観測確定', '社会感情炉心で、周辺の未確認個体を観測せよ。', 2600);
+      ctrl.log({ text: '社会感情炉心の中枢へ進む前に、周辺に残る未確認個体を観測する必要がある。出撃して残りの個体を記録せよ。', kind: 'crit' });
+      ctrl.log({ text: '観測 ' + dexCount() + '/63。', kind: 'system' });
+    } catch (e) {}
+    // ★章8スロットはLAST PHASE入口の復帰点として残し、観測途中はオートのみ更新する。
+    //   第7章スロット（格納容器前進入時・ボス生存）にも触れない。
+    try { if (SaveSystem.canSaveNow()) SaveSystem.writeAuto(); } catch (e) {}
+  }
+  function checkObservationProgress(ctrl) {
+    if (!game.preLastPhaseObservation) return;
+    try { ctrl.log({ text: '観測 ' + dexCount() + '/63。', kind: 'system' }); } catch (e) {}
+    if (dexCount() >= 63) {
+      game.preLastPhaseObservation = false;
+      // 通常戦闘の死亡アニメと報酬処理が完了してからLAST PHASE本編へ進む。
+      setTimeout(function () { beginChapterHead(ctrl); }, 1100);
+    }
+  }
+
+  function descend(ctrl) {
+    maskZone();           // ★カード/タイトルが phase.zone を読む前に“感情”をマスク
+    var T = ST();
+    var lastCard = (T.LAST_PHASE_CARD && T.LAST_PHASE_CARD.length) ? T.LAST_PHASE_CARD : ['社会感情炉心へ。'];
+    var go = function () { beginObservationInterval(ctrl); };
+    if (typeof ctrl._playLastPhaseCardThenMovie === 'function') {
+      ctrl._playLastPhaseCardThenMovie(lastCard, go);   // 内部で enterFinalPhaseZone（→stage1）を実行
+    } else {
+      try { ctrl.enterFinalPhaseZone(); } catch (e) {}
+      go();
+    }
+  }
+
+  function beginChapterHead(ctrl) {
+    // enterFinalPhaseZone で stage1 済み。章頭カードは _playLastPhaseCardThenMovie が表示済みなので、ここは都知事代理へ。
+    if (game.lastPhaseStage < 1) setStage(1);
+    refreshEmotionMasks();
+    trySave(8);
+    setTimeout(function () { queueEventBoss(ctrl, 65, LP.TOCHIJI_PRE, { title: '都市連携中枢' }); }, 600);
+  }
+
+  /* イベントボス撃破後（handleVictory ラッパから） */
+  function afterEventBossVictory(ctrl, e) {
+    var id = e && e.data ? e.data.id : null;
+    if (id === 65) {
+      registerDex(ctrl, 65);
+      setStage(2);
+      var lines = subDex(LP.TOCHIJI_AFTER, dexCount());
+      trySave(8);
+      StoryDialog.play('都市連携中枢 制圧', repl(lines), function () {
+        queueEventBoss(ctrl, 58, LP.KAGAKU_PRE, { title: '感情処理設計記録' });
+      }, 'Last Phase');
+    } else if (id === 58) {
+      registerDex(ctrl, 58);
+      setStage(3);                 // ← 感情の文字化け解除
+      revealZone();
+      try { ctrl.applyZoneState(8, 0, true); } catch (e3) {}  // HUD/カードのゾーン名を実名で再描画
+      refreshEmotionMasks();
+      var lines2 = subDex(LP.KAGAKU_AFTER, dexCount());
+      trySave(8);
+      StoryDialog.play('感情処理設計記録 開示', repl(lines2), function () {
+        try { ctrl.showCenterMessage('正式名称 開示', '東京全域社会感情処理炉 ／ 社会感情炉心', 2600); } catch (e2) {}
+        queueEventBoss(ctrl, 70, LP.MELTDOWN_FIRST_PRE, { title: '未確認中枢反応', unobservable: true });
+      }, 'Last Phase');
+    } else if (id === 57) {
+      registerDex(ctrl, 57);
+      setStage(7);
+      var lines3 = subDex(LP.KUCHO_AFTER, dexCount());
+      trySave(8);
+      StoryDialog.play('行政反応 沈黙', repl(lines3), function () {
+        setStage(8);
+        trySave(8);
+        queueEventBoss(ctrl, 70, LP.MELTDOWN_REMATCH_PRE, { title: 'メルトダウン 再観測' });
+      }, 'Last Phase');
+    } else if (id === 70) {
+      // メルトダウン再戦：原 handleVictory のメルトダウン分岐が登録(67体目)＋責任者不在への接続を行う。
+      // ここでmeltdownDefeatedや段階9を先に確定すると原分岐が飛ばされるため、既存処理に一任する。
+    }
+  }
+
+  function registerDex(ctrl, id) {
+    try {
+      var isNew = !game.encounteredMonsters.has(id);
+      game.encounteredMonsters.add(id);
+      if (isNew && typeof ctrl.questProgress === 'function') ctrl.questProgress('dex');
+      ctrl.updateUI();
+    } catch (e) {}
+  }
+  function subDex(arr, n) { return (arr || []).map(function (l) { return String(l).replace(/__DEX__/g, n); }); }
+
+  /* メルトダウン初戦・敗北 → 再投入管理区 → 区民の心 */
+  function onMeltdownUnobservableDefeat(ctrl) {
+    if (game._mdUnobsDeathRunning) return;
+    game._mdUnobsDeathRunning = true;
+    game.meltdownUnobservableBattle = false;
+    game.state = 'GAMEOVER';
+    game.battleTurn = 'animating';
+    var cmd = document.getElementById('command-panel'); if (cmd) cmd.classList.remove('active');
+    setStage(4);
+    var afterWarp = function () {
+      // 再投入管理区へ戻す（演出ゾーン）＋蘇生
+      try { ctrl.applyZoneState(6, 4200, false); } catch (e) {}
+      var p = game.player; p.hp = p.maxHp; p.mp = p.maxMp; p.statusEffects = [];
+      setStage(5);
+      game.state = 'IDLE';
+      game._mdUnobsDeathRunning = false;
+      try { ctrl.updateUI(); } catch (e) {}
+      trySave(8);   // ★敗北直後はここで初めて保存（再投入管理区＝stage5）。ロードで敗北戦は再生しない。
+      // 続けて「区民の心」イベント
+      setTimeout(function () { playCitizenHeart(ctrl); }, 700);
+    };
+    if (typeof StoryDialog !== 'undefined' && StoryDialog.play) {
+      StoryDialog.play('死亡判定：却下／再投入管理区', repl(LP.MELTDOWN_FIRST_DEFEAT), afterWarp, 'Reentry');
+    } else { afterWarp(); }
+  }
+
+  function playCitizenHeart(ctrl) {
+    if (game.citizenHeartObtained) { afterCitizenHeart(ctrl); return; }
+    StoryDialog.play('特異イベント：区民の心', repl(LP.CITIZEN_HEART), function () {
+      var p = game.player;
+      game.citizenHeartObtained = true;
+      p.hasCitizenHeart = true;
+      p.accessory = 'citizen_heart';
+      try { audio.levelup(); } catch (e) {}
+      setStage(6);
+      try {
+        ctrl.showCenterMessage('区民の心', '取得。負荷転送拒否。中枢反応可視化。', 2800);
+        ctrl.log({ text: '特異装備「区民の心」を取得し、自動装備した。ATK×2 / DEF×3。消費されない。', kind: 'crit' });
+        ctrl.updateUI(); ctrl.renderSystemList && ctrl.renderSystemList(); ctrl.renderReactorMenu && ctrl.renderReactorMenu();
+      } catch (e) {}
+      trySave(8);
+      afterCitizenHeart(ctrl);
+    }, 'Citizen Heart');
+  }
+  function afterCitizenHeart(ctrl) {
+    // 社会感情炉心へ戻し（enterFinalPhaseZoneは初回のみ動作するため applyZoneState で復帰）、区長戦へ
+    try { ctrl.applyZoneState(8, 4200, false); } catch (e) {}
+    setStage(6);
+    try { ctrl.showCenterMessage('ZONE復帰', '社会感情炉心 ─ 炉心深部へ戻る。', 2400); } catch (e) {}
+    setTimeout(function () { queueEventBoss(ctrl, 57, LP.KUCHO_PRE, { title: '行政遮断要求' }); }, 1400);
+  }
+
+  /* ===================== 公開API ===================== */
+  window.LastPhase = {
+    isEventBoss: function (data) { return !!(data && data.isLastPhaseEventBoss); },
+    buildEventBoss: function (ctrl, playerLv) {
+      var id = game.pendingEventBossId;
+      var base = monById(id) || MONSTERS[MONSTERS.length - 1];
+      if (id === 70 && game.meltdownUnobservableBattle) {
+        // 初戦：観測不能。名称マスク・撃破不能（攻撃は必ずミス）。
+        return {
+          data: {
+            id: 70, name: '？？？', tierName: '未確認中枢反応', tier: 5, modelType: 'boss',
+            isLastPhaseEventBoss: true, isMeltdownFirst: true,
+            baseHP: 99999, baseATK: 40, baseEXP: 0, baseGold: 0, skills: [], story: ''
+          },
+          levelScale: 1
+        };
+      }
+      if (id === 70) {
+        // 再戦：可視。原メルトダウン分岐が撃破時に登録・接続するため id70 のまま。
+        return { data: Object.assign({}, base, { modelType: 'boss', isLastPhaseEventBoss: true, isMeltdownRematch: true }), levelScale: bossScale(playerLv, 5) };
+      }
+      // 57/58/65：図鑑どおりの名称。登録は撃破時。
+      return { data: Object.assign({}, base, { modelType: 'boss', isLastPhaseEventBoss: true }), levelScale: bossScale(playerLv, base.tier || 5) };
+    },
+    forcedNormalSpawn: function (ctrl, playerLv) {
+      if (game.preLastPhaseObservation) return pickForcedObservation(playerLv);
+      if (game.postClearObservation) return pickPostClearObservation(playerLv);
+      return null;
+    },
+    beginObservationInterval: function (ctrl) { beginObservationInterval(ctrl); },
+    afterEventBossVictory: afterEventBossVictory,
+    onMeltdownUnobservableDefeat: onMeltdownUnobservableDefeat,
+    refreshEmotionMasks: refreshEmotionMasks,
+    setStage: setStage,
+    enterPostClearObservation: function (ctrl) {
+      game.postClearObservation = true;
+      game.state = 'IDLE';
+      try {
+        document.getElementById('endscreen-win').classList.remove('active');
+        ctrl.applyZoneState(8, 2000, true);
+        ctrl.showCenterMessage('観測モード', '炉心深部に残存する未確認個体を観測する。', 2600);
+        ctrl.log({ text: '残存観測モード。未観測のボス級個体を探索し、図鑑70/70を目指せ。', kind: 'crit' });
+        ctrl.updateUI();
+      } catch (e) {}
+      // ★章8スロット（LAST PHASE）を上書きしないため auto のみ。ロードは postClearObservation で復帰。
+      try { if (SaveSystem.canSaveNow()) SaveSystem.writeAuto(); } catch (e) {}
+    },
+    onPostClearVictory: function (ctrl) {
+      if (!game.postClearObservation) return;
+      if (dexCount() >= 70) {
+        game.postClearObservation = false;
+        try {
+          ctrl.showCenterMessage('観測完了', '変異生物観測録 70/70。', 3000);
+          ctrl.log({ text: '全70種の観測を完了した。図鑑が埋まった。', kind: 'crit' });
+        } catch (e) {}
+        try { if (SaveSystem.canSaveNow()) SaveSystem.writeAuto(); } catch (e) {}
+      }
+    }
+  };
+
+  /* ===================== 既存メソッドの最終オーバーライド ===================== */
+
+  // 格納容器修復後：撃破後テキストからLAST PHASEへ移行し、その区画内で観測確定区間を開始する。
+  var _origUnlock = proto.unlockFinalBossProtocol;
+  proto.unlockFinalBossProtocol = function () {
+    var self = this;
+    if (game.citizenHeartObtained || game.lastPhaseStage >= 1 || game.preLastPhaseObservation) {
+      // すでにLAST PHASE進行中／区民の心取得済みなら再起動しない。
+      return;
+    }
+    if (game._lastPhaseIntroDone) { return; }
+    game._lastPhaseIntroDone = true;
+    var T = ST();
+    var bossAfter = repl((T.CONTAINMENT_BOSS_AFTER && T.CONTAINMENT_BOSS_AFTER.length) ? T.CONTAINMENT_BOSS_AFTER : ['格納容器、隔離完了。']);
+    StoryDialog.play('格納容器 隔離完了', bossAfter, function () {
+      descend(self);
+    }, 'Containment Clear');
+  };
+
+  // enterFinalPhaseZone：ゾーン移行（原処理）＋stage1。
+  var _origEnterFinal = proto.enterFinalPhaseZone;
+  proto.enterFinalPhaseZone = function () {
+    var r = _origEnterFinal.apply(this, arguments);
+    if (game.lastPhaseStage < 1) setStage(1);
+    refreshEmotionMasks();
+    return r;
+  };
+
+  // handleVictory：LAST PHASEイベントボス撃破を後処理に接続。
+  var _origVictory = proto.handleVictory;
+  proto.handleVictory = function () {
+    var e = game.enemy;
+    var self = this;
+    var wasLP = !!(e && e.data && e.data.isLastPhaseEventBoss);
+    if (wasLP && game.meltdownUnobservableBattle) { return; } // 初戦は撃破不能（保険）
+    var r = _origVictory.apply(this, arguments);
+    try {
+      if (wasLP) {
+        // 勝利したイベントボスの予約を消す。残すと次のspawnEnemyでも同じ個体が再出現する。
+        game.pendingEventBossId = null;
+        var isRematch = !!(e.data && e.data.id === 70);
+        if (!isRematch) {
+          setTimeout(function () { afterEventBossVictory(self, e); }, 450);
+        }
+        // 2回目メルトダウンは原handleVictoryの撃破登録・責任者不在接続だけで完結させる。
+      }
+      else if (game.postClearObservation) { window.LastPhase.onPostClearVictory(this); }
+      else if (game.preLastPhaseObservation) { checkObservationProgress(this); }
+    } catch (err) {}
+    return r;
+  };
+
+  // handleDefeat：メルトダウン初戦（観測不能）は専用処理へ。
+  var _origDefeatLP = proto.handleDefeat;
+  proto.handleDefeat = function () {
+    if (game.meltdownUnobservableBattle) { onMeltdownUnobservableDefeat(this); return; }
+    return _origDefeatLP.apply(this, arguments);
+  };
+
+  // メルトダウン初戦の戦闘挙動（攻撃ミス・逃走不可・数ターンで強制敗北）。unseeableBattleとは別系統。
+  var _lpAtk = proto.resolvePlayerAttack;
+  proto.resolvePlayerAttack = function () {
+    if (game.meltdownUnobservableBattle) {
+      var self = this;
+      try { audio.attack(); } catch (e) {}
+      var miss = LP.MELTDOWN_FIRST_MISS;
+      var i = (game._mdMissIdx = (game._mdMissIdx || 0)) % miss.length; game._mdMissIdx++;
+      try { if (scene.enemyMesh) this.spawnDamageNumber(scene.enemyMesh.position.clone().setY(scene.enemyMesh.position.y + 1.7), 'MISS', 'miss'); } catch (e) {}
+      try { scene.punch(0.45, 0.2); } catch (e) {}
+      game.battleTurn = 'animating'; this.updateUI();
+      if (typeof this.engineerPrompt === 'function') this.engineerPrompt(miss[i], function () { self.startEnemyTurn(); }, { autoAdvanceMs: 600 });
+      else setTimeout(function () { self.startEnemyTurn(); }, 900);
+      return;
+    }
+    return _lpAtk.apply(this, arguments);
+  };
+  var _lpRun = proto.playerRun;
+  proto.playerRun = function () {
+    if (game.meltdownUnobservableBattle) {
+      var self = this; game.battleTurn = 'animating'; this.updateUI();
+      if (typeof this.engineerPrompt === 'function') this.engineerPrompt('逃げ場がない。\n炉心深部の奥で、出口の方向が消えている。', function () { self.startEnemyTurn(); }, { autoAdvanceMs: 600 });
+      else setTimeout(function () { self.startEnemyTurn(); }, 900);
+      return;
+    }
+    return _lpRun.apply(this, arguments);
+  };
+  var _lpSkill = proto.useSkill;
+  proto.useSkill = function (skillKey) {
+    if (game.meltdownUnobservableBattle) {
+      var self = this; try { this.closeSubMenu && this.closeSubMenu(); } catch (e) {}
+      game.battleTurn = 'animating'; this.updateUI();
+      if (typeof this.engineerPrompt === 'function') this.engineerPrompt('狙いが定まらない。\n見えない中枢に、技だけが空転する。', function () { self.startEnemyTurn(); }, { autoAdvanceMs: 600 });
+      else setTimeout(function () { self.startEnemyTurn(); }, 900);
+      return;
+    }
+    return _lpSkill.apply(this, arguments);
+  };
+  var _lpEnemyAtk = proto.resolveEnemyAttack;
+  proto.resolveEnemyAttack = function (action) {
+    if (game.meltdownUnobservableBattle) {
+      var self = this;
+      var hits = (game._mdHits = (game._mdHits || 0) + 1);
+      var p = game.player;
+      var dmg = hits >= 3 ? Math.max(1, p.hp) : Math.max(1, Math.ceil(p.maxHp / 3));
+      try { audio.damage(); } catch (e) {}
+      var real = p.takeDamage(dmg);
+      game.battleTookDamage = true;
+      try {
+        var flashEl = document.getElementById('screen-flash'); if (flashEl) { flashEl.classList.add('hit'); setTimeout(function () { flashEl.classList.remove('hit'); }, 70); }
+        scene.fxCA(0.014); scene.flashMesh(scene.playerMesh); scene.shake(0.25, 0.22);
+        if (scene.playerMesh && scene.playerMesh.userData && scene.playerMesh.userData.animator) scene.playerMesh.userData.animator.hitFlinch();
+        this.spawnDamageNumber(scene.playerMesh.position.clone().setY(scene.playerMesh.position.y + 1.7), real, 'dmg');
+      } catch (e) {}
+      var hurt = [
+        '見えない反応に、横から削られた。\n何が当たったのかも分からない。',
+        '炉心深部の干渉が強い。\n回避すべき対象が、まだ画面に存在していない。',
+        'これ以上は、立っていられない。\n見えない以上、守りようがない。'
+      ];
+      game.player.tempDef = 0; this.updateUI(); game.battleTurn = 'animating';
+      var line = hurt[Math.min(hits - 1, hurt.length - 1)];
+      var done = function () { if (game.player.hp <= 0) self.handleDefeat(); else self.endEnemyTurn(); };
+      if (typeof this.engineerPrompt === 'function') this.engineerPrompt(line, done, { autoAdvanceMs: 600 });
+      else setTimeout(done, 900);
+      return;
+    }
+    return _lpEnemyAtk.apply(this, arguments);
+  };
+
+  // 真ボスの早期解放を LAST PHASE 中は止める（科学者で65体到達時の暴発防止）。
+  var _origCheckTB = proto.checkTrueBossDexUnlock;
+  if (typeof _origCheckTB === 'function') {
+    proto.checkTrueBossDexUnlock = function () {
+      if (game.lastPhaseStage > 0 && game.lastPhaseStage < 9) return;
+      return _origCheckTB.apply(this, arguments);
+    };
+  }
+
+  // ロード復帰：lastPhaseStage 駆動。各段階のイベントは未到達のときだけ再発火。
+  var _origResume = proto._resumePhaseEvent;
+  proto._resumePhaseEvent = function (phase) {
+    var self = this;
+    try {
+      if (game.postClearObservation) {
+        setTimeout(function () {
+          try { self.showCenterMessage('観測モード', '残存個体の観測を継続。', 2200); } catch (e) {}
+        }, 500);
+        return;
+      }
+      // 旧セーブのphase7観測区間は、先にLAST PHASEへ移してから観測を再開する。
+      if (game.preLastPhaseObservation && phase < 8) {
+        game.preLastPhaseObservation = false;
+        setTimeout(function () { descend(self); }, 600);
+        return;
+      }
+      if (phase === 8) {
+        var s = game.lastPhaseStage || 0;
+        if (game.preLastPhaseObservation || s === 0) { setTimeout(function () { beginObservationInterval(self); }, 600); return; }
+        refreshEmotionMasks();
+        setTimeout(function () {
+          if (s === 1) queueEventBoss(self, 65, LP.TOCHIJI_PRE, { title: '都市連携中枢' });
+          else if (s === 2) queueEventBoss(self, 58, LP.KAGAKU_PRE, { title: '感情処理設計記録' });
+          else if (s === 3) queueEventBoss(self, 70, LP.MELTDOWN_FIRST_PRE, { title: '未確認中枢反応', unobservable: true });
+          else if (s === 4 || s === 5) playCitizenHeart(self);
+          else if (s === 6) queueEventBoss(self, 57, LP.KUCHO_PRE, { title: '行政遮断要求' });
+          else if (s === 7 || s === 8) queueEventBoss(self, 70, LP.MELTDOWN_REMATCH_PRE, { title: 'メルトダウン 再観測' });
+          else if (s === 9 && game.meltdownDefeated) {
+            // 旧不具合で撃破済みのままphase8に残ったセーブは、再戦させず撃破後演出へ復帰する。
+            game.meltdownTransitionActive = true;
+            if (typeof self.playMeltdownToTrueBossSequence === 'function') {
+              self.playMeltdownToTrueBossSequence();
+            } else {
+              game.meltdownTransitionActive = false;
+              game.finalBossPending = false;
+              game.finalBossUnlocked = true;
+              self.enterNamelessCoreZone();
+              self.spawnEnemy();
+            }
+          }
+        }, 600);
+        return;
+      }
+    } catch (e) {}
+    return _origResume.apply(this, arguments);
+  };
+
+  // handleClear 後：未観測個体が残るなら勝利画面に「観測を続ける」を出す。
+  var _origClear = proto.handleClear;
+  proto.handleClear = function () {
+    var r = _origClear.apply(this, arguments);
+    try {
+      if (game.state === 'COMPLETE') {
+        var obs = document.getElementById('win-observe');
+        if (obs && dexCount() < 70) {
+          setTimeout(function () { obs.style.display = ''; }, 2400);
+        }
+      }
+    } catch (e) {}
+    return r;
+  };
+
+  /* DOM配線 */
+  function wireUI() {
+    try {
+      installEmotionGlitch();
+      var obs = document.getElementById('win-observe');
+      if (obs && !obs.__wired) {
+        obs.__wired = true;
+        obs.addEventListener('click', function () {
+          try { audio.click(); } catch (e) {}
+          var c = window.controller || (window.game && window.game.controller) || null;
+          if (c) window.LastPhase.enterPostClearObservation(c);
+        });
+      }
+      refreshEmotionMasks();
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireUI);
+  else wireUI();
+
+})();
+
+</script>
 
 </body>
 </html>
